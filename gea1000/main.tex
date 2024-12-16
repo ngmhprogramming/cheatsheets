@@ -1,0 +1,444 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\setlist{nosep}
+
+\pdfinfo{
+  /Title (GEA.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{GEA1000}}
+            \\ \normalsize{AY24/25 Sem 1}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{1. Getting Data}
+\subsection{Exploratory Data Analysis}
+\begin{itemize}
+    \item Population: Entire group (of individuals or objects) that we wish to know something about.
+    \item Research Question: Question that investigates characteristic of a population.
+    \begin{itemize}
+        \item Make an estimate about the population.
+        \item Test a claim about the population.
+        \item Compare two sub-populations / investigate a relationship between two variables in the population.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Sampling}
+\begin{itemize}
+    \item Population of Interest: Group which we have interest in drawing conclusion on.
+    \item Population Parameter: Numerical fact about a population.
+    \item Census: Attempt to reach out to the entire population of interest.
+    \item Sample: Proportion of population selected in the study.
+    \item Estimate: Inference about the population parameter based on information obtained from sample.
+    \item Sampling Frame: List from which the sample was obtained.
+    \item Generalisability: Application of results from sample to general population. Should strive to:
+    \begin{itemize}
+        \item Have a sampling frame large than or equal to the population.
+        \item Adopt probability based sampling to minimise selection bias.
+        \item Have a large sample size to reduce variability or random errors.
+        \item Minimise non-response rate.
+    \end{itemize}
+    \item Biasness: Affects generalisability.
+    \begin{itemize}
+        \item Selection Bias: Imperfect sampling frame, resulting in exclusion of units.
+        \item Non-Response Bias: Participant's unwillingness, results in exclusion of information.
+    \end{itemize}
+    \item Probability Sampling: Select units using a randomised mechanism.
+    \begin{itemize}
+        \item Simple Random Sampling: Every unit has equal chance to be chosen, without replacement. Good representation, but time consuming.
+        \item Systematic Sampling: Apply a fixed selection interval $k$, then choose every $kth$ unit from a fixed offset. Simple selection process, but could under-represent population.
+        \item Stratified Sampling: Divide sampling frame into groups (strata). Each stratum should have similar characteristics. Apply simple random sampling to each stratum. Good representation, but might be hard to define stratum.
+        \item Cluster Sampling: Divide sampling frame into clusters. Choose entire clusters using simple random sampling. Less time-consuming, but could see high variability if clusters are not similar.
+    \end{itemize}
+    \item Non-Probability Sampling: Selection without randomisation.
+    \begin{itemize}
+        \item Convenience Sampling: Choose subjects most easily available. Introduces selection bias, might suffer from non-response bias as well.
+        \item Volunteer Sampling: Subjects volunteer, could be unrepresentative.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Variables}
+\begin{itemize}
+    \item Variable: Attribute that can be measured or labeled.
+    \item Data Set: Collection of individuals and variables.
+    \item Independent Variable: Subjected to manipulation.
+    \item Dependent Variable: Hypothesised to change due to manipulation of independent variables.
+    \item Types of Variables:
+    \begin{itemize}
+        \item Categorical: Take on categories or label values. Ordinal variables have natural ordering, as opposed to Nominal variables.
+        \item Numerical: Take on numerical values, can meaningfully perform mathematical operations. Discrete variables have gaps in the set of possible values, as opposed to continuous.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Summary Statistics}
+\begin{itemize}
+    \item Allow us to perform numerical or quantitative comparisons between groups of data.
+    \item Measure central tendencies (mean / median / mode), or spread (variance / standard deviation).
+    \begin{itemize}
+        \item Mean: $\bar{x}=\frac{x_1+...+x_n}{n}$. Average value of numerical variable. Can be calculated on subgroups and combined through weighted average.
+        \item Proportion: Consider fractions, rather than absolute values.
+        \item Sample Variance: $Var = \frac{(x_1-\bar{x})^2+...(x_n-\bar{x})^2}{n-1}$. $s_x=\sqrt{Var}$. Dividing by $n-1$ is to account for correction in a sample v/s population.
+        \item Coefficient of Variation: $cv=\frac{s_x}{\bar{x}}$. Used to quantify spread of data relative to mean, has no units.
+        \item Median: Middle number in sorted list of data points. Mean of middle 2 numbers if even size. Median of sample must lie between lowest and highest subgroups.
+        \item $Q_1$: $25$th percentile, $Q_3$: $75$th percentile. Split data points in lower and upper half, then find median. If odd number, exclude middle in halves.
+        \item Interquartile Range: $IQR = Q_3-Q_1$.
+        \item Mode: Value that appears the most often.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Study Design}
+\subsubsection{Experimental Study}
+\begin{itemize}
+    \item Manipulate independent variable to observe possible effects on dependent variable, to find evidence for a cause-and-effect relationship.
+    \item Separate Sample into Treatment Group v/s Control Group
+    \item Random Assignment: Use chance to allocate subjects into treatment and control groups. By law of probability, if the number of subjects is large, subjects in both groups will tend to be similar in all aspects.
+    \item Assignment could lead to overstating or understanding of actual effects, due to bias.
+    \item Placebo: Inactive substance or intervention that looks the same as actual treatment. Can cause plcaebo effect.
+    \item Subject Blinding: Give control group placebo so that subjects do not know which group they are in.
+    \item Assessor Blinding: Do not let assessors know which group the subjects they are grading are from.
+\end{itemize}
+\subsubsection{Observational Study}
+\begin{itemize}
+    \item Observes individuals and measures variables of interest, without direct manipulation of variables, might not provided covincing evidence for cause-and-effect.
+    \item Can be used when ethical issues are present.
+    \item Describe as Exposure and Non-Exposure group instead, where subjects self-assign.
+\end{itemize}
+
+\section{2. Categorical Data Analysis}
+\subsection{Rates}
+\begin{itemize}
+    \item Proportion of Sample.
+    \item Marginal Rate: Rate relating to one variable.
+    \item Conditional Rate: $A$ given $B = rate(A|B) = \frac{rate(A \cap B)}{rate(B)}$.
+    \item Joint Rate: Rate of two variables, e.g. $rate(A \cap B)$.
+    \item Symmetry Rule:
+    \begin{itemize}
+        \item $rate(A|B)>rate(A|NB)\leftrightarrow rate(B|A)>rate(B|NA)$.
+        \item $rate(A|B)<rate(A|NB)\leftrightarrow rate(B|A)<rate(B|NA)$.
+        \item $rate(A|B)=rate(A|NB)\leftrightarrow rate(B|A)=rate(B|NA)$.
+    \end{itemize}
+    \item Basic Rule:
+    \begin{itemize}
+        \item $rate(A)$ lies between $rate(A|B)$ and $rate(A|NB)$.
+        \item The closer $rate(B)$ is to 1, the closer $rate(A)$ is to $rate(A|NB)$.
+        \item If $rate(B)=50\%$, then $rate(A)=\frac{1}{2}[rate(A|B)+rate(A|NB)]$.
+        \item If $rate(A|B)=rate(A|NB)$ then $rate(A)=rate(A|B)=rate(A|NB)$.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Association}
+\begin{itemize}
+    \item Association $\neq$ Causation.
+    \item Positive Association: $rate(A|B)>rate(A|NB)$, $rate(B|A)>rate(B|NA)$, $rate(NA|NB)>rate(NA|B)$, $rate(NB|NA)>rate(NB|A)$.
+    \item Negative Association: Opposites of all above.
+    \item There are other things we can compare to show association between $A$ and $B$ such as $NA$ and $NB$.
+\end{itemize}
+
+\subsection{Simpson's Paradox}
+\begin{itemize}
+    \item Trend in strictly more than half of subgroups disappears or reverses when groups are combined.
+    \item Implies that there is a confounder present.
+\end{itemize}
+
+\subsection{Confounders}
+\begin{itemize}
+    \item External variable associated with the two variables being investigated.
+    \item Managed by segregating data by the confounding variable.
+    \item Measure and collect data on additional variables that might be relevant.
+    \item Can perform randomised assignment to remove association between treatment and confounder.
+\end{itemize}
+
+\section{3. Dealing with Numerical Data}
+\subsection{Univariate EDA}
+\subsubsection{Describing Distributions}
+\begin{itemize}
+    \item Histogram: Sort data points into ranges or bins.
+    \item Shape: Peaks and Skewness.
+    \begin{itemize}
+        \item Unimodal distribution has 1 distinct peak, compared to multimodal with more than 1 peak.
+        \item Symmetrical: Left and right halves of the distribution are approximately mirror images.
+        \item Skewed: Peak shifted to side. Right Skewed: Tail on right, Left Skewed: Tail on left.
+        \item Central Tendency: Mean, Median, Mode. Left Skewed: $mean < median < mode$, Right Skewed: $mode < median < mean$ in general.
+        \item Spread: Standard Deviation and Range.
+        \item Outlier: Falls well above of below most data points. Should not be removed unnecessarily.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Box Plots}
+\begin{itemize}
+    \item Use 5 Number Summary: Minimum, $Q_1$, Median, $Q_3$, and Maximum.
+    \item Outlier: $> Q_3+1.5 \times IQR$, or $< Q_1-1.5 \times IQR$.
+    \item Draw box from $Q_1$ to $Q_3$.
+    \item Draw vertical line at median.
+    \item Draw lines (whiskers) from $Q_1$ and $Q_3$ to the most extreme data points which are not outliers.
+    \item Mark outliers with dots or asterisks.
+\end{itemize}
+
+\subsection{Bivariate EDA}
+\begin{itemize}
+    \item Statistical Relationship: Non-deterministic. Given one variable, can find average value of another variable, unlike deterministic where we can find exact value.
+    \item Plot using scatter plot.
+    \item Compare level of linear association using correlation coefficient.
+    \item Fit best fit line or curve by performing regression analysis.
+\end{itemize}
+
+\subsubsection{Describing Bivariate Relationships}
+\begin{itemize}
+    \item Direction: Positive relationship: Both increase at the same time, Negative relationship: Both change in opposite directions.
+    \item Form: Shape of scatter plot, e.g. linear or non-linear (e.g. quadratic or exponential).
+    \item Strength: How closely data follows form of relationship.
+\end{itemize}
+
+\subsubsection{Correlation Coefficient}
+\begin{itemize}
+    \item Measure of linear association.
+    \item Ranges from -1 to 1.
+    \item Sign tells us about direction of association.
+    \item Magnitude tells us about strength of association. Weak: 0 to 0.3, Moderate: 0.3 to 0.7, Strong: 0.7 to 1.
+    \item Computation:
+    \begin{itemize}
+        \item Find mean and SD of $x$ and $y$.
+        \item Convert into standard units, using $\frac{x-\bar{x}}{s_x}$.
+        \item Compute $xy$ for each for each data point.
+        \item Then $r=\frac{\sum xy}{n-1}$.
+        \item $r$ is not affected by interchanging axes, or adding / multiplying all data points by a constant.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Fallacies}
+\begin{itemize}
+    \item Ecological: Using ecological / aggregate level correlation to conclude about individual level correlation.
+    \item Atomistic: Using individual level correlation to conclude about ecological / aggregate level correlation.
+\end{itemize}
+
+\subsubsection{Linear Regression}
+\begin{itemize}
+    \item Fit data points to linear model, then use this model to predict data points.
+    \item Least Squares: Find line that minimises sum of squared error between $y$ values.
+    \item Regression line will always pass through averages for data set.
+    \item Line has the form $Y=mX+b$, where $m=\frac{s_Y}{s_X}r$.
+    \item Regression cannot be applied to data outside of the range.
+    \item Exponential relationships: ln on both sides to model it as a linear relationship.
+\end{itemize}
+
+\section{4. Statistical Inference}
+\subsection{Probability}
+\begin{itemize}
+    \item Mathematical  means to reason about uncertainty.
+    \item Outcomes: Set of possibilities of probability experiment.
+    \item Must be repeatable and allowing for listing of all possible outcomes.
+    \item Sample Space: Collection of all possible outcomes of a probability experiment.
+    \item Event: Sub-collection of sample space.
+    \item An outcome is an event, but an event is not necessarily an outcome.
+    \item Probability of event is the total probability that outcome of experiment is an element of event.
+    \item Rules of Probability
+    \begin{itemize}
+        \item $0 \leq P(E) \leq 1$ where $E$ is an event.
+        \item $P(S)=1$ where $S$ is the entire sample space.
+        \item If $E$ and $F$ are mutually exclusive, $P(E \cup F)=P(E)+P(F)$.
+    \end{itemize}
+    \item Uniform Probability: Every outcome has an equal probability in the sample space.   
+\end{itemize}
+
+\subsection{Conditional Probability and Independence}
+\begin{itemize}
+    \item If $E$ and $F$ cannot happen together, then $P(E|F)=0$. This is also true if $P(F)$ = 0.
+    \item For two independent events, $P(A \cap B)=P(A)\cdot P(B)$. The probability of one happening does not affect the probability of the other.
+    \item Two events are conditionally independent given a 3rd event if $P(A \cap B|C)=P(A|C)\cdot P(B|C)$.
+    \item Law of Total Probability: If $E$, $F$, $G$ are events from a sample space where $E$ and $F$ are mutually exclusive, and $E \cup F = S$, then $P(G)=P(G|E) \cdot P(E) + P(G|F) \cdot P(F)$.
+\end{itemize}
+
+\subsection{Fallacies}
+\begin{itemize}
+    \item Prosecutor's Fallacy: Wrongly assuming that $P(A|B)=P(B|A)$.
+    \item Conjunction Fallacy: Believing that $P(A \cap B) > P(A)$ or $P(A \cap B) > P(B)$. In reality, the opposite is true.
+    \item Base Rate Fallacy: Information about rate of occurence (base rate information) is ignored or not given appropriate weight. Example: Given low chance of falsely detecting drunk drivers, always accurately detecting drunk drivers, and a low chance of actual drunk driving, assuming that the probability a person is drunk given a positive result is high.
+\end{itemize}
+
+\subsection{Medical Testing}
+\begin{itemize}
+    \item True Positive Rate / Sensitivity: $P(Test Postive | Infected)$.
+    \item True Negative Rate / Specificity: $P(Test Negative | Not Infected)$.
+    \item Use contingency table to tabulate.
+\end{itemize}
+
+\subsection{Random Variables}
+\begin{itemize}
+    \item Numerical variable with probabilities assigned to each possible value.
+    \item Can be discrete or continuous.
+    \item Continuous random variables can be plotted with density curves. Probability of a range of values is then the integral / area under the graph.
+\end{itemize}
+
+\subsection{Statistical Inference}
+\begin{itemize}
+    \item Drawing inferences or conclusions about the population in question.
+    \item Sample Statistic = Population Parameter + Bias + Random Error. Ideally, Sample Statistic should be as close to Population Parameter as possible.
+    \item Fundamental Rule: Available data can be used to make inferences about a much larger group if the data can be considered to be representative with regards to the question of interest.
+    \item Good sampling methods and practices can reduce bias to an insignificant level.
+\end{itemize}
+
+\subsection{Confidence Interval}
+\begin{itemize}
+    \item Range of values that is likely to contain a population parameter based on a certain degree of confidence (confidence level).
+    \item Population Proportion: Proportion of population fulfilling a certain criteria. To construct the confidence interval, use $p^* \pm z^* \times \sqrt{\frac{p^*(1-p^*)}{n}}$, where $p^*$ is sample proportion, $z^*$ is z-value from a standard normal distribution, and $n$ is the sample size. The $\pm$ part is the margin of error.
+    \item We are $x\%$ confident  that the population parameter lies within the confidence interval. If many simple random samples of the same size are taken, and a confidence interval is constructed for each of them, $x\%$ of the confidence intervals constructed would contain the population parameter.
+    \item Confidence intervals cannot give us an exact value. Uncertainty arises from sampling, not value of population parameter.
+    \item Smaller sample size: Larger random error, wider confidence interval.
+    \item When the confidence level is higher, the confidence interval is wider.
+    \item Population Mean: $\bar{x}\pm t^* \times \frac{s}{\sqrt{n}}$, where $\bar{x}$ is sample mean, $t^*$ is t-value from t-distribution, $s$ is sample standard deviation, and $n$ is sample size.
+\end{itemize}
+
+\subsection{Hypothesis Testing}
+\begin{itemize}
+    \item Hypothesis Test: Statistical inference method to decide if data from a random sample is sufficient to support a particular hypothesis about a population.
+    \item Steps:
+    \begin{itemize}
+        \item Identify question, state null and alternative hypotheses.
+        \item Set significance level; a measurement of threshold for determining if deviation can be explained by chance.
+        \item Find the relevant sample statistic.
+        \item Calculate the p-value.
+        \item Make a conclusion based on the p-value and significance level.
+    \end{itemize}
+    \item p-value: Probability of obtaining a result as extreme or more extreme than our observation in the direction of the alternative hypothesis, assuming the null hypothesis is true.
+    \item When p-value < significance level, we have sufficient evidence to reject the null hypothesis in favour of the alternative hypothesis.
+    \item When p-value $\geq$ significance level, we have insufficient evidence to reject the null hypothesis. The hypothesis is inconclusive. This does not mean that we accept the null hypothesis.
+\end{itemize}
+
+\subsubsection{Hypothesis Test for Population Proportion}
+\begin{itemize}
+    \item Null Hypothesis: $H_0: p=0.5$.
+    \item Alternative Hypothesis: $H_1:p<0.5$.
+\end{itemize}
+
+\subsubsection{Hypothesis Test for Sample Mean}
+\begin{itemize}
+    \item Null Hypothesis: $H_0: \mu = 69$.
+    \item Alternative Hypothesis: $H_1:\mu >69$.
+\end{itemize}
+
+\subsubsection{Hypothesis Test for Association}
+\begin{itemize}
+    \item Use a chi-square test.
+    \item Null Hypothesis: There is no association between A and B at the population level.
+    \item Alternative Hypothesis: There is an association between A and B at the population level.
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{dash.png}
+    \item pls give me A+ dash thanks
+\end{center}
+
+\end{multicols*}
+
+\end{document}

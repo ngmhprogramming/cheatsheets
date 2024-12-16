@@ -1,0 +1,591 @@
+\documentclass[5pt, portrait]{article}
+\pagestyle{empty}
+\usepackage[scaled=0.92]{helvet}
+\usepackage[a4paper,margin=5mm,portrait]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\renewcommand{\baselinestretch}{0.5}
+\usepackage{titlesec}
+\titlespacing\section{0pt}{0pt}{0pt}
+\titlespacing\subsection{0pt}{0pt}{0pt}
+\titlespacing\subsubsection{0pt}{0pt}{0pt}
+
+\makeatletter
+\def\verbatim{\small\@verbatim \frenchspacing\@vobeyspaces \@xverbatim}
+\makeatother
+
+\begin{document}
+
+\section{Maybe}
+\begin{verbatim}
+static <T> Maybe<T> of(T val)
+\end{verbatim}
+\begin{verbatim}
+Creates a Maybe<T> with the given content val if val is not null.
+Otherwise, returns the shared instance of None<?>.
+\end{verbatim}
+
+\begin{verbatim}
+static <T> Maybe<T> some(T val)
+\end{verbatim}
+\begin{verbatim}
+Creates a Maybe<T> with the given content val which may be null.
+\end{verbatim}
+
+\begin{verbatim}
+static <T> Maybe<T> none()
+\end{verbatim}
+\begin{verbatim}
+Creates a Maybe<T> without any content, this is guaranteed to return the shared instance of None<?>.
+\end{verbatim}
+
+\begin{verbatim}
+String toString()
+\end{verbatim}
+\begin{verbatim}
+Returns the string representation of Maybe<T>.
+\end{verbatim}
+
+\begin{verbatim}
+boolean equals(Object obj)
+\end{verbatim}
+\begin{verbatim}
+Maybe<T>: Returns true if the content is equal to the content of obj. Otherwise returns false.
+None<T>: Returns true if obj is also None<T>. Otherwise returns false.
+\end{verbatim}
+
+\begin{verbatim}
+<U> Maybe<U> map
+(Transformer<? super T, ? extends U> fn)
+\end{verbatim}
+\begin{verbatim}
+Maybe<T>: Create a new instance of Maybe<T> by applying the transformer fn to the content and wrapping
+it in Maybe<T>. It will never return None<T> to allow for our InfiniteList<T> to contain null.
+None<T>: Returns None<T>.
+\end{verbatim}
+
+\begin{verbatim}
+Maybe<T> filter
+(BooleanCondition<? super T> pred)
+\end{verbatim}
+\begin{verbatim}
+Maybe<T>: If the content is not null and pred.test(content) returns true, we return the current instance.
+Otherwise, returns None<T>.
+None<T>: Returns None<T>.
+\end{verbatim}
+
+\begin{verbatim}
+<U> Maybe<U> flatmap
+(Transformer<? super T, ? extends Maybe<? extends U>> fn)
+\end{verbatim}
+\begin{verbatim}
+Maybe<T>: Create a new instance of Maybe<T> by applying the transformer fn to the content without
+wrapping it in Maybe<T> as fn already returns Maybe<U>.
+None<T>: Returns None<T>.
+\end{verbatim}
+
+\begin{verbatim}
+T orElse(Producer<? extends T> prod)
+\end{verbatim}
+\begin{verbatim}
+Maybe<T>: Returns the content (even if it is null).
+None<T>: Returns the value produced by the producer prod.
+\end{verbatim}
+
+\begin{verbatim}
+void ifPresent(Consumer<? super T> cons)
+\end{verbatim}
+\begin{verbatim}
+Maybe<T>: Pass the content to the consumer cons.
+None<T>: Do nothing.
+\end{verbatim}
+
+\section{Lazy}
+\begin{verbatim}
+static <T> Lazy<T> of(T val)
+\end{verbatim}
+\begin{verbatim}
+Creates a Lazy<T> with the given content val already evaluated.
+\end{verbatim}
+
+\begin{verbatim}
+static <T> Lazy<T> of(Producer<? extends T> prod)
+\end{verbatim}
+\begin{verbatim}
+Creates a Lazy<T> with the content not yet evaluated and will be evaluated using the given producer.
+\end{verbatim}
+
+\begin{verbatim}
+boolean equals(Object obj)
+\end{verbatim}
+\begin{verbatim}
+Returns true if the content is equal to the content of obj. Otherwise returns false.
+This forces evaluation of the content.
+\end{verbatim}
+
+\begin{verbatim}
+<U> Lazy<U> map
+(Transformer<? super T, ? extends U> fn)
+\end{verbatim}
+\begin{verbatim}
+Lazily maps the content using the given transformer.
+\end{verbatim}
+
+\begin{verbatim}
+Lazy<Boolean> filter
+(BooleanCondition<? super T> pred)
+\end{verbatim}
+\begin{verbatim}
+Lazily test if the value passes the test or not and returns a Lazy<Boolean> to indicate the result.
+\end{verbatim}
+
+\begin{verbatim}
+<U> Lazy<U> flatMap
+(Transformer<? super T, ? extends Lazy<? extends U>> fn)
+\end{verbatim}
+\begin{verbatim}
+Lazily creates a new instance of Lazy<T> by applying the transformer fn to the content without
+wrapping it in another Lazy<..>.
+\end{verbatim}
+
+\begin{verbatim}
+<U, V> Lazy<V> combine
+(Lazy<? extends U> lazy, Combiner<? super T, ? super U, ? extends V> fn)
+\end{verbatim}
+\begin{verbatim}
+Combine this with lazy using Combiner by invoking fn.combine(this.get(), lazy.get()).
+Then we wrap the result back in Lazy.
+\end{verbatim}
+
+\begin{verbatim}
+T get()
+\end{verbatim}
+\begin{verbatim}
+Evaluates (if not yet evaluated, otherwise do not evaluate again) and returns the content.
+\end{verbatim}
+
+\section{Optional}
+\begin{verbatim}
+static <T> Optional<T> empty()
+\end{verbatim}
+\begin{verbatim}
+Returns an empty Optional instance.
+\end{verbatim}
+
+\begin{verbatim}
+boolean equals(Object obj)
+\end{verbatim}
+\begin{verbatim}
+Indicates whether some other object is "equal to" this Optional.
+\end{verbatim}
+
+\begin{verbatim}
+Optional<T> filter(Predicate<? super T> predicate)
+\end{verbatim}
+\begin{verbatim}
+If a value is present, and the value matches the given predicate, return an Optional describing the value,
+otherwise return an empty Optional.
+\end{verbatim}
+
+\begin{verbatim}
+<U> Optional<U> flatMap(Function<? super T,Optional<U>> mapper)
+\end{verbatim}
+\begin{verbatim}
+If a value is present, apply the provided Optional-bearing mapping function to it, return that result,
+otherwise return an empty Optional.
+\end{verbatim}
+
+\begin{verbatim}
+T get()
+\end{verbatim}
+\begin{verbatim}
+If a value is present in this Optional, returns the value, otherwise throws NoSuchElementException.
+\end{verbatim}  
+
+\begin{verbatim}
+void ifPresent(Consumer<? super T> consumer)
+\end{verbatim}
+\begin{verbatim}
+If a value is present, invoke the specified consumer with the value, otherwise do nothing.
+\end{verbatim}  
+
+\begin{verbatim}
+<U> Optional<U> map(Function<? super T,? extends U> mapper)
+\end{verbatim}
+\begin{verbatim}
+If a value is present, apply the provided mapping function to it, and if the result is non-null,
+return an Optional describing the result.
+\end{verbatim}  
+
+\begin{verbatim}
+static <T> Optional<T> of(T value)
+\end{verbatim}
+\begin{verbatim}
+Returns an Optional with the specified present non-null value.
+\end{verbatim}  
+
+\begin{verbatim}
+T orElse(T other)
+\end{verbatim}
+\begin{verbatim}
+Return the value if present, otherwise return other.
+\end{verbatim}  
+
+\begin{verbatim}
+T orElseGet(Supplier<? extends T> other)
+\end{verbatim}
+\begin{verbatim}
+Return the value if present, otherwise invoke other and return the result of that invocation.
+\end{verbatim}  
+
+\begin{verbatim}
+String toString()
+\end{verbatim}
+\begin{verbatim}
+Returns a non-empty string representation of this Optional suitable for debugging.
+\end{verbatim}  
+
+\section{Stream}
+\begin{verbatim}
+boolean allMatch(Predicate<? super T> predicate)
+boolean anyMatch(Predicate<? super T> predicate)
+boolean noneMatch(Predicate<? super T> predicate)
+\end{verbatim}
+\begin{verbatim}
+Returns whether all / any / none elements of this stream match the provided predicate.
+\end{verbatim} 
+
+\begin{verbatim}
+static <T> Stream<T> concat(Stream<? extends T> a, Stream<? extends T> b)
+\end{verbatim}
+\begin{verbatim}
+Creates a lazily concatenated stream, all of first then all of second.
+\end{verbatim} 
+
+\begin{verbatim}
+long count()
+\end{verbatim}
+\begin{verbatim}
+Returns the count of elements in this stream.
+\end{verbatim} 
+
+\begin{verbatim}
+Stream<T> distinct()
+\end{verbatim}
+\begin{verbatim}
+RReturns a stream consisting of the distinct elements (according to Object.equals(Object)) of this stream.
+\end{verbatim} 
+
+\begin{verbatim}
+static <T> Stream<T> empty()
+\end{verbatim}
+\begin{verbatim}
+Returns an empty sequential Stream.
+\end{verbatim} 
+
+\begin{verbatim}
+Stream<T> filter(Predicate<? super T> predicate)
+\end{verbatim}
+\begin{verbatim}
+Returns a stream consisting of the elements of this stream that match the given predicate.
+\end{verbatim} 
+
+\begin{verbatim}
+Optional<T> findAny()
+Optional<T> findFirst()
+\end{verbatim}
+\begin{verbatim}
+Returns an Optional describing some / first element of the stream, or an empty Optional if the stream is empty.
+\end{verbatim} 
+
+\begin{verbatim}
+<R> Stream<R> flatMap(Function<? super T,? extends Stream<? extends R>> mapper)
+\end{verbatim}
+\begin{verbatim}
+Returns a stream consisting of the results of applying the provided mapping function to each element.
+\end{verbatim} 
+
+\begin{verbatim}
+void forEach(Consumer<? super T> action)
+\end{verbatim}
+\begin{verbatim}
+Performs an action for each element of this stream.
+\end{verbatim} 
+
+\begin{verbatim}
+static <T> Stream<T> generate(Supplier<T> s)
+\end{verbatim}
+\begin{verbatim}
+Returns an infinite sequential unordered stream where each element is generated by the provided Supplier.
+\end{verbatim} 
+
+\begin{verbatim}
+static <T> Stream<T> iterate(T seed, UnaryOperator<T> f)
+\end{verbatim}
+\begin{verbatim}
+Returns an infinite sequential ordered Stream produced by iterative application of a function f to an initial element seed.
+\end{verbatim} 
+
+\begin{verbatim}
+Stream<T> limit(long maxSize)
+\end{verbatim}
+\begin{verbatim}
+Returns a stream consisting of the elements of this stream, truncated to be no longer than maxSize in length.
+\end{verbatim} 
+
+\begin{verbatim}
+<R> Stream<R> map(Function<? super T,? extends R> mapper)
+\end{verbatim}
+\begin{verbatim}
+Returns a stream consisting of the results of applying the given function to the elements of this stream.
+\end{verbatim} 
+
+\begin{verbatim}
+Optional<T> max(Comparator<? super T> comparator)
+Optional<T> min(Comparator<? super T> comparator)
+\end{verbatim}
+\begin{verbatim}
+Returns the maximum / minimum element of this stream according to the provided Comparator.
+\end{verbatim} 
+
+\begin{verbatim}
+static <T> Stream<T> of(T... values)
+\end{verbatim}
+\begin{verbatim}
+Returns a sequential ordered stream whose elements are the specified values.
+\end{verbatim} 
+
+\begin{verbatim}
+Stream<T> peek(Consumer<? super T> action)
+\end{verbatim}
+\begin{verbatim}
+Returns a stream consisting of the elements of this stream, performing the provided action on each element.
+\end{verbatim} 
+
+\begin{verbatim}
+T reduce(T identity, BinaryOperator<T> accumulator)
+<U> U reduce(U identity, BiFunction<U,? super T,U> accumulator, BinaryOperator<U> combiner)
+\end{verbatim}
+\begin{verbatim}
+Performs a reduction on the elements of this stream, using the provided identity, accumulation and combining functions.
+\end{verbatim} 
+
+\begin{verbatim}
+Stream<T> skip(long n)
+\end{verbatim}
+\begin{verbatim}
+Returns a stream consisting of the remaining elements of this stream after discarding the first n elements of the stream.
+\end{verbatim} 
+
+\begin{verbatim}
+Stream<T> sorted(Comparator<? super T> comparator)
+\end{verbatim}
+\begin{verbatim}
+Returns a stream consisting of the elements of this stream, sorted according to the provided Comparator.
+\end{verbatim} 
+
+\begin{verbatim}
+List<Object> toList()
+\end{verbatim}
+\begin{verbatim}
+Returns a List containing the elements of this stream.
+\end{verbatim} 
+
+\section{List}
+\begin{verbatim}
+boolean add(E e)
+\end{verbatim}
+\begin{verbatim}
+Appends the specified element to the end of this list (optional operation).
+\end{verbatim}
+
+\begin{verbatim}
+boolean addAll(Collection<? extends E> c)
+\end{verbatim}
+\begin{verbatim}
+Appends all of the elements in the specified collection to the end of this list in order.
+\end{verbatim}
+
+\begin{verbatim}
+void clear()
+\end{verbatim}
+\begin{verbatim}
+Removes all of the elements from this list (optional operation).
+\end{verbatim}
+
+\begin{verbatim}
+boolean contains(Object o)
+boolean containsAll(Collection<?> c)
+\end{verbatim}
+\begin{verbatim}
+Returns true if this list contains the / all specified element.
+\end{verbatim}
+
+\begin{verbatim}
+static <E> List<E> copyOf(Collection<? extends E> coll)
+\end{verbatim}
+\begin{verbatim}
+Returns an unmodifiable List containing the elements of the given Collection, in its iteration order.
+\end{verbatim}
+
+\begin{verbatim}
+boolean equals(Object o)
+\end{verbatim}
+\begin{verbatim}
+Compares the specified object with this list for equality.
+\end{verbatim}
+
+\begin{verbatim}
+E get()
+\end{verbatim}
+\begin{verbatim}
+Returns the element at the specified position in this list.
+\end{verbatim}
+
+\begin{verbatim}
+int indexOf(Object o)
+\end{verbatim}
+\begin{verbatim}
+Returns the index of the first occurrence of the specified element in this list, or -1 if not found.
+\end{verbatim}
+
+\begin{verbatim}
+boolean isEmpty()
+\end{verbatim}
+\begin{verbatim}
+Returns true if this list contains no elements.
+\end{verbatim}
+
+\begin{verbatim}
+static <E> List<E> of()
+static <E> List<E> of(E... elements)
+\end{verbatim}
+\begin{verbatim}
+Returns an unmodifiable list containing an arbitrary number of elements.
+\end{verbatim}
+
+\begin{verbatim}
+E remove(int index)
+\end{verbatim}
+\begin{verbatim}
+Removes the element at the specified position in this list (optional operation).
+\end{verbatim}
+
+\begin{verbatim}
+E set(int index, E element)
+\end{verbatim}
+\begin{verbatim}
+Replaces the element at the specified position in this list with the specified element (optional operation).
+\end{verbatim}
+
+\begin{verbatim}
+int size()
+\end{verbatim}
+\begin{verbatim}
+Returns the number of elements in this list.
+\end{verbatim}
+
+\begin{verbatim}
+default void sort(Comparator<? super E> c)
+\end{verbatim}
+\begin{verbatim}
+Sorts this list according to the order induced by the specified Comparator.
+\end{verbatim}
+
+\begin{verbatim}
+default Stream<E> stream()
+\end{verbatim}
+\begin{verbatim}
+Returns a sequential Stream with this collection as its source.
+\end{verbatim}
+
+\section{Producer}
+\begin{verbatim}
+Producer<T>
+T produce(CreationalContext<T> ctx)
+\end{verbatim}
+\begin{verbatim}
+Causes an instance to be produced via the Producer.
+\end{verbatim}
+
+\section{Consumer}
+\begin{verbatim}
+Consumer<T>
+void accept(T t)
+\end{verbatim}
+\begin{verbatim}
+Performs this operation on the given argument.
+\end{verbatim}
+
+\section{Bifunction}
+\begin{verbatim}
+Bifunction<T, U, R>
+R apply(T t, U u)
+\end{verbatim}
+\begin{verbatim}
+Applies this function to the given arguments.
+\end{verbatim}
+
+\section{Functional Interface}
+\begin{verbatim}
+@FunctionalInterface
+\end{verbatim}
+\begin{verbatim}
+An interface with only one abstract method.
+\end{verbatim}
+
+
+
+\section{Comparable}
+\begin{verbatim}
+int compareTo(T o)
+\end{verbatim}
+\begin{verbatim}
+Compares this object with the specified object for order.
+\end{verbatim}
+
+\section{Comparator}
+\begin{verbatim}
+int compare(T o1, T o2)
+\end{verbatim}
+\begin{verbatim}
+Compares its two arguments for order.
+\end{verbatim}
+
+\section{Generics and Wildcards}
+\begin{verbatim}
+public class Pair<S extends Comparable<S>, T> implements Comparable<Pair<S, T>>
+\end{verbatim}
+\begin{verbatim}
+Defining a class with Generics.
+\end{verbatim}
+
+\begin{verbatim}
+public static <T> T findLargest(T[] array)
+\end{verbatim}
+\begin{verbatim}
+Defining a class with Generics.
+\end{verbatim}
+
+\begin{verbatim}
+@SuppressWarnings("unchecked")
+T[] tmp = (T[]) new Object[size];
+Wrapper<T>[] tmp = (Wrapper<T>[]) new Wrapper<?>[size];
+\end{verbatim}
+\begin{verbatim}
+Making a generic array (with wildcards).
+\end{verbatim}
+
+\begin{verbatim}
+Transformer<? super T, ? extends U>
+\end{verbatim}
+\begin{verbatim}
+Producer Extends, Consumer Super for best wildcard flexibility.
+\end{verbatim}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Screenshot 2024-11-09 132152.png}
+    \caption{Read the question}
+\end{figure}
+
+\end{document}

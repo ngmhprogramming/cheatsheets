@@ -1,0 +1,698 @@
+\documentclass[10pt, portrait]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,portrait]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\setlist{nosep}
+
+\pdfinfo{
+  /Title (CS1231S.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{2}
+
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{CS1231S}}
+            \\ \normalsize{AY24/25 Sem 1}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{1. Speaking Mathematically}
+\subsection{Important Sets}
+\begin{itemize}
+    \item $\mathbb{N}$: the set of all natural numbers (include $0$, i.e. $\mathbb{Z}_{\ge 0}$)
+    \item $\mathbb{Z}$: the set of all integers
+    \item $\mathbb{Q}$: the set of all rational numbers
+    \item $\mathbb{R}$: the set of all real numbers
+    \item $\mathbb{C}$: the set of all complex numbers
+\end{itemize}
+
+\subsection{Statements}
+\begin{itemize}
+    \item Universal Statement $\forall$: A certain property is true for \textbf{all} elements in a set
+    \item Conditional statement $\rightarrow$: If one thing is true then some other thing has to be true
+    \item Existential Statement $\exists$: There is \textbf{at least one} thing for which a certain property is true
+    \item Universal Conditional Statement
+    \item Universal Existential Statement
+    \item Existential Universal Statement (not the same!)
+\end{itemize}
+
+\subsection{Terms used in Proofs}
+\begin{itemize}
+    \item Definition: Precise and unambiguous description of mathematical term.
+    \item Axiom / Postulate: A statement that is assumed to be true without proof.
+    \item Theorem: A mathematical statement that is proved using rigorous mathematical reasoning.
+    \item Lemma: A small theorem; a minor result which helps to prove a theorem.
+    \item Corollary: A result that is a simple deduction from a theorem.
+    \item Conjecture: A statement believed to be true, but for which there is no proof (yet).
+\end{itemize}
+
+\subsection{Properties of Integers on Addition and Multiplication}
+\begin{itemize}
+    \item Closure: $x+y \in \mathbb{Z}$
+    \item Commutativity: $x+y = y+x$
+    \item Associativity: $x+y+z = (x+y)+z = x+(y+z)$
+    \item Distributivity: $x(y+z) = xy + xz$
+    \item Trichotomy: $x = y$ or $x < y$ or $x > y$
+\end{itemize}
+
+\subsection{Number Definitions}
+\begin{itemize}
+    \item Even and Odd Integers (Lecture 1 Slide 27): An integer is even iff $\exists k s.t. n = 2k$. An integer is odd iff $\exists k s.t. n = 2k+1$. Every integer is even or odd, but not both (Assumption 1).
+    \item Without Loss Of Generality (WLOG): Used before an assumption in a proof which narrows the premise to some special case, and implies that the proof for that case can be easily applied to all other cases.
+    \item Counter-Example: Shows that a statement is not always true.
+    \item Divisibility (Lecture 1 Slide 32): If n and d are integers with $d \neq 0$, $d \mid n$ iff $\exists k \in \mathbb{Z}$ s.t. $n = dk$
+    \item Theorem 4.7.1: $\sqrt{2}$ is irrational
+    \item Rational and Irrational Numbers: r is rational iff $\exists a, b \in \mathbb{Z}$ s.t. $r = \frac{a}{b}, b \neq 0$
+    \item Fraction in lowest term (Lecture 1 Slide 37): A fraction $\frac{a}{b}$ is said to be in lowest terms if the largest integer that divides both a and b is 1. Every rational can be reduced to a fraction in its lowest term. (Assumption 2)
+    \item Proposition 4.6.4: For all integers $n$, if $n^2$ is even then $n$ is even. (Proof by contraposition)
+    \item Colorful (CS1231S): An integer $n$ is colorful if $\exists k$ s.t. $n = 3k$
+\end{itemize}
+
+\section{2. The Logic of Compound Statements}
+\subsection{Definitions}
+\begin{itemize}
+    \item Defn 2.1.1 (Statement): A statement (or proposition) is a sentence that is true or false, but not both.
+    \item Defn 2.1.2 (Negation): The negation of p is "not p" and is denoted $\lnot p$.
+    \item Defn 2.1.3 (Conjunction): The conjunction of p and q is "p and q", denoted $p \land q$.
+    \item Defn 2.1.4 (Disjunction): The disjunction of p and q is "p or q", denoted $p \lor q$.
+    \item Defn 2.1.5 (Statement Form / Propositional Form): A statement form (or propositional form) is an expression made up of statement variables and logical connectives.
+    \item Defn 2.1.6 (Logical Equivalence): Two statement forms are logically equivalent iff they have identical truth values for each possible substitution of statements for their statement variables. The logical equivalence of P and Q is denoted by $P \equiv Q$.
+    \item Defn 2.1.7 (Tautology): A tautology is a statement form that is always true regardless of the truth values of its statement variables.
+    \item Defn 2.1.8 (Contradiction): A contradiction is a statement form that is always false regardless of the truth values of its statement variables.
+    \item Defn 2.2.1 (Conditional): The conditional of q by p is "if p then q", denoted $p \rightarrow q$. p is the hypothesis (antecedent), and q is the conclusion (consequent).
+    \item Defn 2.2.2 (Contrapositive): The contrapositive of a conditional statement $p \rightarrow q$ is $\lnot q \rightarrow \lnot p$
+    \item Defn 2.2.3 (Converse): The converse of a conditional statement $p \rightarrow q$ is $q \rightarrow p$ 
+    \item Defn 2.2.4 (Inverse): The inverse of a conditional statement $p \rightarrow q$ is $\lnot p \rightarrow \lnot q$ 
+    \item Defn 2.2.5 (Only if): "p only if q" means $\lnot q \rightarrow \lnot p$ or "if p then q" $p \rightarrow q$
+    \item Defn 2.2.6 (Biconditional): The biconditional of p and q is "p if and only if q" and is denoted "$p \leftrightarrow q$"
+    \item Defn 2.2.7 (Necessary and Sufficient Conditions): "r is a sufficient condition for s" means $r \rightarrow s$, "r is a necessary condition for s" means $s \rightarrow r$
+    \item Defn 2.3.1 (Argument): An argument is a sequence of statements. All statements except for the final one are called premises, while the final statement is called the conclusion. The symbol $\therefore$ is normally placed before the conclusion. An argument form is valid if the conclusion is true when all the premises are true.
+    \item Defn 2.3.2 (Sound and Unsound Arguments): an argument is sound iff it is valid and all its premises are true. An argument that is not sound is unsound.
+\end{itemize}
+
+\subsection{Theorem 2.1.1 Logical Equivalences}
+\begin{multicols*}{2}
+Implication Law
+$$p \rightarrow q \equiv \lnot p \lor q$$
+Commutative Laws
+  $$ p \land q \equiv q \land p $$
+  $$ p \lor  q \equiv q \lor  p $$
+Associative Laws
+  $$ p \land q \land r \equiv (p \land q) \land r \equiv p \land (q \land r) $$
+  $$ p \lor q \lor r \equiv (p \lor  q) \lor  r \equiv p \lor  (q \lor  r) $$
+Distributive Laws
+  $$ p \land (q \lor  r) \equiv (p \land q) \lor  (p \land r) $$
+  $$ p \lor  (q \land r) \equiv (p \lor  q) \land (p \lor  r) $$
+Identity Laws
+  $$ p \land \textbf{true} \equiv p $$
+  $$ p \lor  \textbf{false} \equiv p $$
+Negation Laws
+  $$ p \lor  \lnot p \equiv \textbf{true} $$
+  $$ p \land \lnot p \equiv \textbf{false} $$
+Double Negative Law
+  $$ \lnot ( \lnot p ) \equiv p $$
+Idempotent Laws
+  $$ p \land p \equiv p $$
+  $$ p \lor  p \equiv p $$
+Universal Bound Laws
+  $$ p \lor  \textbf{true} \equiv \textbf{true} $$
+  $$ p \land \textbf{false} \equiv \textbf{false} $$
+De Morgan's Laws
+  $$ \lnot ( p \land q ) \equiv \lnot p \lor  \lnot q $$
+  $$ \lnot ( p \lor  q ) \equiv \lnot p \land \lnot q $$
+Absorption Laws
+  $$ p \lor  (p \land q) \equiv p $$
+  $$ p \land (p \lor  q) \equiv p $$
+Negations of $\textbf{true}$ and $\textbf{false}$
+  $$ \lnot \textbf{true} \equiv \textbf{false} $$
+  $$ \lnot \textbf{false} \equiv \textbf{true} $$
+\end{multicols*}
+
+\subsection{Argument Forms and Fallacies}
+\begin{multicols*}{2}
+\begin{itemize}
+    \item Modus Ponens:
+    \begin{itemize}
+        \item If $p$ then $q$
+        \item $p$
+        \item $\therefore q$
+    \end{itemize}
+    \item Modus Tollens:
+    \begin{itemize}
+        \item If $p$ then $q$
+        \item $\lnot q$
+        \item $\therefore \lnot p$
+    \end{itemize}
+    \item Generalization:
+    \begin{itemize}
+        \item $p$
+        \item $p \lor q$
+    \end{itemize}
+    \item Specialization:
+    \begin{itemize}
+        \item $p \land q$
+        \item $\therefore p$
+    \end{itemize}
+    \item Conjunction:
+    \begin{itemize}
+        \item $p$
+        \item $q$
+        \item $\therefore p \land q$
+    \end{itemize}
+    \item Elimination:
+    \begin{itemize}
+        \item $p \lor q$
+        \item $\lnot q$
+        \item $\therefore p$
+    \end{itemize}
+    \item Transitivity:
+    \begin{itemize}
+        \item $p \rightarrow q$
+        \item $q \rightarrow r$
+        \item $\therefore p \rightarrow r$
+    \end{itemize}
+    \item Division into Cases
+    \begin{itemize}
+        \item $p \lor q$
+        \item $p \rightarrow r$
+        \item $q \rightarrow r$
+        \item $\therefore r$
+    \end{itemize}
+    \item Contradiction Rule
+    \begin{itemize}
+        \item $\lnot p \rightarrow false$
+        \item $\therefore p$
+    \end{itemize}
+    \item Converse Error
+    \begin{itemize}
+        \item $p \rightarrow q$
+        \item $q$
+        \item $p$
+    \end{itemize}
+    \item Inverse Error
+    \begin{itemize}
+        \item $p \rightarrow q$
+        \item $\lnot p$
+        \item $\lnot q$
+    \end{itemize}
+\end{itemize}
+\end{multicols*}
+
+\subsection{Compund Statements Notes}
+\begin{itemize}
+     \item Order of Operations: $\lnot, \land / \lor, \rightarrow / \leftrightarrow$ \ (use parentheses if ambiguous)
+    \item Show logical unequivalence by (i) finding a different row in truth table, (ii) finding a counter example.
+    \item A conditional statement is vacuously true when the hypothesis is false.
+    \item A conditional is logically equivalent with its contrapositive, which is the negation of its converse / inverse.
+    \item If r is a sufficient condition for s, then r is sufficient to guarantee the occurrence of r.
+    \item If r is a necessary condition for s, s cannot occur without r.
+    \item To test an argument form for validity, construct the truth table. A critical row is a row in the truth table in which all premises are true. If there is a critical row in which the conclusion is false, the argument form is invalid. If there are no critical rows, the argument is vacuously valid.
+\end{itemize}
+
+\section{3. The Logic of Quantified Statements}
+\subsection{Definitions}
+\begin{itemize}
+    \item Defn 3.1.1 (Predicate): A predicate is a sentence that contains a finite number of variables and becomes a statement when specific values are substituted for the variables. The domain of a predicate variable is the set of all values that may be substituted in place of the variable.
+    \item Defn 3.1.2 (Truth Set): If $P(x)$ is a predicate and $x$ has domain $D$, the truth set has all elements of $D$ that make $P(x)$ true when substituted for x, denoted by $\{x \in D \mid P(x)\}$
+    \item Defn 3.1.3 (Universal Statement): Let $Q(x)$ be a predicate and $D$ the domain of $x$. A universal statement has the form $\forall x \in D, Q(x)$. A value for $x$ for which $Q(x)$ is false is a counterexample.
+    \item Defn 3.1.4 (Existential Statement): Let $Q(x)$ be a predicate and $D$ the domain of $x$. An existential statement has the form $\exists x \in D$ s.t. $Q(x)$. The symbol $\exists !$ is used to denote uniqueness.
+    \item Theorem 3.2.1 Negation of a Universal Statment: The negation of the statement $\forall x \in D, P(x)$ is equivalent to $\exists x \in D$  s.t. $\lnot P(x)$
+    \item Theorem 3.2.2 Negation of an Existential Statement: The negation of the statment $\exists x \in D$ s.t. $P(x)$ is equivalent to $\forall x \in D, \lnot P(x)$
+    \item Defn 3.2.1 (Contrapositive, Converse, Inverse): These terms can also be applied on universal conditional statements.
+    \item Defn 3.2.2 (Necessary and Sufficient conditions, Only if): These terms can also be applied on universal conditional statements.
+    \item Defn 3.4.1 (Valid Argument Form): An argument form is valid if no matter what predicates are substituted in its premises, if the premise statements are all true, then the conclusion is also true. An argument is valid iff its form is valid.
+\end{itemize}
+
+\subsection{Arguments with Quantified Statements}
+\begin{multicols*}{2}
+\begin{itemize}
+    \item Universal Modus Ponens:
+    \begin{itemize}
+        \item $\forall x (P(x) \rightarrow Q(x))$
+        \item $P(a)$ for a particular $a$
+        \item $\therefore Q(a)$
+    \end{itemize}
+    \item Universal Modus Tollens
+    \begin{itemize}
+        \item $\forall x, (P(x) \rightarrow Q(x)$
+        \item $\lnot Q(a)$ for a particular $a$
+        \item $\therefore \lnot P(a)$
+    \end{itemize}
+    \item Universal Transitivity
+    \begin{itemize}
+        \item $\forall x (P(x) \rightarrow Q(x)$
+        \item $\forall x (Q(x) \rightarrow R(x)$
+        \item $\therefore \forall x (P(x) \rightarrow R(x)$
+    \end{itemize}
+    \item Universal Instantiation
+    \begin{itemize}
+        \item $\forall x \in D P(x)$
+        \item $\therefore P(a)$ if $a \in D$
+    \end{itemize}
+    \item Universal Generalisation
+    \begin{itemize}
+        \item $P(a)$ for every $a \in D$
+        \item $\therefore \forall x \in D P(x)$
+    \end{itemize}
+    \item Existential Instantiation
+    \begin{itemize}
+        \item $\exists x \in D P(x)$
+        \item $\therefore P(a)$ for some  $a \in D$
+    \end{itemize}
+    \item Existential Generalisation
+    \begin{itemize}
+        \item $P(a)$ for some $a \in D$
+        \item $\exists x \in D P(x)$
+    \end{itemize}
+    \item Converse Error
+    \begin{itemize}
+        \item $\forall x (P(x) \rightarrow Q(x))$
+        \item $Q(a)$ for a particular $a$
+        \item $\therefore P(a)$
+    \end{itemize}
+    \item Inverse Error
+    \begin{itemize}
+        \item $\forall x (P(x) \rightarrow Q(x))$
+        \item $\lnot P(a)$ for a particular $a$
+        \item $\therefore \lnot Q(a)$
+    \end{itemize}
+\end{itemize}
+\end{multicols*}
+
+\subsection{Quantified Statements Notes}
+\begin{itemize}
+    \item To show a universal statement is true, we use exhaustion. To show it is false, we use a counterexample.
+    \item To show an existential statement is true, we use an example. To show it is false, we use exhaustion.
+    \item $\forall x \in D, Q(x) \equiv Q(x_1) \land Q(x_2) \land ... \land Q(x_n)$, and $\exists x \in D, Q(x) \equiv Q(x_1) \lor Q(x_2) \lor ... \lor Q(x_n)$
+    \item Universal statements can be vacuously true if the predicate of a conditional is false for every element in the domain, which also happens if the domain is empty.
+    \item In a statement with multiple quantifiers, the order of quantifiers with the \textbf{SAME} type can be interchanged.
+\end{itemize}
+
+\section{4. Methods of Proof}
+\subsection{Definitions}
+\begin{itemize}
+    \item Prime: An integer $n$ is prime iff $n > 1$ and $\forall r, s$, if $n = rs$ then $r = n$ or $s = n$.
+    \item Composite: An integer $n$ is composite iff $n > 1$ and $\exists r, s$ s.t. $n = rs$, $1 < r < n$, $1 < s < n$.
+    \item Theorem 4.2.1: Every integer is a rational number. (Prove with $\frac{a}{1}$)
+    \item Theorem 4.2.2: The sum of any two rational numbers is rational. (Proof by algebra)
+    \item Corollary 4.2.3: The double of a rational number is rational.
+    \item Theorem 4.3.1: $\forall a, b$, if $a \mid b$ then $a \leq b$ (Proof by algebra)
+    \item Theorem 4.3.2: The only divisors of 1 are 1 and -1 (Proof by cases)
+    \item Theorem 4.3.3: $\forall a, b, c$ if $a \mid b$ and $b \mid c$ then $a \mid c$
+    \item Theorem 4.6.1: There is no greatest integer (Proof by contradiction)
+\end{itemize}
+
+\subsection{Proofs}
+
+\subsection{Methods of Proof}
+\begin{itemize}
+    \item Direct Proof: Show a series of steps leading from start to end. Deduction is a type of direct proof.
+    \item Divison into Cases: Split the statement into cases and show it is true in all of them.
+    \item Constructive Proof of Existential statements: Provide an example where the statement is true.
+    \item Disproving Universal Statements by Counterexample: Give a counterexample where the negation is true, or where the antecedent is true and the consequent is false.
+    \item Proving Universal Statements by Exhaustion: Show the statement is true for every element in the domain.
+    \item Proving Universal Statements by Generalizing from the Generic Particular: Suppose x is a particular but arbitrarily chosen element of the set, show x satisfies the property.
+    \item Proof by Contradiction:
+    \begin{itemize}
+        \item Suppose the statement to be proved, $S$, is false. That is, the negation of the statement, $\lnot S$, is true.
+        \item Show that this supposition leads logically to a contradiction.
+        \item Conclude that the statement $S$ is true.
+    \end{itemize}
+    \item Proof by Contraposition: Prove the contraposition of the statement instead.
+\end{itemize}
+
+\section{5. Set Theory}
+\subsection{Definitions}
+\begin{itemize}
+    \item Set: An \textbf{unordered} collection of objects (members / elements)
+    \item Set-Roster Notation: Write all elements of the set between braces.
+    \item Membership of a set: $x \in S$ means $x$ is an element of $S$. Similarly, $x \notin S$ means $x$ is not an element of $S$.
+    \item Cardinality of a set: $\mid S \mid$ is the size of the set $S$, or the number of elements in $S$.
+    \item Set-Builder Notation: Let $U$ be a set and $P(x)$ be a predicate over $U$. Then the set of $x \in U$ s.t. $P(x)$ is true is $\{x \in U : P(x)\}$.
+    \item Replacement Notation: Let $A$ be a set and $t(x)$ be a term in a variable $x$. Then the set of all objects of the form $t(x)$ where $x \in A$ is $\{t(x) : x \in A\}$.
+    \item Subset and Superset: Let A and B be sets. A is a subset of B, $A \subseteq B$, iff every element in A is also an element of B. We can also write $B \supseteq A$ or B is a superset of A.
+    \item Proper Subset: A is a proper subset of B, $A \subsetneq B$ iff $A \subseteq B$ and $A \neq B$.
+    \item Empty Set: $\emptyset$
+    \item Theorem 6.2.4: An empty set is a subset of every set, $\forall A, \emptyset \subseteq A$
+    \item Singleton: Set with exactly one element.\
+    \item Ordered Pair: An ordered pair has the form $(x, y)$. Two Ordered pairs $(a, b)$ and $(c, d)$ are equal iff $a = c$ and $b = d$. This can also be extended to ordered n-tuples.
+    \item Cartesian Product: The Cartesian product of sets A and B, $A \times B$, is the set of all ordered pairs $(a, b)$ where $a \in A$ and $b \in B$. This can also be extended to more than 2 sets.
+    \item Set Equality: $A = B$ iff every element of $A$ is $B$ and every element of $B$ is in $A$, or $A \subseteq B$ and $B \subseteq A$.
+    \item Union: The union of $A$ and $B$, $A \cup B$ is the set of all elements that are in at least one of $A$ or $B$.
+    \item Intersection: The intersection of $A$ and $B$, $A \cap B$ is the set of all elements that are in both $A$ and $B$.
+    \item Difference / Relative Complement: The difference of $B - A$, $B \backslash A$ is the set of elements that are in $B$ and not $A$.
+    \item Complement: The complement of $A$, $\bar{A}$ is the set of elemnts in $U$ that are not in $A$.
+    \item Interval Notation: $(a, b) = \{x \in \mathbb{R} : a \textless x \textless b\}$, $[a, b] = \{x \in \mathbb{R} : a \leq x \leq b\}$. $[]$ means closed intervals, while $()$ means open intervals.
+    \item Disjoint: Two sets are disjoint iff they have no elements in common, $A \cap B = \emptyset$.
+    \item Mutually / Pairwise Disjoint / Nonoverlapping: Multiple sets are mutually disjoint iff $\forall A_i, A_j$, $A_i$ and $A_j$ are disjoint.
+    \item Partition: Collection of mutually disjoint sets.
+    \item Theorem 4.4.1 Quotient-Remainder Theorem: Given $n, d$, $\exists ! q, r$ s.t. $n = dq+r$, $0 \leq r \textless d$
+    \item Power Set: $\mathcal{P}(A)$ is the set of all subsets of $A$. By power set axiom, any element of $\mathcal{P}(A)$ is a set.
+    \item Theorem 6.3.1 Cardinality of Power Set of a Finite Set: If $\mid A \mid = n$, $\mid \mathcal{P}(A) \mid = 2^n$.
+\end{itemize}
+
+\subsection{Set Properties}
+\begin{itemize}
+    \item Inclusion of Intersection: $A \cap B \subseteq A$
+    \item Inclusion in Union: $A \subseteq A \cup B$
+    \item Transitive Property of Subsets: $A \subseteq B \land B \subseteq C \rightarrow A \subseteq C$.
+    \item Procedural Definitions: Define using $\land, \lor$ instead
+    \begin{itemize}
+        \item $a \in X \cup Y \leftrightarrow a \in X \lor a \in Y$
+        \item $a \in X \cap Y \leftrightarrow a \in X \land a \in Y$
+        \item $a \in X - Y \leftrightarrow a \in X \land a \notin Y$
+        \item $a \in \bar{X} \leftrightarrow a \notin X$
+        \item $(a, b) \in X \times Y \leftrightarrow a \in X \land b \in Y$
+    \end{itemize}
+\end{itemize}
+
+\subsection{Theorem 6.2.2 Set Identities}
+\begin{multicols*}{2}
+Commutative Laws
+$$A \cup B = B \cup A$$
+$$A \cap B = B \cap A$$
+Associative Laws
+$$(A \cup B) \cup C = A \cup (B \cup C)$$
+$$(A \cap B) \cap C = A \cap (B \cap C)$$
+Distributive Laws:
+$$A \cup (B \cap C) = (A \cup B) \cap (A \cup C)$$
+$$A \cap (B \cup C) = (A \cap B) \cup (A \cap C)$$
+Identity Laws
+$$A \cup \emptyset = A$$
+$$A \cap U = A$$
+Complement Laws
+$$A \cup \bar{A} = U$$
+$$A \cap \bar{A} = \emptyset$$
+Double Complement Law
+$$\bar{\bar{A}} = A$$
+Idempotent Laws
+$$A \cup A = A$$
+$$A \cap A = A$$
+Universal Bound Laws
+$$A \cup U = U$$
+$$A \cap \emptyset = \emptyset$$
+De Morgan's Laws
+$$\overline{A \cup B} = \bar{A} \cap \bar{B}$$
+$$\overline{A \cap B} = \bar{A} \cup \bar{B}$$
+Absorption Laws
+$$A \cup (A \cap B) = A$$
+$$A \cap (A \cup B) = A$$
+Complements of $U$ and $\emptyset$
+$$\bar{U} = \emptyset$$
+$$\bar{\emptyset} = U$$
+Set Difference Law
+$$A \backslash B = A \cap \bar{B}$$
+\end{multicols*}
+
+\section{6. Relations}
+\subsection{Definitions}
+\begin{itemize}
+    \item Relation: A binary relation from $A$ to $B$ is a subset of $A \times B$. Given an ordered pair $(x, y)$ in $A \times B$, $x$ is related to $y$ by $R$, $x R y$, iff $(x, y) \in R$
+    \item Domain, Co-Domain, Range: Let $R$ be a relation from $A$ to $B$. Domain is the set $\{a \in A : a R b$ for some $b \in B\}$. Co-Domain is B. Range is the set $\{b \in B : a R b$ for some $a \in A\}$
+    \item Inverse Relation: The inverse relation $R^{-1}$ is $\{(y, x) \in B \times A : (x, y) \in R\}$
+    \item Relation on a Set: A relation on a set $A$ is a subset of $A \times A$.
+    \item Composite Relations: Let $R \subseteq A \times B$ and $S \subseteq B \times C$ be relations. The composition of $R$ with $S$, denoted $S \circ R$ is the relation from $A$ to $C$ s.t. $\forall x \in A, \forall Z \in C, x S \circ R z \leftrightarrow (\exists y \in B, x R y \land y S z)$.
+    \item Proposition: Composition is Associative
+    \item Proposition: Inverse of Composition: $(S \circ R)^{-1} = R^{-1} \circ S^{-1}$.
+    \item n-ary Relation: Subset of $A^n$
+    \item Reflexivity: $R$ is reflexive iff $\forall x \in A, x R x$.
+    \item Symmetry: $R$ is symmetric iff $\forall x, y \in A, x R y \rightarrow y R x$
+    \item Antisymmetry: $R$ is antisymmetric iff $\forall x, y \in A, x R y \land y R x \rightarrow x = y$.
+    \item Assymetry: $R$ is asymmetric iff $\forall x, y \in A, x R y \rightarrow y \cancel{R} x$
+    \item Transitivity: $R$ is transitive iff $\forall x, y, z \in A, x R y \land y R z \rightarrow x R z$.
+    \item Transitive Closure: The transitive closure of $R$ on $A$ is $R^t$ on $A$ s.t. (i) $R^t$ is transitive, (ii) $R \subseteq R^t$, (iii) If $S$ is another transitive relation containing $R$, $R^t \supseteq S$. Reflexive and Symmetric closure are similarly defined.
+    \item Partition: $\mathscr{C}$ is a partition of $A$ if (i) $\mathscr{C}$ is a set where all elements are non-empty subsets of $A$, (ii) Every element of $A$ is in exactly one element of $\mathscr{C}$. Elements of a partition are components. Alternatively, $\forall x \in A, \exists ! S \in \mathscr{C} (x \in S)$.
+    \item Relation Induced by Partition: The relation $R$ induced by a partition on $A$ is $\forall x, y, \in A, x R y \leftrightarrow \exists$ a component $S$ of $\mathscr{C}$ s.t. $x, y, \in S$.
+    \item Theorem 8.3.1 Relation Induced by a Partition: $R$ is reflexive, symmetric, and transitive.
+    \item Equivalence Relation: $R$ is an equivalence relation iff $R$ is reflexive, symmetric and transitive. The symbol $\lnot$ is commonly used.
+    \item Equivalence Class: Suppose $A$ is a set and $\lnot$ is an equivalence relation on $A$. For each $a \in A$, the equivalence class of $a$, $[a]$, is the set of elements $x \in A$ s.t. $a \lnot x$. $[a]_{\lnot} = \{x \in A : a \lnot x\}$
+    \item Theorem 8.3.4: The partition Induced by an Equivalence Relation: If $R$ is an equivalence relation on $A$, then the distinct equivalence classes of $R$ form a partition of $A$.
+    \item Congruence: $a$ is congruent to $b$ modulo $n$ iff $a-b = nk$ for some $k \in \mathbb{Z}$.
+    \item Congruence mod $n$ is an equivalence relation on $\mathbb{Z}$ for every $n \in \mathbb{Z}^+$
+    \item Set of equivalence classes: $A / \lnot$ is the set of all equivalence classes with respect to $\lnot$, $A / \lnot = \{[x]_{\lnot} : x \in A\}$.
+    \item Partial Order Relation: $R$ is a partial order iff $R$ is reflexive, antisymmetric and transitive.
+    \item Partially Ordered Set: $A$ is a poset with respect to a partial order relation $R$ on $A$, $(A, R)$.
+    \item Curly Less Than Equals: $\preccurlyeq$ is used for partial orders to prevent confusion with $\leq$.
+    \item Hasse Diagrams: Simplification of the directed graph of a partial order relation. Place vertices s.t. all arrows point upwards, then remove all self-loops, remove arrows implied by transitivity, and remove direction indicators.
+    \item Comparable: $a$ and $b$ are comparable iff $a \preccurlyeq b$ or $b \preccurlyeq a$. If not, they are noncomparable.
+    \item Compatible: $a$ and $b$ are compatible iff $\exists c \in A, a \preccurlyeq c, b \preccurlyeq c$. (There are other possible definitions, be careful.)
+    \item Maximal Element: $c$ is maximal iff $\forall x \in A, c \preccurlyeq x \rightarrow c = x$.
+    \item Minimal Element: $c$ is minimal iff $\forall x \in A, x \preccurlyeq c \rightarrow c = x$.
+    \item Largest Element: $c$ is the largest iff $\forall x \in A, x \preccurlyeq c$.
+    \item Smallest Element: $c$ is the smallest iff $\forall x \in A, c \preccurlyeq x$.
+    \item Total Order Relations: $R$ is a total order relation if $R$ is a partial order and $\forall x, y \in A, x R y \lor y R x$.
+    \item Linearization: A total order s.t. $x \preccurlyeq y \rightarrow x \preccurlyeq^* y$.
+    \item Well-Ordered Set: $A$ is well-ordered iff every non-empty subset of $A$ contains a smallest (not minimal) element.
+\end{itemize}
+
+\subsection{Lemma Rel.1 Equivalence Classes}
+The following are equivalent:
+\begin{itemize}
+    \item (i) $x \lnot y$
+    \item (ii) $[x] = [y]$
+    \item (iii) $[x] \cap [y] \neq \emptyset$
+\end{itemize}
+Proof
+\begin{itemize}
+    \item (i) $\rightarrow (ii)$
+    \begin{itemize}
+        \item Suppose $x \lnot y$
+        \item $y \lnot x$ by symmetry
+        \item For every $z \in [x]$
+        \item $x \lnot z$ by definition of $[x]$
+        \item $y \lnot z$ by transitivity
+        \item $z \in [y]$ by definition of $[y]$
+        \item $\therefore [x] \subseteq [y]$
+        \item Similarly for $[y] \subseteq [x]$
+        \item $\therefore [x] = [y]$
+    \end{itemize}
+    \item (ii) $\rightarrow$ (iii)
+    \begin{itemize}
+        \item Suppose $[x] = [y]$
+        \item $[x] \cap [y] = [x]$ by Idempotent Law
+        \item However, $x \lnot x$ by reflexivity
+        \item This shows $x \in [x] = [x] \cap [y]$
+        \item $\therefore [x] \cap [y] \neq \emptyset$
+    \end{itemize}
+    \item (iii) $\rightarrow$ (i)
+    \begin{itemize}
+        \item Suppose $[x] \cap [y] \neq \emptyset$
+        \item Take $z \in [x] \cap [y]$
+        \item Then $z \in [x] and z \in [y]$ by definition of $\cap$
+        \item Then $x \lnot z$ and $y \lnot z$ by definition of $[x]$ and $[y]$
+        \item $y \lnot z$ implies $z \lnot y$ by symmetry
+        \item $\therefore x \lnot y$ by transitivity
+    \end{itemize}
+\end{itemize}
+
+\subsection{Theorem Rel.2 Equivalence classes form a partition}
+$A / \lnot$ is a partition of $A$
+Proof Steps
+\begin{itemize}
+    \item $A / \lnot$ is a set by definition
+    \item Show every element of $A / \lnot$ is a nonempty subset of $A$.
+    \begin{itemize}
+        \item Let $S \in A / \lnot$
+        \item Find $x \in A$ s.t. $S = [x]$ by definition of $A / \lnot$
+        \item Then $S = [x] \subseteq A$ by definition of equivalence classes
+        \item $x \lnot x$ by reflexivity of $\lnot$
+        \item Hence $x \in [x] = S$ by definition of $[x]$
+        \item $\therefore S$ is non-empty
+    \end{itemize}
+    \item Show every element of $A$ is in at least one element of $A / \lnot$.
+        \begin{itemize}
+            \item Let $x \in A$
+            \item $x \lnot x$ by reflexivity of $\lnot$
+            \item $\therefore x \in [x] \in A / \lnot$
+        \end{itemize}
+    \item Show every element of $A$ is in at most one element of $A / \lnot$.
+    \begin{itemize}
+        \item Let $x \in A$  s.t. $x \in S_1, x \in S_2$
+        \item Find $y_1, y_2 \in A$ s.t. $S_1 = [y_1]$ and $S_2 = [y_2]$
+        \item $x \in [y_1] \cap [y_2]$
+        \item $[y_1] \cap [y_2] \neq \emptyset$
+        \item $\therefore S_1 = [y_1] = [y_2] = S_2$ by equivalence classes lemma
+    \end{itemize}
+\end{itemize}
+
+\subsection{Relations Notes}
+\begin{itemize}
+    \item Relations can be represented with arrow diagrams or directed graphs.
+    \item Composite relations can be found by walking on the directed graph.
+    \item We can view partitions as a "in the same component" relation.
+    \item Properties such as reflexivity and symmetry can be vacuously true. A set can be both symmetric and antisymmetric at the same time.
+    \item Any smallest element is minimal, and any largest element is maximal.
+    \item Kahn's Algorithm
+    \begin{itemize}
+        \item Find a minimal element $c$ of $A$
+        \item Remove $c$ from $A$ and add it to the linearization
+        \item Repeat until $A$ is empty
+    \end{itemize}
+\end{itemize}
+
+\section{Useful Tutorial Questions}
+\begin{itemize}
+    \item Tutorial 1 Question 10: The product of any two odd integers is an odd integer.
+    \item Tutorial 1 Question 11: $n^2$ is odd iff $n$ is odd. $n^2$ is even iff $n$ is even.
+    \item Tutorial 2 Question 4: Rational numbers are closed under addition. Integers and rational numbers are not closed under division.
+    \item Tutorial 2 Question 11: If $n = ab$ where $a$ and $b$ are positive, then $a \leq n^\frac{1}{2}$ or $b \leq n^\frac{1}{2}$.
+    \item Tutorial 3 Question 5: $A \cap (B \backslash C) = (A \cap B) \backslash C$.
+    \item Tutorial 3 Question 6: $A \backslash (B \backslash C) = (A \backslash B) \cup (A \cap C)$.
+    \item Tutorial 3 Question 8: $A \subseteq B$ iff $A \cup B = B$.
+    \item Tutorial 3 Question 9: $(A \backslash B) \cup (B \backslash A) = (A \cup B) \backslash (A \cap B)$.
+    \item Tutorial 4 Question 2: Show the following are logically equivalent: (i) R is symmetric, (ii) $\forall x, y \in A, x R y \leftrightarrow y R x$, (iii) $R = R^{-1}$.
+    \begin{itemize}
+        \item (i) $\rightarrow$ (ii)
+        \begin{itemize}
+            \item Suppose $R$ is symmetric
+            \item Let $x, y \in A$
+            \item If $x R y$ then $y R x$ by symmetry of $R$
+            \item If $y R x$ then $x R y$ by symmetry of $R$
+            \item $\therefore x R y \leftrightarrow y R x$
+        \end{itemize}
+        \item (ii) $\rightarrow$ (iii)
+        \begin{itemize}
+            \item Suppose $\forall x, y \in A, x R y \leftrightarrow y R x$
+            \item $\forall x, y \in A$
+            \item $(x, y) \in R \leftrightarrow x R y$ by definition of $x R y$
+            \item $\leftrightarrow y R x$
+            \item $\leftrightarrow x R^{-1} y$ by definition of $R^{-1}$
+            \item $\leftrightarrow (x, y) \in R^{-1}$ by definition of $x R^{-1} y$
+            \item $\therefore R = R^{-1}$
+        \end{itemize}
+        \item (iii) $\rightarrow$ (i)
+        \begin{itemize}
+            \item Suppose $R = R^{-1}$
+            \item Let $x, y \in A, x R y$
+            \item Then $x R^{-1} y$ as $R = R^{-1}$
+            \item $y R x$ by definition of $R^{-1}$
+            \item $\therefore$ R is symmetric
+        \end{itemize}
+    \end{itemize}
+    \item Tutorial 4 Question 5: For an equivalence relation $R$,
+    \begin{itemize}
+        \item (i) $R^{-1} \circ R = R \circ R^{-1}$
+        \item (ii) $R \subseteq R \circ R$
+        \item (iii) $R \circ R \subseteq R$
+        \item (iv) $R \circ R^{-1} = R$
+        \item (v) $R = R \circ R$ from (ii) and (iii)
+    \end{itemize}
+    \item Tutorial 4 Question 7: Composition of relations is associative, $T \circ (S \circ R) = (T \circ S) \circ R$.
+    \item Tutorial 5 Question 5: $\subseteq$ on $\mathcal{P}(A)$ is a partial order.
+    \item Tutorial 5 Question 8: Every asymmetric relation is antisymmetric.
+    \item Tutorial 5 Question 11: Any two comparable elements are compatible. Any two compatible elements are not necessarily compatible.
+\end{itemize}
+\end{multicols*}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{tantc.jpg}
+    pls give me A+ prof thanks
+\end{figure}
+
+\end{document}
