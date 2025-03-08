@@ -1,0 +1,369 @@
+\documentclass[10pt, portrait]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,portrait]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\setlist{nosep}
+
+\pdfinfo{
+  /Title (MA1521.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{2}
+
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{MA1521}}
+            \\ \normalsize{AY24/25 Sem 1}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{0. Real Numbers and Functions}
+\begin{itemize}
+    \item Finding Maximal Domain: Exclude $Q(x)=0$ if the function is $\frac{P(X)}{Q(X)}$.
+    \item Finding Maximal Range: Express $x$ in terms of $y$, and see range of $y$. e.g. If quadratic, $y$ will be inside a square root.
+\end{itemize}
+
+\section{1. Limits and Continuity}
+\begin{itemize}
+    \item Left Limit: $\lim_{x \to c^-} f(x)$ is the value $f(x)$ approaches when $x$ approaches $c$ from the left.
+    \item Right Limit: $\lim_{x \to c^+} f(x)$ is the value $f(x)$ approaches when $x$ approaches $c$ from the right.
+    \item Existence of Limit: If $\lim_{x \to c^-} f(x) = \lim_{x \to c^+} f(x) = L$, $\lim_{x \to c}f(x)$ exists with value $L$ for $c$ which is not an endpoint.
+    \item Continuity at a Point: Limit at the point exists, only consider one side if endpoint.
+    \item Continuity on an Interval: $f$ is continuous on an interval if $f$ is continuous at $x=c$ for all $c$ in the interval.
+    \item Evaluation of Limits: Addition, Scaling, Product of 2 functions, Fraction.
+    \item Composition of Limit: If $g$ is continuous at $b$ and $\lim_{x\to c}f(x)=b$, then $lim_{x\to c}g(f(x))=g(b)=g(lim_{x \to c}f(x))$.
+    \item Limit at Infinity: $\lim_{x\to \infty}f(x)$ is the value $f(x)$ approaches as $x$ tends to positive infinity. $\lim_{x\to-\infty}f(x)$ is the value $f(x)$ approaches as $x$ tends to negative infinity. If the limit to infinity is $c$, $y=c$ is a horizontal asymptote of the graph $f(x)$.
+    \item Indeterminate Form of Limit: A limit that evaluates to $\frac{0}{0}$ or $\frac{\infty}{\infty}$.
+    \item Limit to infinity of Polynomial: $\lim_{x\to \pm \infty}\frac{P(x)}{Q(x)}$ depends on the leading term $\frac{Ax^c}{Bx^d}$. If $c < d$, the limit is $0$. If $c > d$, the limit is $\pm\infty$. If $c=d$, the limit is $\frac{A}{B}$.
+    \item Useful Trigo Limits: $\lim_{x\to c}\frac{sin(g(x))}{g(x)}=\lim_{x\to c}\frac{g(x)}{sin(g(x))}=1$ if $\lim_{x\to c}g(x)=0$ (also works for $tan$).
+    \item Squeeze Theorem: If $g(x) \leq f(x) \leq h(x)$, then if $\lim_{x\to c}g(x)=\lim_{x\to c}h(x)=L$, $\lim_{x\to c}f(x)=L$ at $x=c$.
+    \item Intermediate Value Theorem: If $f$ is continuous on $[a, b]$, $f(c)=k$ for some $c \in [a,b]$ for all $k$ between $f(a)$ and $f(b)$.
+\end{itemize}
+
+\section{2. Derivatives}
+\begin{itemize}
+    \item Derivative: $f'(x_0)=\lim_{h\to 0}\frac{f(x_0+h)-f(x_0)}{h}$.
+    \item Differentiability implies continuity at a point, but the converse is not necessarily true.
+    \item Differentiability on Interval: A function $f$ is differentiable on an interval if it is differentiable at every point in the interval.
+    \item Standard Derivatives: For $f(x)$, multiply result by $f'(x)$.
+    \item Product Rule: $\frac{d}{dx}(uv)=\frac{du}{dx}v+u\frac{dv}{dx}$.
+    \item Quotient Rule: $\frac{d}{dx}(\frac{u}{v})=\frac{\frac{du}{dx}v-u\frac{dv}{dx}}{v^2}$.
+    \item Derivative of Inverse Function: $(f^{-1})'(a)=\frac{1}{f'(f^{-1}(a))}$. Let $b=f^{-1}(a)$ so that $a=f(b)$. $(f^{-1})'(a)=\frac{1}{f'(f^{-1}(a))}=\frac{1}{f'(b)}$.
+    \item Reciprocal of Derivative: If an inverse function exists, $\frac{dx}{dy}=\frac{1}{\frac{dy}{dx}}$.
+    \item Derivative of Parametric Equation: $\frac{dy}{dx}=\frac{dy}{dt} \cdot \frac{dt}{dx}$.
+    \item Second Derivative of Parametric Equation: $\frac{d^2y}{dx^2}=\frac{d}{dt}(\frac{dy}{dx}) \div \frac{dx}{dt}=\frac{\frac{d}{dt}(g'(t))}{f'(t)} \div f'(t)=\frac{g''(t)f'(t)-g'(t)f''(t)}{f'(t)^3}$.
+    \item Derivative of $y=f(x)^{g(x)}$: First find the derivative of $lny$ then solve for $\frac{dy}{dx}$.
+    \item Change of Base Formula: $log_ax=\frac{lnx}{lna}$.
+\end{itemize}
+
+\section{3. Applications of Differentiation}
+\begin{itemize}
+    \item Tangent Equation: $y-f(x_0)=f'(x_0)(x-x_0)$.
+    \item Normal Equation: $y-f(x_0)=-\frac{1}{f'(x_0)}(x-x_0)$.
+    \item Increasing Function: $f'(x) > 0$ for all $x$ in $(a, b)$.
+    \item Decreasing Function: $f'(x) < 0$ for all $x$ in $(a, b)$.
+    \item Concave Upward: If $f''(c) > 0$ the graph is concave upward at $(c, f(c))$.
+    \item Concave Downward: If $f''(c) < 0$ the graph is concave downward at $(c, f(c))$.
+    \item Inflection Point: Graph has a tangent line and concavity changes. At this point $(c, f(c))$, $f''(c)=0$ if it exists.
+    \item Absolute Maxima: $x=c$ is an absolute maxima if $f(x) \leq f(c)$ for all $x$ in the domain of $f$. Minima is defined similarly.
+    \item Local Maxima: $x=c$ is a local maxima at $x=c$ if $f(x)\leq f(c)$ for $x$ in some open interval containing it. Minima is defined similarly.
+    \item Extreme Value Theorem: If $f$ is continuous on a closed interval $[a,b]$, then $f$ has an absolute maximum and minimum at some points in $[a,b]$.
+    \item If $f$ is differentiable on an open interval containing $x=c$ and $f$ has a local extremum at $x=c$, then $f'(c)=0$.
+    \item Critical Point: Not an end-point and either $f'(c)=0$ or $f'(c)$ does not exist.
+    \item Local extrema and Critical Points: If $f$ has a local extrema at $x=c$, then $c$ is a critical point of $f$. The converse is not necessarily true.
+    \item First Derivative Test for Absolute Extrema: For a critical point $c$, if $f'(x)>0$ for all $x < c$ and $f'(x) <0$ for all $x > c$, then $c$ is a maximum point. If $f'(x)<0$ for all $x < c$ and $f'(x) > 0$ for all $x > c$, then $c$ is a minimum point.
+    \item First Derivative Test for Local Extrema: If $f'$ does not change sign at $x=c$, there is no local extrema at $c$. If it changes from positive to negative, it is a maximum. If it changes from negative to positive, it is a minimum.
+    \item Second Derivative Test: Suppose $f$ is twice differentiable. Then if $f'(c)=0$ and $f{''}(c)<0$ then $c$ is a local maximum. If $f{''}(c)>0$ then $c$ is a local minimum. If $f''(c)=0$ then no conclusion can be drawn.
+    \item L'Hôpital's Rule: If $lim_{x\to c}\frac{f(x)}{g(x)}$ is indeterminate, then it is equivalent to $lim_{x\to c}\frac{f'(x)}{g'(x)}$. This also holds for limits at infinity and one-sided limits.
+    \item $0^0$: Consider $\lim_{x\to 0^+}x^x = \lim_{x\to 0^+}e^{ln(x^x)}=1$ by applying lopital's.
+    \item $\infty^0$: Consider $\lim_{x\to 0^+}(\frac{2}{x})^x = 1$ using the previous result.
+    \item $1^\infty$: Consider $\lim_{x\to 0^+}(1+x)^{\frac{1}{x}}=e$ using $e^{ln}$ and lopital's.
+    \item Rolle's Theorem: Let $f$ be continuous on $[a,b]$ and differentiable on $(a,b)$. If $f(a)=f(b)$, there is at least one $c$ in $(a,b)$ with $f'(c)=0$.
+    \item Number of solutions using Rolle's Theorem: Consider $f(x)$ and $f'(x)$. If $f(x)$ has more than 1 solution, then there is $f'(c)=0$ between the 2 solutions.
+    \item Mean Value Theorem: Let $f$ be continuous on $[a,b]$ and differentiable on $(a,b)$. There is at least one $c$ in $(a,b)$ such that $f'(c)=\frac{f(b)-f(a)}{b-a}$.
+\end{itemize}
+
+\section{4. Integrals}
+\begin{itemize}
+    \item Integral: $F$ is an antiderivative of $f$ on an interval $I$ if $F'(x)=f(x)$ for all $x$ in $I$.
+    \item Partial Fractions: Decompose $\frac{P(x)}{Q(x)}$ as a sub of simple fractions whose denominators are factors of $Q(x)$.
+    \item Repeated Factor: Decompose into factor and factor squared.
+    \item Quadratic Factor: Fraction will be $\frac{Ax+B}{ax^2+bx+c}$.
+    \item Integration by Substitution: Let $u=g(x)$ be a differentiable function with range $I$ and $f$ is continuous on $I$. Then $\int f(g(x))g'(x)dx=\int f(u)du$.
+    \item The Other Integration by Substitution: Let $x=g(t)$ be a differentiable function with range $I$ and $f$ is continuous on $I$. Then $\int f(x)dx=\int f(g(t))g'(t)dt$.
+    \item Trigonometric Substitution:
+    \begin{itemize}
+        \item $\sqrt{a^2-(x+b)^2}$: $x+b=a sin\theta$.
+        \item $\sqrt{a^2+(x+b)^2}$: $x+b=a tan\theta$.
+        \item $\sqrt{(x+b)^2-a^2}$: $x+b=a sec\theta$.
+    \end{itemize}
+    \item Integration by Parts: $\int f'(x)g(x)dx=f(x)\cdot g(x)-\int f(x)g'(x)dx$.
+    \item Order of Preference from Differentiate to Integration: Log, Inverse Trigo, Algebra, Trigo (Both), Exponential.
+    \item Riemann Sum: $\int_a^bf(x)dx=\sum_{k=1}^n(\frac{b-a}{n})f(a+k(\frac{b-a}{n}))$.
+    \item Fundamental Theorem of Calculus 1: $\int_a^bf(x)dx=\int_a^bF'(x)dx=F(b)-F(a)$.
+    \item Fundamental Theorem of Calculus 2: The function $g(x)=\int_a^xf(t)dt$ is continuous and differentiable, and $g'(x)=f(x)$. Then $\frac{d}{dx}\int_a^{g(x)}f(t)dt=f(g(x))\cdot g'(x)$.
+    \item Type I Improper Integral: Integral with an infinite boundary. Take the boundary of the integral replaced with a parameter. If both boundaries are infinite, split into 2 integrals about a point in between. The evaluate the limit of the integral as the parameter tends to infinity.
+    \item Type II Improper Integral: Integral which is not continuous on a boundary. Similar to Type I, replace boundary with a limit.
+\end{itemize}
+
+\section{5. Applications of Integration}
+\begin{itemize}
+    \item Area between Curves: If $f(x)\geq g(x)$, $A=\int_a^bf(x)-g(x)dx$. If not, $A=\int_a^b|f(x)-g(x)|dx$. The same can be said about curves defined on $y$ instead.
+    \item Volume of Solid of Revolution by Disk Method: $V = \pi \int_a^bf(x)^2dx$.
+    \item Between 2 curves, need to distinguish between $V = \pi \int_a^bf(x)^2-g(x)^2dx$ and $V = \pi \int_a^b(f(x)-g(x))^2dx$ (probably wrong).
+    \item Cylindrical Shell Method: $V=2\pi\int_a^bx|f(x)|dx$. Between 2 curves, $V=2\pi\int_a^bx|f(x)-g(x)|dx$.
+    \item Depending on how the function is defined and the axis to revolve around, use Disk or Cylindrical Shell Method.
+    \item Arc Length of a Curve: $\int_a^b\sqrt{1+f'(x)^2}dx$ for $y=f(x)$. (Or $g'(y)$ for $x=f(y)$).
+\end{itemize}
+
+\section{6. Sequences and Series}
+\begin{itemize}
+    \item Limit of a Sequence: Let $\{a_n\}_{n=1}^\infty$ be a sequence of real numbers. If $\lim_{n\to \infty}a_n=L$, the sequence converges to $L$. If it does not exist, the sequence diverges.
+    \item Squeeze Theorem for Sequences: If $a_n\leq b_n \leq c_n$ for all $n$ and $\lim_{n \to \infty}a_n=\lim_{n \to \infty}c_n=L$ then $\lim_{n \to \infty}b_n=L$.
+    \item Convergent Series: If $\sum_{n=1}^\infty a_n$ is convergent. $\lim_{n\to \infty}a_n=0$.
+    \item $n^{th}$ Term Test for Divergence: If $\lim_{n\to \infty}a_n$ does not exist or $\lim_{n\to \infty}a_n \neq 0$ then the series $\sum_{n=1}^{\infty}a_n$ is divergent. If it is 0, we cannot draw any conclusions.
+    \item A series $\sum_{n=1}^\infty a_n$ of nonnegative terms converges iff its partial sums are bounded from above.
+    \item Harmonic Series: $\sum_{n=1}^{\infty}\frac{1}{n}$ is divergent.
+    \item Integral Test: The series $\sum_{n=1}^\infty a_n$ is convergent iff the improper integral $\int_1^\infty f(x)dx$ is convergent.
+    \item P-Series: The p-series $\sum_{n=1}^\infty \frac{1}{n^p}$ is convergent iff $p > 1$.
+    \item Comparison Test: Suppose $\sum_{n=1}^\infty a_n$ and $\sum_{n=1}^\infty b_n$ are series with nonnegative terms such that $0 \leq a_n\leq b_n$ for all $n$. If $\sum_{n=1}^\infty b_n$ is convergent, $\sum_{n=1}^\infty a_n$ is also convergent. If $\sum_{n=1}^\infty a_n$ is divergent, $\sum_{n=1}^\infty b_n$ is also divergent.
+    \item Ratio Test: Suppose $\sum_{n=1}^\infty a_n$ is a series such that $\lim_{n\to \infty}|\frac{a_{n+1}}{a_n}|=L$. If $0\leq L < 1$, the series is absolutely convergent. If $L>1$, the series is divergent. If $L=1$, the test is inconclusive.
+    \item Root Test: Suppose $\sum_{n=1}^\infty a_n$ is a series such that $\lim_{n\to \infty}\sqrt[n]{|a_n|}=L$. If $0\leq L < 1$, then the series is absolutely convergent. If $L>1$, the series is divergent. If $L=1$, the test is inconclusive.
+    \item Alternating Series Test: If $b_n$ is a sequence of positive numbers such that $b_n$ is decreasing and $\lim_{n \to \infty}b_n=0$, the alternating series $\sum_{n=1}^\infty (-1)^{n-1}b_n$ and $\sum_{n=1}^\infty (-1)^nb_n$ are convergent.
+    \item Absolute Convergence: If $\sum_{n=1}^\infty |a_n|$ is convergent, then $\sum_{n=1}^\infty a_n$ is convergent. A conditionally convergent series is convergent but NOT absolutely convergent.
+    \item Power Series: A power series has the form $\sum_{n=0}^\infty c_nx^n=c_0+c_1x+c_2x^2+...$. A power series with $(x-a)$ instead is centered around $a$, and converges at $x=a$.
+    \item Radius of Convergence of Power Series: For a power series, either the series converges at only $x=a$, all $x$, or there is a positive $R$ such that the series converges absolutely if $|x-a|<R$ and diverges if $|x=a|>R$.
+    \item Interval of Convergence: The interval $[a-R, a+R]$ where the power series converges. However, we need to manually check the endpoints of the interval.
+    \item Finding Radius of Convergence: For the power series $\sum_{n=1}^\infty c_n(x-a)^n$, if $\lim_{n\to \infty}|\frac{c_{n+1}}{c_n}|=L$ or $\lim_{n\to \infty}\sqrt[n]{|c_n|}=L$. Then $L|x-a| < 1$, and $R=\frac{1}{L}$. For $(x-a)^{2n}$, $L|x-a|^2 < 1$. The radius is around the center of the power series.
+    \item Order of Tests:
+    \begin{itemize}
+        \item Don't look like they converge to zero: Divergence Test.
+        \item Check for p-series convergence.
+        \item Looks like p-series or geometric series: Comparison test.
+        \item Only has rationals, polynomials, radicals: Comparison or limit comparison test. However, all terms must be positive.
+        \item Factorials and powers of $n$: Ratio test, especially for factorials.
+        \item Can be written as $a_n=(-1)^nb_n$ or $a_n=(-1)^{n+1}b_n$: Alternating series test.
+        \item Can be written as $a_n=(b_n)^n$: Root test.
+        \item If $a_n=f(n)$ for some positive, decreasing function and $\int_a^\infty f(x)dx$ is easy to calculate: Integral test.
+    \end{itemize}
+    \item Standard Series:
+    \begin{itemize}
+        \item $\frac{1}{1-x} = \sum_{n=0}^\infty x^n=1+x+x^2+...$
+        \item $e^x=\sum_{n=0}^\infty \frac{x^n}{n!}=1+x+\frac{x^2}{2!}+\frac{x^3}{3!}+...$
+        \item $ln(1+x)=\sum_{n=1}^\infty (-1)^{n+1}\frac{x^n}{n}=x-\frac{x^2}{2}+\frac{x^3}{3}-...$
+        \item Others: Derive by subbing in for $x$ (e.g. $-x^2$ for $tan^{-1}$) or integrating.
+    \end{itemize}
+    \item Differentiation of Power Series: If a power series has radius of convergence $R>0$, the function defined by the power series is differentiable on the interval $|x-a|<R$, $f'(x)=\sum_{n=1}^\infty nc_n(x-a)^{n-1}$ and $\int f(x)dx=\sum_{n=0}^\infty c_n\frac{(x-a)^{n+1}}{n+1}+C$.
+    \item Taylor Series: If a power series has a representation at $x=a$, the coefficients are given by $c_n=\frac{f^{(n)}(a)}{n!}$ where $f^{(n)}$ is the $n^{th}$ differentiation. It is unique and has the form $f(x)=\sum_{n=0}^\infty \frac{f^{(n)}(a)}{n!}(x-a)^n$, (the Taylor Series of $f$ at $x=a$).
+    \item Maclaurin Series: Special case of Taylor Series when $a=0$.
+\end{itemize}
+
+\section{7. Vectors and Geometry of Space}
+\begin{itemize}
+    \item Distance Formula: $|P_1P_2|=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}$.
+    \item Equation of Sphere: A sphere with center $C(h, k, l)$ and radius $r$ is $(x-h)^2+(y-k)^2+(z-l)^2=r^2$.
+    \item Triangle Law: The sum of 2 vectors $\bm{u}$ and $\bm{v}$, $\bm{u+v}$ is the vector from the start of $\bm{u}$ to the end of $\bm{v}$ if the start of $\bm{v}$ is put at $\bm{u}$.
+    \item Scalar Multiplication: $c\bm{u}$ is the vector whose length is $|c|$ times of $\bm{u}$ and is in the same direction if $c>0$ or opposite if $c<0$.
+    \item Vector Between 2 Points: The vector between $A(x_1,y_1,z_1)$ and $B(x_2,y_2,z_2)$, $\vec{AB}$ is $\bm{a}=\langle x_2-x_1, y_2-y_1, z_2-z_1 \rangle$.
+    \item Vector Properties: Addition is commutative and associative, 0 is the additive identity, addition with negation gives 0, scalar multiplication is commutative, distributive and associative, 1 is the multiplicative identity.
+    \item Basis Vectors: Length 1 in the direction of each axis, $\bm{i}=\langle1, 0, 0\rangle$, $\bm{j}=\langle0, 1, 0\rangle$, $\bm{k}=\langle0, 0, 1\rangle$.
+    \item Unit Vector: Vector of length 1, given by $\bm{u}=\frac{\bm{a}}{||\bm{a}||}$.
+    \item Dot Product: For $\bm{a}=\langle a_1,a_2,a_3\rangle$ and $\bm{b}=\langle b_1,b_2,b_3\rangle$, $\bm{a}\cdot\bm{b}=a_1b_1+a_2b_2+a_3b_3$.
+    \item Dot Product Properties: Commutative, Distributive, Associative, 0 is identity, $\bm{a}\cdot\bm{a}=||a||^2$.
+    \item Angle Between Vectors (Dot Product): $\bm{a}\cdot\bm{b}=||\bm{a}||||\bm{b}||cos\theta$.
+    \item Orthogonal Vectors: Two vectors are orthogonal iff their dot product is 0.
+    \item Projection: Given $\bm{a}=\vec{PQ}$ and $\bm{b}=\vec{PR}$, let $S$ be the foot of perpendicular from $R$ to $\bm{a}$. $\vec{PS}$ is the vector projection of $\bm{b}$ onto $\bm{a}$, $proj_{\bm{a}}\bm{b}$. The scalar projection is the signed magnitude of the vector projection (component of $\bm{b}$ along $\bm{a}$ is $comp_{\bm{a}}\bm{b} = ||\bm{b}||cos\theta=\frac{\bm{a}\cdot\bm{b}}{||\bm{a}||}$. $proj_{\bm{a}}\bm{b}=comp_{\bm{a}}\bm{b}\times\frac{\bm{a}}{||\bm{a}||}=\frac{\bm{a}\cdot\bm{b}}{\bm{a}\cdot\bm{a}}\cdot\bm{a}$.
+    \item Distance from Point to Plane: The shortest distance from $P(x_0,y_0,z_0)$ to the plane $ax+by+cz=d$ is $\frac{|ax_0+by_0+cz_0-d|}{\sqrt{a^2+b^2+c^2}}$.
+    \item Cross Product: For $\bm{a}=\langle a_1,a_2,a_3\rangle$ and $\bm{b}=\langle b_1,b_2,b_3\rangle$, $\bm{a}\times\bm{b}=\langle a_2b_3-a_3b_2,-(a_1b_3-a_3b_1),a_1b_2-a_2b_1\rangle$.
+    \item Orthogonal Vector to 2 other Vectors: $\bm{a}\times\bm{b}$ is orthogonal to both $\bm{a}$ and $\bm{b}$.
+    \item Angle between Vectors (Cross Product): $||\bm{a}\times\bm{b}||=||\bm{a}||||\bm{b}||sin\theta$.
+    \item Cross Product Properties: Multiplication with scalar is associative, it is distributive, and $\bm{a}\times\bm{b}=-\bm{b}\times\bm{a}$.
+    \item Parametric Equation of Line: $x=x_0+at$, $y=y_0+bt$, $z=z_0+ct$.
+    \item Skew Lines: Lines that are non-parallel and non-intersecting.
+    \item Vector Equation of Plane: $\bm{n}\cdot(\bm{r}-\bm{r}_0)=0$ where $\bm{n}$ is the normal vector.
+    \item Linear Equation of Plane: $ax+by+cz=d$ where $\bm{n}=\langle a,b,c\rangle$.
+\end{itemize}
+
+\section{8. Functions of Several Variables}
+\begin{itemize}
+    \item Derivative of Vector-Valued Function: If $\bm{r}(t)=\langle f(t),g(t),h(t)\rangle$ and $f,g,h$ are differentiable at $t=a$, $\bm{r}'(a)=\langle f'(a),g'(a),h'(a)\rangle$. Normal derivative rules apply. This gives the tangent vector at $t=a$.
+    \item Arc Length Formula: For the same $\bm{r}$, $s=\int_a^b\sqrt{f'(t)^2+g'(t)^2+h'(t)^2}dt=\int_a^b||\bm{r}'(t)||dt$.
+    \item Partial Derivative:  $f_x$ or $\frac{\partial f}{\partial x}$ is the partial derivative of $f$ w.r.t $x$. That means all other variables are assumed to be constant. $f_{xy}$ is a higher order derivative which means differentiating by $x$ then $y$.
+    \item Clairaut's Theorem: If $f_{xy}$ and $f_{yx}$ are both continuous, $f_{xy}(a,b)=f_{yx}(a,b)$.
+    \item Equation of Tangent Plane: Suppose $z=f(x,y)$. $\bm{n}=\langle f_x(a,b),f_y(a,b),-1\rangle$. The equation of the tangent plane is $f_x(a,b)(x-a)+f_y(a,b)(y-b)-(z-f(a,b))=0$.
+    \item Chain Rule Case 1: $\frac{dz}{dt}=\frac{\partial f}{\partial x}\frac{dx}{dt}+\frac{\partial f}{\partial y}\frac{dy}{dt}$. Works with $> 2$ parameters as well.
+    \item Chain Rule Case 2: If $x$ and $y$ have 2 parameters $s$ and $t$, $\frac{dz}{ds}=\frac{\partial f}{\partial x}\frac{dx}{ds}+\frac{\partial f}{\partial y}\frac{dy}{ds}$ and $\frac{dz}{dt}=\frac{\partial f}{\partial x}\frac{dx}{dt}+\frac{\partial f}{\partial y}\frac{dy}{dt}$.
+    \item Implicit Differentiation: Suppose $F(x,y,z)=0$ where $F$ is differentiable and $z=f(x,y)$ implicitly. Then $\frac{\partial z}{\partial x}=-\frac{F_x(x,y,z)}{F_z(x,y,z)}$ and $\frac{\partial z}{\partial y}=-\frac{F_y(x,y,z)}{F_z(x,y,z)}$.
+    \item Increment: If $z=f(x,y)$, $\Delta z=f(x+\Delta x, y+\Delta y)-f(x,y)$.
+    \item Differentials: If $dx=\Delta x$ and $dy=\Delta y$, $dz=f_x(x,y)dx+f_y(x,y)dy$.
+    \item Increment Approximation: For small increments, $\Delta z \approx dz=f_x(a,b)dx+f_y(a,b)dy=f_x(a,b)\Delta x+f_y(a,b)\Delta y$.
+    \item 2D Directional Derivative: The Directional derivative of $f$ in the direction of any UNIT vector $\bm{u}=\langle a,b \rangle$, $D_{\bm{u}}f(x,y)=f_x(x,y)a+f_y(x,y)b=\langle f_x,f_y\rangle \cdot \bm{u}$.
+    \item Gradient: $\triangledown f(x,y)=\langle f_x,f_y\rangle$.
+    \item 3D Directional Derivative: $D_{\bm{u}}f(x_0,y_0,z_0)=\triangledown f(x_0,y_0,z_0) \cdot \bm{u}$ where $\triangledown f=\langle f_x,f_y,f_z \rangle$.
+    \item Level Curve v/s $\triangledown f$: Suppose $\triangledown f(x_y,y_0)\neq0$. Then $\triangledown f(x_y,y_0)$ is perpendicular to the level curve $f(x,y)=k$ at the point $(x_0,y_0)$ where $f(x_0,y_0)=k$.
+    \item Level Surface v/s $f$: Suppose $\triangledown F(x_0,y_0,z_0)\neq0$. Then $\triangledown F(x_0,y_0,z_0)\cdot\bm{r}'(t_0)=0$, meaning they are orthogonal.
+    \item Tangent Plane to Level Surface: $\triangledown F(x_0,y_0,z_0)\cdot\langle x-x_0,y-y_0,z-z_0\rangle=0$.
+    \item Maximizing Rate of Increase: Assume $\triangledown f(P)\neq0$. Let $\bm{u}$ be a unit vector making an angle $\theta$ with $\triangledown f$. Then $D_{\bm{u}} f(P)=||\triangledown f(P)||cos\theta$. $\triangledown f(P)$ points in direction of maximum rate of increase, while $-\triangledown f(P)$ points in direction of maximum rate of decrease.
+    \item Local Extrema: If there is a local extrema at $(a,b)$, then $f_x(a,b)=f_y(a,b)=0$.
+    \item Critical Point: $f_x(a,b)=0$ and $f_y(a,b)=0$ or a partial derivative does not exist.
+    \item Saddle Point: Critical point where every disk centered at $(a,b)$ contains points where $f(x,y)<f(a,b)$ and points where $f(x,y)>f(a,b)$.
+    \item Second Derivative Test: $D=D(a,b)=f_{xx}(a,b)f_{yy}(a,b)-[f_{xy}(a,b)]^2$.
+    \begin{itemize}
+        \item $D>0$, $f_{xx}(a,b)>0$: Local Minimum.
+        \item $D>0$, $f_{xx}(a,b) < 0$: Local Maximum.
+        \item $D<0$: Saddle Point.
+        \item $D=0$: No conclusion can be drawn.
+    \end{itemize}
+\end{itemize}
+
+\section{9. Double Integrals}
+\begin{itemize}
+    \item Volume as Double Integral: The volume of the solid that lies above a rectangle and below the surface $z=f(x,y)$ is $V=\int\int_R f(x,y)dA$.
+    \item Iterated Integral: $\int_a^b\int_c^df(x,y)dydx$ means integrating $y$ from $c$ to $d$ first with $x$ fixed then $x$ from $a$ to $b$.
+    \item Fubini's Theorem: If $f$ is continuous on $R$, then $\int_a^b\int_c^df(x,y)dydx=\int_c^d\int_a^bf(x,y)dxdy$.
+    \item Special Case: $\int\int_Rg(x)h(y)dA=(\int_a^bg(x))(\int_c^dh(y)dy)$.
+    \item Type I Region: Region lying between graph of two continuous functions of $x$. Integrate by $y$ first, then $x$.
+    \item Type II Region: Region lying between graph of two continuous functions of $y$. Integrate by $x$ first, then $y$.
+    \item Polar Coordinates: $r^2=x^2+y^2$, $x=rcos\theta$, $y=rsin\theta$.
+    \item Integration of Polar Coordinates: $\int\int_Rf(x,y)dA=\int_c^d\int_a^bf(rcos\theta,rsin\theta)rdrd\theta$. Don't forget the extra $r$!
+    \item Surface Area: $\int\int_D dS=\int\int_D\sqrt{f_x^2+f_y^2+1}dA$ where $f_x^2$ and $f_y^2$ are partial derivatives.
+\end{itemize}
+
+\section{10. Ordinary Differential Equations}
+\begin{itemize}
+    \item Separable ODE:
+    \begin{itemize}
+        \item $y'=f(x)g(y)$
+        \item $\frac{1}{g(y)}y'=f(x)$
+        \item $\int\frac{1}{g(y)}dy=\int f(x)dx+C$.
+    \end{itemize}
+    \item Reduction to Separable Form:
+    \begin{itemize}
+        \item For $y'=g(\frac{y}{x})$, sub $v=\frac{y}{x}$.
+        \item Then $y=vx$ and $y'=v+xv'$.
+        \item The equation becomes $v+xv'=g(v)$ which is separable.
+        \item Another useful substitution is $u=ax+by+c$.
+    \end{itemize}
+    \item Linear First Order ODE:
+    \begin{itemize}
+        \item The standard form is $y'+P(x)y=Q(x)$.
+        \item Multiply by the integrating factor $I(x)=e^{\int P(x)dx}$.
+        \item The equation reduces to $(y\cdot I(x))'=Q(x)\cdot I(x)$, which we can solve by integrating both sides by $x$.
+    \end{itemize}
+    \item The Bernoulli Equation:
+    \begin{itemize}
+        \item $y'+p(x)y=q(x)y^n$, where $n\neq0,1$.
+        \item Sub $u=y^{1-n}$ and find $y'$.
+        \item Sub in for $y'$ and divide by the coefficient of $u'$ to get $u'+(1-n)p(x)u=(1-n)q(x)$ which is a first order linear ODE.
+        \item Solve the new ODE then finish the substitution.
+    \end{itemize}
+\end{itemize}
+
+\end{multicols*}
+
+\end{document}
