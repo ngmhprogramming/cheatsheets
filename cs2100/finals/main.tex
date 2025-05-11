@@ -865,6 +865,444 @@ contents={%
     \end{itemize}
 \end{itemize}
 
-\end{multicols*}
+\section{13. Boolean Algebra}
+\begin{itemize}
+    \item High/True/1 and Low/False/0
+    \item Combinational Circuit: No memory, output depends solely on input
+    \item Sequential Circuit: With memory, output depends on both input and current state
+    \item AND: $\cdot$, OR: $+$, NOT: $'$
+    \item Precedence: NOT > AND > OR
+\end{itemize}
 
+\subsection{Laws / Theorems}
+\begin{itemize}
+    \item Identity Laws: $A+0=0+A=A$, $A\cdot 1 = 1 \cdot A=A$
+    \item Inverse/Complement Laws: $A+A'=A'+A=1$, $A\cdot A' = A'\cdot A = 0$
+    \item Commutative Laws: $A+B=B+A$, $A\cdot B= B\cdot A$
+    \item Associative Laws: $A+(B+C)=(A+B)+C$, $A\cdot(B\cdot C)=(A\cdot B)\cdot C$
+    \item Distributive Laws: $A\cdot(B+C)=(A\cdot B)+(A\cdot C)$, $A+(B\cdot C)=(A+B)\cdot(A+C)$
+    \item Duality: If AND/OR and 0/1 in an equation are swapped, it remains valid
+    \item Idempotency: $X+X=X$, $X\cdot X = X$
+    \item One / Zero Element: $X+1=1+X=1$, $X\cdot 0 = 0 \cdot X = 0$
+    \item Involution: $(X')'=X$
+    \item Absorption 1: $X+X\cdot Y=X$, $X\cdot(X+Y)=X$
+    \item Absorption 2: $X+X'\cdot Y=X+Y$, $X\cdot(X'+Y)=X\cdot Y$
+    \item DeMorgan's (Can be generalised): $(X+Y)'=X'\cdot Y'$, $(X\cdot Y)'=X'+Y'$
+    \item Consensus: $X\cdot Y+X'\cdot Z+Y\cdot Z=X\cdot Y + X' \cdot Z$, $(X+Y)\cdot(X'+Z)\cdot(Y+Z)=(X+Y)\cdot(X'+Z)$
+\end{itemize}
+
+\subsection{Standard Forms}
+\begin{itemize}
+    \item Literal: Boolean variable on its own or in its complemented form
+    \item Product Term: A single literal or a logical product of several literals
+    \item Sum Term: A single literal or a logical sum of several literals
+    \item Sum-of-Products Expression: A product term or a logical sum of several product terms
+    \item Product-of-Sums Expression: A sum term or a logical product of several sum terms
+    \item Minterm: Product term that contains n literals from all the variables
+    \item Maxterm: Sum term that contains n literals from all the variables
+    \item Minterm is complement of maxterm
+    \item Canonical Form: Unique form of representation
+    \item Sum of Minterms: Gather minterms of function where output is 1
+    \item Product of Maxterms: Gather maxterms of function where output is 0
+    \item Opposite of each other
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{terms.png}
+\end{center}
+
+\section{14. Logic Circuits}
+\begin{itemize}
+    \item See previous pages for list of logic gates
+    \item XOR: Check different, XNOR: Check same
+    \item Fan-in: Number of inputs to a gate
+    \item Cannot have hanging inputs!
+    \item Draw circle for wire intersection
+    \item Complete set of logic: Can make any boolean function
+    \item e.g. \{AND, OR, NOT\}, \{NAND\}, \{NOR\}
+    \item NAND with both inputs $X$ gives $X'$
+    \item NAND of NAND(X, Y) gives $X\cdot Y$
+    \item NAND (X', Y') gives $X+Y$
+    \item Similar for NOR but swap some cases around
+    \item SOP: Use 2 level AND-OR or NAND circuit
+    \item POS: Use 2 level OR-AND or NOR circuit
+\end{itemize}
+
+\section{15. Simplification}
+\begin{itemize}
+    \item Minimise number of literals
+    \item Algebraic Simplification can be hard
+\end{itemize}
+
+\subsection{Half Adder}
+\begin{itemize}
+    \item Adds $(X, Y)$ producing $(C, S)$
+    \item $C=X\cdot Y$, $S=X'\cdot Y + X \cdot Y'=X \oplus Y$
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{halfadder.png}
+\end{center}
+
+\subsection{K-maps}
+\begin{itemize}
+    \item Gray Code: Unweighted, only single bit change from one code value to next
+    \item K-map: Systematic method to obtain simplified SOP expressions
+    \item Each square is a minterm differing by one literal
+    \item Has wrap-around
+    \item Group as many cells as possible, select as few groups as possible to cover all the cells (minterms) of the function
+    \item Implicant: Product term used to cover minterms of function
+    \item Prime Implicant: Product term obtaned by combining the maximum possible number of minterms from adjcant squares in the map
+    \item Essential Prime Implicants: Prime implicant that includes at least one minterm that is not covered by any other prime implicant
+    \item SOP: Select minimum subset of prime implicants to cover minterms, and add them together
+    \item Don't Care: Can be either 1 or 0, might help with simplifying k-maps
+    \item POS: Draw k-map of complement, then apply DeMorgan's on the result
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{3varkmap.png}
+\end{center}
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{4varkmap.png}
+\end{center}
+
+
+\section{17. Combinational Circuits}
+\subsection{Full Adder}
+\begin{itemize}
+    \item To fully add two binary numbers, need 3 bits
+    \item $C=X\cdot Y+X\cdot Z + Y\cdot Z$, $S=X'\cdot Y' \cdot Z+X'\cdot Y\cdot Z'+X\cdot Y'\cdot Z'+X\cdot Y\cdot Z$
+    \item Can be made from 2 half adders and an OR gate
+    \item Z is Cin, C is Cout
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{fulladder.png}
+\end{center}
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{fulladder2.png}
+\end{center}
+
+\subsection{4-bit Parallel Adder}
+\begin{itemize}
+    \item Add two 4-bit numbers together with Cin to get 5-bit result
+    \item Use addition formula for each pair of bits and Cin
+    \item $C_{i+1}S_i=X_i+Y_i+C_i$
+    \item $C_{i+1}=X_i\cdot Y_i+(X_i\oplus Y_i)\cdot C_i$, $S_i=X_i\oplus Y_i\oplus C_i$
+    \item Can use same logic to expand to 16-bit parallel adder
+    \item Example Application: Voting system
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{paralleladder.png}
+\end{center}
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{paralleladder2.png}
+\end{center}
+
+\subsection{Magnitude Comparator}
+\begin{itemize}
+    \item Check trichotomy
+\end{itemize}
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{comparator.png}
+\end{center}
+
+\subsection{Circuit Delays}
+\begin{itemize}
+    \item Max of each input / output
+    \item Analyse components
+    \item Full adder: If $C_i=mt$, $S_i=max(t, mt)+t$, $C_{i+1}=max(t, mt)+2t$
+    \item Parallel Adder: $S_n=(2(n-1)+2)t$, $C_{n+1}=(2(n-1)+3)t$
+\end{itemize}
+
+\section{18. MSI Components}
+\subsection{Decoder}
+\begin{itemize}
+    \item Convert binary information from $n$ input lines to $2^n$ output lines, can be used to generate minterms
+    \item Implemented with AND gates
+    \item We can implement functions by using the output minterms
+    \item Can have enable control signal, which is either one/zero-enable
+    \item Can build larger decoders from smaller ones
+    \item Can also have negated outputs
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{decoder.png}
+\end{center}
+
+\subsection{Encoder}
+\begin{itemize}
+    \item Opposite of decoding
+    \item Provides a code corresponding to input line
+    \item Implemented with OR gates
+    \item Priority Encoder: Input with highest priority takes precedence, all zero is invalid
+\end{itemize}
+
+\subsection{Demultiplexer}
+\begin{itemize}
+    \item Directs data from input to one selected output line
+    \item Identical to decoder with enable using data
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{demultiplexer.png}
+\end{center}
+
+\subsection{Multiplexer}
+\begin{itemize}
+    \item Selects intput from one of the input lines and pipes it to output line
+    \item Output is sum of (product of data lines and selection lines)
+    \item Larger multiplexers can be constructed from smaller ones
+    \item Constructing Function: Connect variables to selection lines, put 1 on data line if it is a minterm, 0 otherwise
+    \item Squeezing Multiplexers: Use one variable less by moving it to the input data lines
+    \item Group inputs by selector lines, and determine MUX input based on remaining variable and function
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{multiplexer.png}
+\end{center}
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{squeeze.png}
+\end{center}
+
+\section{19. Sequential Logic}
+\begin{itemize}
+    \item Syncronous: Outputs change at specific time, Asynchronous: Outputs change at any time
+    \item Multivibrator: Class of sequential circuits, Bistable, Monostable, Astable
+    \item Bistable logic devices: Latches and flip flops
+    \item Memory Element: Device which can remember value indefinitely, or change value on command from inputs
+    \item Clock: Usually a Square Wave
+    \item Memory Element can be Pulse Triggered (Latches) or Edge triggered (Flip-flops)
+    \item Flip-flops are synchronous bistable devices, and have a $>$ indicating clock input
+\end{itemize}
+
+\subsection{S-R Latch}
+\begin{itemize}
+    \item Inputs: $S, R$, Outputs: $Q, Q'$
+    \item $Q$ high: SET state, $Q$ low: RESET state
+    \item Gated: Has enable input, outputs can only change if enabled
+\end{itemize}
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{srlatch.png}
+\end{center}
+
+\subsection{Gated D Latch}
+\begin{itemize}
+    \item S-R latch, but $R=S'$
+    \item Eliminates invalid state
+\end{itemize}
+\begin{center}
+    \includegraphics[width=0.7\linewidth]{dlatch.png}
+\end{center}
+
+\subsection{Asynchronous Inputs}
+\begin{itemize}
+    \item Affect state of flip-flop independent of clock
+    \item Preset immediately sets output to HIGH
+    \item Clear immediately sets output to LOW
+\end{itemize}
+
+\subsection{Flip-Flops}
+\subsubsection{Characteristic Table}
+\begin{center}
+    \includegraphics[width=\linewidth]{flipflopc.png}
+\end{center}
+\subsubsection{Excitation Table}
+\begin{center}
+    \includegraphics[width=\linewidth]{flipflope.png}
+\end{center}
+\subsubsection{State Table and State Diagram}
+\begin{itemize}
+    \item Use K-map to find flip-flop input functions based on current state and input
+    \item Edge is input/output
+    \item Nodes are states
+\end{itemize}
+\begin{center}
+    \includegraphics[width=\linewidth]{statediagram.png}
+\end{center}
+
+\subsection{Memory}
+\begin{itemize}
+    \item stores program and data
+    \item 1 byte = 8 bits, 1 word is a multiple of bytes
+    \item Hierarchy: Fast expensive volatile to Slow cheap non-volatile
+    \item Memory unit stores information in words
+    \item Has input (write) lines and output (read) lines
+    \item Address consists of lines to choose location
+    \item Static RAM: Uses flip-flops as memory cells, Dynamic RAM: Uses capacitor charges to represent data, have to be constantly refreshed
+    \item Memory Array: Chips combined to form larger memory
+\end{itemize}
+
+\section{20. Pipelining}
+\begin{itemize}
+    \item Does not help latency of single tasks, but rather throughput of entire workload
+    \item Multipled tasks operating simultaneously using different resources
+    \item Delays are due to slowest stage and stalling for dependencies
+    \item Introduce Pipeline registers between stages
+\end{itemize}
+\begin{center}
+    \includegraphics[width=\linewidth]{pipeline.png}
+\end{center}
+\begin{itemize}
+    \item Stages and information:
+    \begin{itemize}
+        \item ID Stage: IF/ID supplies register numbers, offset, PC+4, ID/EX receives data values from register file, extended immediate, PC+4
+        \item EX Stage: ID/EX supplies above, EX/MEM receives (PC+4)+(Immd x 4), ALU result, isZero?, Data Read 2
+        \item MEM Stage: EX/MEM supplies above, MEM/WB receives ALU result, memory read data
+        \item WB Stage: MEM/WB supplies above, at the end, result is written back to register file
+        \item However, register provided by IF/ID is wrong, so we need to pass it from ID/EX all the way through
+    \end{itemize}
+    \item Each control signal has an associated stage
+    \item Single-Cycle Processor: Cycle Time = max(Total of time for each stage) for each instruction, Execution time for I instructions is multiplied
+    \item Multi-Cycle Processor: Cycle Time = max(Time for a stage), Execution time for I instructions = I x Average Cycles per Instruction x Cycle Times
+    \item Pipelining Processor: Cycle Time = max(Time for a stage) + Pipelining Overhead, Cycles for I instructions = I + N - 1, Execution time for I instructions = (I + N - 1) x Cycle Time
+    \item Ideal Speedup: Each stage takes same amount of time, no pipelining overhead, number of instructions is much larger than number of stages, gives N times speedup
+\end{itemize}
+
+\subsection{21. Pipeline Hazards}
+\subsubsection{Structural Hazard}
+\begin{itemize}
+    \item Simultaneous use of hardware resource
+    \item e.g. If only single memory, memory could be accessed at the same time by 2 different instructions
+    \item Stalling: Delay instruction for a cycle
+    \item Separate Memory: Split memory into data and instruction memory
+    \item Writing and Reading from memory at same time: Split cycle into half, first half for writing and second half for reading
+\end{itemize}
+
+\subsection{Instruction Dependencies}
+\subsubsection{Data Dependencies}
+\begin{itemize}
+    \item Overlap between data accessed by different instructions
+    \item Read After Write / True data dependency: Later instruction reads from destination register written by earlier instruction
+    \item Write after read, Write after write, do not cause pipeline hazards
+    \item Result from execution is produced at end of EX stage, and only needed at start of EX stage of next instruction
+    \item Solution: Forward the result to any later instructions, bypassing data read or ID
+    \item However, this does not work for the result of LOAD instructions after MEM stage, so we still need stalling
+\end{itemize}
+
+\subsubsection{Control Dependencies}
+\begin{itemize}
+    \item Execution of instruction depends on another
+     \item Control Dependency: Branch decision is made in MEM stage
+    \item Stalling: Waiting until after MEM stage to fetch next instruction, introduces 3 cycle delay
+    \item Techniques: Early branch resolution, Branch prediction, Delayed branching
+    \item Early Branching: Make decision in ID stage instead of MEM, reduced to 1 cycle delay
+    \item However, registers involved might be produced by instructions before, and further stalling might be needed
+    \item Solve by adding forwarding path from ALU to ID stage, still has 1 cycle delay
+    \item After a load instruction, early branching does not speedup
+    \item Branch Prediction: Assume all branches are not taken
+    \item If wrong guess is made, flush instructions
+    \item Delayed Branching: Move non-control dependent instructions into slots following a branch (branch-delay slots)
+    \item Executed regardless of outcome, if no such instruction, add no-op
+    \item With early branching, we have 1 slot
+\end{itemize}
+
+\subsection{Summary}
+\begin{itemize}
+    \item Default: Wait till after MEM then get result in ID
+    \item Forwarding: Forward from EX to next EX, or MEM to next EX
+    \item Default: Wait till after MEM to get result to IF next instruction
+    \item Early Branching: Compute result in ID, forward from previous EX
+    \item Branch Prediction: Carry on and fetch next instruction, fetch correct instruction immediately after actual result is known
+    \item List of delay durations:
+\end{itemize}
+\begin{center}
+    \includegraphics[width=0.8\linewidth]{delays.png}
+\end{center}
+
+\section{22. Cache}
+\begin{itemize}
+    \item Keep frequently and recently used data in smaller but faster memory
+    \item Principle of Locality: Program access only a small portion of the memory address space within a small time interval
+    \item Temporal Locality: Recently referenced items are likely to be referenced again soon
+    \item Spatial Locality: Nearby items are likely to be referenced soon
+    \item Cache Hit: Data is in cache, Rate: Fraction of memory access that hit, Time: Time to access cache
+    \item Cache Miss: Data is not in cache, Rate: 1 - Hit rate, Penalty: Time to replace cache block + hit time
+    \item Average Access Time = Hit Rate * Hit Time + (1 - Hit Rate) * Miss Penalty
+    \item Cache Block/Line: Unit of transfer between memory and cache, typically one or more words
+    \item MIPS: 1 word = 4 bytes = 32 bits
+    \item Memory Address = (32-N) Block Number + N Offset
+\end{itemize}
+
+\subsection{Direct Mapped Cache}
+\begin{itemize}
+    \item Cache Index = Block Number mod Number of Cache Blocks
+    \item If Number of Cache Blocks = $2^M$, then the last M bits are the cache index
+    \item Multiple memory blocks can map to the same cache block when they have the same cache index
+    \item They have different Tag = Block Number / Number of Cache Blocks
+    \item If Cache Block Size = $2^N$ bytes and Number of Cache Blocks = $2^M$, then Memory Address = (32-N-M) bits Tag, M bits Index, N bits offset
+    \item Block Number = Tag + Index bits
+    \item Cache also has a valid bit indicating validity of data
+    \item Example:
+    \begin{itemize}
+        \item e.g. 4GB Memory, 16KB Cache, 16 byte blocks
+        \item Offset = $N = 2^4$ bits, Block Number = 32 - 4 = 28 bits
+        \item Number of Blocks = $2^{28}$
+        \item Number of Cache Blocks = 1024 = $2^{10}$
+        \item Cache Index = $M = 10$ bits
+        \item Cache Tag = 32 - 10 - 4 = 18 bits
+    \end{itemize}
+    \item Offset = log2 Number of bytes in Block
+    \item Number of Cache Blocks = Cache Size / Block Size
+    \item Cache Index = log2 Number of Cache Blocks
+    \item Tag = 32 - Offset - Cache Index
+    \item Compulsory / Cold Miss: First access to block, needs to be brought into cache
+    \item Conflict / Collision Miss: Several blocks are mapped to same block or set
+    \item Capacity Miss: Blocks are discarded as cache cannot contain all blocks needed
+    \item Cache and main memory could be inconsistent
+    \item Write-through: Write data both to cache and to main memory
+    \item Limited by memory speed, can use write buffer to speedup
+    \item Write-back: Write data to cache, and only to main memory when evicted
+    \item Wasteful if we write back every block, can use dirty bit to indicate whether data is changed
+    \item On read miss, data loaded into cache and then loaded into register
+    \item Write Allocate: Load complete block into cache, change only required word in cache, write to main memory depending on policy
+    \item Write Around: Do not load block to cache, write directly to main memory only
+\end{itemize}
+\begin{center}
+    \includegraphics[width=0.8\linewidth]{directcache.png}
+\end{center}
+
+\section{23. Set / Fully Associative Cache}
+\subsection{Set Associative Cache}
+\begin{itemize}
+    \item Block Size tradeoff: Large block size takes advantage of spatial locality, but larger miss penalty, and fewer blocks increases miss rate
+    \item Set Associative Cache targets conflict misses
+    \item N-way Set Associative Cache: Memory block can be in a fixed number of locations in cache
+    \item Cache contains a number of sets, each with N blocks
+    \item Memory block can be place in any of the N blocks after loading
+    \item Cache Set Index = Block Number mod Number of Cache Sets
+    \item Essentially the same as direct mapping bit and math wise
+    \item Number of Sets = Cache Blocks / N-way
+    \item Set Index = log2 Number of Sets
+    \item Rule of Thumb: A direct mapped cache of size N has about the same miss rate as a 2-way set associative cache of size N/2
+\end{itemize}
+\begin{center}
+    \includegraphics[width=0.8\linewidth]{setcache.png}
+\end{center}
+
+\subsection{Fully Associative Cache}
+\begin{itemize}
+    \item Memory block can be placed in any location in cache
+    \item Cache Block size = $2^N$ bytes
+    \item Number of Cache blocks = $2^M$
+    \item Offset = N bits, Tag = 32 - N bits
+\end{itemize}
+\begin{center}
+    \includegraphics[width=0.8\linewidth]{fullcache.png}
+\end{center}
+
+\subsection{Performance / Replacement Policy}
+\begin{itemize}
+    \item Total Miss = Cold Miss + Conflict Miss + Capacity Miss
+    \item Capacity Miss = Total Miss - Cold Miss when Conflict Miss = 0
+    \item Conflict miss is 0 for fully associative cache
+    \item Set Associative / Fully Associative Cache needs to replace blocks if full using block replacement policy
+    \item Least Recently Used: Temporal Locality
+    \item First in First Out, Random Replacement, Least Frequently Used
+\end{itemize}
+\begin{center}
+    \includegraphics[width=0.8\linewidth]{cache.png}
+\end{center}
+\end{multicols*}
 \end{document}
