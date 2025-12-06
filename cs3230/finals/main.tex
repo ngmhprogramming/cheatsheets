@@ -1,0 +1,981 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\usepackage{background}
+\setlist{nosep}
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=0.4,
+angle=0,
+% contents={\includegraphics[width=\paperwidth,height=\paperheight]{image.png}}
+contents={}
+}
+
+\pdfinfo{
+  /Title (CS3230.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{CS3230}}
+            \\ \normalsize{AY25/26 Sem 1}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{Asymptotic Analysis}
+\subsection{Recursive Fibonacci}
+\begin{itemize}
+    \item Let $T(n)$ be the number of operations done by $Fib(n)$
+    \item $T(0)=T(1)=2$ for checking if statement and return
+    \item $\forall n \geq 2, T(n)=T(n-1)+T(n-2)+8$ for the extra checking and calls
+    \item So $T(n) \geq Fib(n)$ 
+    \item $Fib(n)=Fib(n-1)+Fib(n-2), Fib(n) \geq 2 \cdot Fib(n-2)$
+    \item Doubles every two terms, so it doubles $\lceil \frac{n-2}{2} \rceil$ times and $T(n) \geq Fib(n) \geq 2^{\frac{n-2}{2}}$
+\end{itemize}
+
+\subsection{Big O Notation}
+\begin{itemize}
+    \item $f \in O(g): \exists c > 0, n_0 > 0, \forall n \geq n_0, 0 \leq f(n) \leq cg(n)$, $g$ is an upper bound on $f$, also written as $f(n)=O(g(n))$
+    \item Multiple $c$ and $n_0$ could work for the same case
+    \item $f \in \Omega(g): \exists c > 0, n_0 > 0, \forall n \geq n_0, 0 \leq cg(n)\leq f(n) $, $g$ is a lower bound on $f$
+    \item $f \in \Theta(g):$ tight bound, $\Theta(g)=O(g) \cap \Omega(g)$
+    \item $f \in o(g)$: $\forall c > 0, \exists n_0 > 0, \forall n \geq n_0, 0 \leq f(n) < cg(n)$,  strict upper bound
+    \item $f \in \omega(g)$: $\forall c > 0, \exists n_0 > 0, \forall n \geq n_0, 0 \leq cg(n) < f(n)$, strict lower bound
+\end{itemize}
+
+\subsection{Limits}
+\begin{itemize}
+    \item $lim_{n\rightarrow\infty}(\frac{f(n)}{g(n)})=0 \Rightarrow f(n) \in o(g(n))$
+    \item $lim_{n\rightarrow\infty}(\frac{f(n)}{g(n)})<\infty \Rightarrow f(n) \in O(g(n))$
+    \item $0<lim_{n\rightarrow\infty}(\frac{f(n)}{g(n)})<\infty \Rightarrow f(n)\in\Theta(g(n))$
+    \item $lim_{n\rightarrow\infty}(\frac{f(n)}{g(n)})>0 \Rightarrow f(n)\in\Omega(g(n))$
+    \item $lim_{n\rightarrow\infty}(\frac{f(n)}{g(n)})=\infty \Rightarrow f(n)\in\omega(g(n))$
+\end{itemize}
+
+\subsection{Example Limit Proof}
+\begin{itemize}
+    \item By definition, $lim_{n\rightarrow\infty} \frac{f(n)}{g(n)}=0$ means $\forall \varepsilon > 0, \exists n_0 > 0, \forall n \geq n_0, \frac{f(n)}{g(n)} < \varepsilon$.
+    \item We can pick $c = \varepsilon$, then we have $f(n) < \varepsilon \cdot g(n), f(n) < c \cdot g(n), f(n) \in o(g(n))$.
+\end{itemize}
+
+\subsection{Properties}
+\begin{enumerate}
+    \item Reflexivity of $O,\Omega,\Theta$: $f(n)\in O(f(n))$
+    \item Transitivity of all: $f(n)\in O(g(n)) \land g(n) \in (h(n)) \Rightarrow f(n) \in O(h(n))$
+    \item Symmetry: $f(n)\in\Theta(g(n))\Leftrightarrow g(n)\in\Theta(f(n))$
+    \item Complementarity: $f(n)\in O(g(n)) \Leftrightarrow g(n)\in\Omega(f(n))$, $f(n)\in o(g(n)) \Leftrightarrow g(n)\in\omega(f(n))$
+\end{enumerate}
+
+\subsection{Useful Facts}
+\begin{itemize}
+    \item $e^x\geq 1+x$
+    \item For any $k>0, a>1$, $n^k \in o(a^n)$
+    \item $n^i \in \Omega(log^jn)$
+    \item $log_ba=\frac{log_ca}{log_cb}$
+    \item $log_ba=\frac{1}{log_ab}$
+    \item $a^{log_bc}=c^{log_ba}$
+    \item Stirling's Approximation: $n!=\sqrt{2\pi n}(\frac{n}{e})^n(1+\Theta(\frac{1}{n}))$, $log(n!)\in\Theta(n\ log \ n)$
+    \item $\sum_{k=1}^nk=\frac{1}{2}n(n+1)\in\Theta(n^2)$
+    \item $\sum_{k=0}^n x^k=\frac{x^{n+1}-1}{x-1}$
+    \item $\sum_{k=0}^\infty x^k=\frac{1}{1-x}$ when $|x|<1$
+    \item $H_n=\sum_{k=1}^n\frac{1}{k}=ln\ n+O(1)$
+    \item L'Hopital's: $lim_{x\rightarrow\infty}\frac{f(x)}{g(x)}=lim_{x\rightarrow\infty}\frac{f'(x)}{g'(x)}$
+    \item Conditional Probability: $P(A|B)=\frac{P(A \cap B)}{P(B)}$
+    \item Baye's Theorem: $P(A|B)=\frac{P(A)P(B|A)}{P(B)}=\frac{P(A)P(B|A)}{P(A)P(B|A)+P(\overline{A})P(B|\overline{A})}$
+    \item For constant $i$, $a > 0$, $(n+a)^i \in O(n^i)$
+\end{itemize}
+
+\subsection{WA1 Asymptotics}
+\begin{itemize}
+    \item $f(n)=3^n, g(n)=2^n \cdot n^{10000}$, $f(n) \in \omega(g(n))$
+    \item $f(n)=2^{(2^n)}, g(n)=2^{(2^{n+1})}$, $f(n)\in o(g(n))$ since $g(n)=(f(n))^2$
+    \item $f(n)=\sum_{i=1}^n\frac{1}{2^i}, g(n)=\sum_{i=1}^n\frac{i^{10000}}{2^i}$, $f(n) \in \Theta(g(n))$ since exponential grows faster than polynomial
+    \item $f(n)=log\ log\ n^n, g(n)=log\ log\ 2^{\sqrt{n}}$, $f(n) \in \Theta(g(n))$, since both are exponential in polynomial in $n$, double logarithm is $\Theta(log\ n)$
+    \item $f(n)=2^{\sqrt{log\ n}}, g(n)=\sqrt{n}$, $f(n) \in o(g(n))$ by comparing the logarithms
+    \item $f(n)=2^{\sqrt{log\ n}}, g(n)=2^{(2^{\sqrt{log\ log\ n}})}$, $f(n)\in\omega(g(n))$ by comparing double logarithm
+    \item $f(n)=n^{\frac{1}{log\ n}}, g(n)=n^{\frac{1}{log^2n}}$, $f(n) \in \Theta(g(n))$ both are equal to $2$
+    \item $f(n)=n^{\frac{1}{log\ n}}, g(n)=n^{\frac{1}{\sqrt{log\ n}}}$, $f(n) \in o(g(n))$ since $f(n)=1, g(n) \rightarrow \infty$
+\end{itemize}
+
+\section{Solving Recurrences}
+\subsection{Telescoping}
+\begin{itemize}
+    \item Goal: Make successive terms cancel out leaving first and last
+    \item Mergesort: $T(n)=2T(n/2)+n \Rightarrow \frac{T(n)}{n}=\frac{T(n/2)}{n/2}+1$ and so on
+    \item By expanding, we have $log\ n$ layers which cancel out to leave $\frac{T(n)}{n}=\frac{T(1)}{1}+log\ n$ and $T(n)=O(n\ log\  n)$
+    \item $T(n)=aT(\frac{n}{b})+f(n) \Rightarrow \frac{T(n)}{g(n)}=\frac{T(\frac{n}{b})}{g(\frac{n}{b})}+h(n), g(n)=ag(n/b), h(n)=\frac{f(n)}{g(n)}$
+\end{itemize}
+
+\subsection{Substitution}
+\begin{itemize}
+    \item Guess form of solution, then verify by induction
+    \item e.g. Tower of Hanoi: Solve $T(n)=2T(n-1)+1$, guess $T(n)=2^n-1$, then verify by induction
+    \item Example: $T(n)=4\cdot T(n/2)+\sqrt{n}$
+    \item Trying gives $T(n)\in O(n^3)$ and $T(n) \in \Omega(n)$, but nothing tight
+    \item Guess $T(n) \in \Theta(n^2)$ using $T(n) \leq c_2 \cdot n^2-c_1\cdot n$ (to deal with the $\sqrt{n}$ term)
+    \item For $c_1=1$, set $c_2$ large enough so $T(1) \leq c_2-c_1$
+    \item Upper Bound: $T(n)=4\cdot T(n/2)+\sqrt{n} \leq 4\cdot(c_2\cdot n^2/2^2-c_1\cdot n / 2)+\sqrt{n}=c_2\cdot n^2-2\cdot c_1 \cdot n + \sqrt{n} \leq c_2 \cdot n^2 - c_1 \cdot n + (\sqrt{n}-c_1\cdot n)\leq c_2 \cdot n^2 - c_1 \cdot n$
+    \item Lower Bound: Guess $T(n) \geq c_3\cdot n^2$ where $c_3>0$
+    \item $T(n)=4\cdot T(n/2)+\sqrt{n}\geq 4 \cdot (c_3 \cdot n^2 / 2^2)+\sqrt{n}=c_3\cdot n^2 + \sqrt{n} \geq c_3 \cdot n^2$
+    \item Combining both gives $T(n) \in \Theta(n^2)$
+\end{itemize}
+
+\subsection{Recursion Tree}
+\begin{itemize}
+    \item Draw recursion tree
+    \item Multiply layers and sum of nodes in each layer
+\end{itemize}
+
+\subsection{Master Theorem}
+\begin{itemize}
+    \item Solve recurrence of generic form $T(n)=aT(n/b)+f(n)$, $a\geq 1, b \geq 1, f \in \Omega(1)$
+    \item Classify work into splitting/combining and solving base cases
+    \item Solving base cases is linear in the number of leaves, $n^d$
+    \item Tree Height: $log_b n$, Number of children of a node: $a$, Number of leaves: $a^{log_bn}=n^{log_ba}=n^d$, $d=log_ba$ is the critical exponent
+    \item Cost of splitting and combining is $f(n)$
+    \item Floors and ceilings within recursive subproblem do not affect asymptotic growth of the function
+\end{itemize}
+
+\subsection{Cases}
+\begin{itemize}
+    \item 1: $f(n)\in O(n^{d-\epsilon}) \Rightarrow T(n)\in\Theta(n^{d})$, $\epsilon>0$
+    \item 2: $f(n)\in\Theta(n^{d}log^kn)$
+    \begin{itemize}
+        \item 2a: $k \geq 0 \Rightarrow T(n)\in\Theta(n^{d}log^{k+1}n)$
+        \item 2b: $k = -1 \Rightarrow T(n)\in\Theta(n^{d}log\ log\ n)$
+        \item 2c: $k < -1 \Rightarrow T(n)\in\Theta(n^{d})$
+    \end{itemize}
+    \item 3: $f(n)\in\Omega(n^{d+\epsilon}) \Rightarrow T(n)\in\Theta(f(n))$, $\epsilon > 0$, requires regularity condition $af(n/b)\leq cf(n), c<1$ to ensure $f(n)$ is dominant term (although actually redundant)
+    \begin{align*}
+    af(n/b) &\leq cf(n) \\
+    \frac{a}{c}f(n/b) &\leq f(n) \\
+    (\frac{a}{c})^if(1) &\leq f(b^i) \\
+    \Omega(n^{d+\epsilon}) \ni n^{log_b(\frac{a}{c})}f(1) = (\frac{a}{c})^{log_bn}f(1) &\leq f(n) \\
+    \epsilon = log_b(\frac{a}{c})-log_ba > 0, n &= b_i
+    \end{align*}
+\end{itemize}
+
+\subsection{Glossary}
+\begin{itemize}
+    \item Dominant Term: Largest term in terms of time complexity
+    \item Linearity: $f(x) \in \Theta(x)$, $f(x)$ is linear in $x$
+    \item Polynomial: $f(n)=n^c$ for some $c \in \Theta(1)$, Polylog: $f(n)=(log\ n)^c$ for some $c \in \Theta(1)$ 
+\end{itemize}
+
+\section{Proof of Correctness}
+\subsection{Iterative Algorithm}
+\begin{itemize}
+    \item Goal: Prove a given algorithm is correct
+    \item Loop Invariant (Induction Hypothesis): Desirable conditions that should be satisfied at the start of each iteration
+    \item Initialisation (Base Case): Show invariants are true at the start of the first iteration
+    \item Maintenance (Inductive Step): Show that if invariant is true at the start of current iteration then it is also true at the start of the next iteration
+    \item Termination (Induction implies Correctness): If the loop invariant holds at the end of the last iteration, then the algorithm outputs a correct answer
+\end{itemize}
+
+\section{Dijkstra's Proof}
+\begin{itemize}
+    \item Loop Invariant: At the start of an iteration, $\forall u \in R, d(u)=dist(s,u)$ (all processed vertices have the correct shortest distance)
+    \item Observation 1: $d(v)=min_{u \in R}(d(u)+w(u,v)) \geq dist(s,v)$
+    \item Termination: At end of computation, $R=V$, and all computed distances are correct
+    \item Maintenance: Claim for selected $v$, $dist(s,v)=min_{u \in R}(d(u)+w(u,v))$
+    \item Consider a shortest path $P$ from $s$ to $v$.
+    \item Observation 2: All vertices in $P \backslash \{v\}$ must be in $R$
+    \item If not, we should have taken $x$, the first vertex not in $R$ along $P$, because $min_{u \in R}(d(u)+w(u,v)) \geq dist(s, v)=d(u')+w(u',v) \geq min_{u \in R}(d(u)+w(u,v))$
+    \item Binary Heap: $O(log\ n)$ operations, overall $O((m+n)\ log\ n)$, Fibonacci Heap: $O(1)$ insert, $O(log\ n)$ extract, $O(m+n\ log\ n)$
+    \item New Algorithm: $O(m\ log^{2/3}n)$, faster when $m \in o(n\ log^{1/3}n)$ (sparse graph)
+\end{itemize}
+
+\subsection{Recursive Algorithms}
+\begin{itemize}
+    \item Base Case: Show correctness
+    \item Inductive Step: Assume algorithm is correct for input size smaller than $n$, then show it is correct for size $n$
+\end{itemize}
+
+\subsection{Binary Search Proof}
+\begin{itemize}
+    \item Base Case: Obvious
+    \item Induct on array size, if mid is what we want, returns correctly, if not falls into a smaller and correct case
+    \item Binary Search: Prove it works for one element, then induct on array size
+\end{itemize}
+
+\section{Divide and Conquer}
+\begin{itemize}
+    \item Divide problem into smaller subproblems
+    \item Solve subproblems recursively
+    \item Combine subproblem solutions to get the solution of the the full problem
+    \item Naive Matrix Multiplication: $\Theta(n^3)$
+    \item Divide and Conquer: Split into quadrants, $T(n)=8T(n/2)+\Theta(n^2), T(n) \in \Theta (n^3)$, no improvement
+    \item Strassen's Algorithm: Split into quadrants, $T(n)=7T(n/2)+18\cdot n^2, T(n)\in\Theta(n^{log_27})\approx\Theta(n^{2.807...})$
+    \item H-Index: Find greatest $i$ such that $A[i] \geq i$, this can be done using binary search in $O(n)$ time
+    \item However, we can improve this to $O(log\ ans)$
+    \item Try increasing $2^i$ where $i=0,1,2,...$ until we get $i^* \geq ans$
+    \item Then $i^*/2 < ans \leq i^*$ so we can binary search on $[1,i^*]$ with cost $O(log\ i^*)$
+\end{itemize}
+
+\section{Sorting}
+\begin{itemize}
+    \item Sort elements in an array in non-decreasing order
+    \item Comparison Based: Elements can only be compared with each other and no other properties can be used
+    \item Worst-case time complexity for comparison-based sorting is $\Omega(n\ log\ n)$
+    \item Decision Tree: Every node asks a question, and takes a child depending on answer, at leaf an output is given
+    \item Model a comparison based algorithm as a decision tree, which has $n!$ leaves minimum, and height at least $log(n!)\in \Theta(n\ log \ n)$ by Stirling's
+    \item To merge $k$ sorted arrays of size $n$, $\Theta(kn\ log\ k)$ is a tight lower bound using $T(k,n)=2T(k/2, n) +ckn$
+    \item The number of ways to combine is $\frac{(kn)!}{(n!)^k}$, so the complexity is $\Theta(kn\ log\ k)$ using $log(n!) \in n\ log\ n - n\ log\ e+ O(log\ n)$
+    \item Counting sort is not comparison-based, and finishes in $O(n+k)$ time
+    \item Other Properties: Small running time (Worst / Average Case), Stability (Preserving original positions of equal items), In-Place (Uses $O(1)$ extra memory) 
+    \item Stooge Sort: Sort first $2n/3$, last $2n/3$, first $2n/3$, $T(n)=3T(2n/3)+O(1)$, $T(n) \in O(n^{log_{3/2}3})=O(n^{2.7095...})$
+\end{itemize}
+
+\subsection{QuickSort Analysis}
+\begin{itemize}
+    \item $T(n)=T(j-1)+T(n-j)+cn$ if pivot is $j$th element
+    \item Worst Case: $j=1$ or $j=n$, $T(n)=T(n-1)+cn\in\Theta(n^2)$, proof by induction
+    \item Average Case: $A(n)$ is expected running time when input is a uniformly random permutation $\pi$
+    \item $A(n)=\sum_{\pi} \frac{1}{n!} \cdot $ (running time of quick sort on $\pi$)
+    \item $A(n)=\frac{1}{n}\sum_{j=1}^n[A(j-1)+A(n-j)+cn]$
+    \item $A(n)=cn+\frac{2}{n}\sum_{j=0}^{n-1}A(j)$
+    \item $n \cdot A(n)=cn^2+2\sum_{j=0}^{n-1}A(j)$
+    \item $(n-1)\cdot A(n-1)=c(n-1)^2+2\sum_{j=0}^{n-2}A(j)$
+    \item $n\cdot A(n)-(n-1)\cdot A(n-1)=c(2n-1)+2A(n-1)$
+    \item $n\cdot A(n)- (n+1)\cdot A(n-1)=n\cdot A(n)-(n-1)\cdot A(n-1)-2A(n-1)=c(2n-1)$
+    \item $\frac{A(n)}{n+1}-\frac{A(n-1)}{n}=\frac{c(2n-1)}{n(n+1)}<\frac{c(2n+2)}{n(n+1)}=\frac{2c}{n}$
+    \item $\frac{A(n)}{n+1}<2c \cdot(\frac{1}{n}+\frac{1}{n-1}+...+\frac{1}{2})+\frac{A(1)}{2}$ by telescoping
+    \item $A(n)\in O(n\ log\ n)$
+\end{itemize}
+
+\subsection{Karatsuba's Algorithm}
+\begin{itemize}
+    \item Naive: To compute $C(x)=A(x) \times B(x)$ where they are polynomials, compute the coefficients of $C(x)$ in $O(n^2)$ with complete search
+    \item Karatsuba's: Compute $A_1(x) \times B_1(x), A_2(x) \times B_2(x)$ still. However, instead of computing $A_1(x) \times B_2(x), A_2(x) \times B_1(x)$, instead compute $[A_1(x)+A_2(x)] \times [B_1(x) +B_2(x)]$. Then $A_1(x) \times B_2(x)+A_2(x)\times B_1(x)=[A_1(x)+A_2(x)]\times [B_1(x)+B_2(x)]-A_1(x)\times B_1(x)- A_2(x) \times B_2(x)$
+    \item Then we have $T(n)=3 \cdot T(n/2)+O(n)$ which is $T(n) \in \Theta(n^{log_23})=\Theta(n^{1.58...})$
+\end{itemize}
+
+\section{Randomised Algorithms}
+\begin{itemize}
+    \item Utilise randomisation to develop algorithms that are more efficient or simpler than their deterministic counterparts at the cost of allowing a small error probability
+    \item Verification of Matrix Multiplication: Check if square $AB=C$, takes $O(n^{2.807})$ by Strassen's
+    \item Freivald's: Choose a size $n$ column vector where each entry is random binary number with uniform probability, then check if $ABv=Cv$ in $O(n^2)$ time
+    \item If $AB=C$, then $ABv=Cv$ will output correctly
+    \item If not $AB\neq C$, consider $C^*=AB-C, u=C^*v$. It will output an incorrect answer iff all $u_k=0$
+    \item Principle of Deferred Decisions: Instead of fixing all random choices in advance, we conceptually defer the outcomes of random choices until the moment they are actually needed
+    \item Once we reveal random numbers excluding $v_j$, the non $v_j$ term is fixed, and there is at most one choice of it which makes $u_i=0$
+    \item The probability of success is $\geq 1/2$, and can be increased to $\geq 1-1/2^t$ by repeating $t$ times
+\end{itemize}
+
+\subsection{Coupon Collector}
+\begin{itemize}
+    \item Given $n$ types of coupons, we want to obtain all, how many must we buy to collect all types of coupons
+    \item Throw $m$ balls in $n$ bins, and check the probability that every bin contains at least one ball
+    \item For a specific bin, the probability it has no balls is $(1-1/n)^m=(1-1/n)^{n\cdot m/n}\leq e^{-m/n}$ using $1+x \leq e^x$
+    \item The probability at least one bin is empty is at most $n(1-1/n)^m \leq ne^{-m/n}$
+    \item The probability is at most $1/n$ if $m \geq 2n\lceil ln\ n\rceil$ since $e^{-2\ ln\ n}=\frac{1}{n^2}$
+    \item So we can buy $m=2n\lceil ln\ n\rceil \in \Theta(n\ log\ n)$ boxes for a success probability of at least $1-\frac{1}{n}$
+    \item Expected Value: $E[X]=\sum_x x \cdot Pr[X=x]$
+    \item Markov Inequality: If $X$ is a non-negative random variable and $a>0$, then $Pr[X \geq a \cdot E[X]] \leq 1/a$
+    \item e.g. If the expected runtime is at most $t$, the runtime is at most $100 \cdot t$ with probability at least $0.99$, let $\alpha=100$
+    \item Linearity of Expectation: $E[A+B]=E[A]+[B]$
+    \item Indicator Random Variable: Let $\varepsilon$ be an event, then the indicator random variable $1_\varepsilon$ is defined as $1$ if it occurs or $0$ otherwise, so $E[1_\varepsilon]=Pr[\varepsilon]$
+\end{itemize}
+
+\subsection{Quicksort Again}
+\begin{itemize}
+    \item Let $X_{i,j}$ be the number of comparisons made between $a_i$ and $a_j$
+    \item $E[comparisons]=E[\sum_{i<j}X_{i,j}]=\sum_{i<j}E[X_{i,j}]$ by LOE
+    \item Let $\varepsilon_{i,j}$ denote the event $X_{i,j}=1$
+    \item We claim $Pr[\varepsilon_{i,j}] = \frac{2}{j-i+1}$ for $i<j$
+    \item A comparison is made between them only if the pivot chosen is either one of them, and they must start in the same array
+    \item Each number is equally likely to be the pivot, and from $(a_i,...,a_j)$, there are $j-i+1$ elements
+    \item $E[comparisons]=\sum_{i<j}\frac{2}{j-i+1}=2\sum_{i=1}^{n-1}\sum_{j=i+1}^n\frac{1}{j-i+1}=2\sum_{i=1}^{n-1}(\frac{1}{2}+\frac{1}{3}+...+\frac{1}{n-i+1})\in O(n\ log\ n)$
+    \item Randomised quick sort finishes in $O(n\ log\ n)$ time with probability at least 0.99 by Markov Inequality
+\end{itemize}
+
+\subsection{Summary of Techniques}
+\begin{itemize}
+    \item Las Vegas: Always correct, but time complexity guarantee is only in expectation
+    \item Monte Carlo: Output is correct with some probability, but the time complexity guarantee always holds
+    \item Principle of Deferred Decision: If we can show $\forall x , Pr[\varepsilon|X=x]\geq p$, then $Pr[\varepsilon]\geq p$
+    \item Success Probability Amplification: The error probability can be reduced to at most $f$ by repeating the algorithm $\lceil log \frac{1}{f} \rceil$ times
+    \item Union Bound: Upper bound the probability that bad $\varepsilon$ occurs, and you know $Pr[\varepsilon] =Pr[\varepsilon_1\lor ...\lor\varepsilon_n]\leq Pr[\varepsilon_1]+...+Pr[\varepsilon_n]$
+    \item Then to make sure $Pr[\varepsilon]\leq f$, we just need to make sure $Pr[\varepsilon_i]\leq \frac{f}{n}$ for each $i$
+    \item Markov Inequality: If $X$ is a non-negative random variable and $a>0$, then $Pr[X \geq a \cdot E[X]] \leq \frac{1}{a}$
+    \item Can be used to turn Las Vegas algorithm into Monte Carlo algorithm via Markov inequality
+    \item Set $Pr[\text{runtime} \geq 100 \cdot T(n)] \leq Pr[\text{runtime} \geq 100 \cdot \text{expected runtime}] \leq \frac{1}{100}$, then the runtime is $\in \Theta(T(n))$ with $Pr \geq 0.99$, just set a time limit of $100 \cdot T(n)$
+    \item Linearity of Expectation: $E[A+B]=E[A]+E[B]$
+\end{itemize}
+
+\subsection{Transmission}
+\begin{itemize}
+    \item Goal: Check whether two n-bit strings are equal
+    \item Method: Create a set $S$ of $n^2$ smallest primes
+    \item Sample a random prime $p$ from $S$
+    \item Send $p$ and $S_A\ mod\ p$
+    \item Check $S_B\ mod\ p$ against $S_A\ mod\ p$
+    \item When they are equal, the output will be correct
+    \item When they are not equal, the output is incorrect iff $p$ divides $|S_A-S_B|$, let this value be $d$
+    \item Then $1 \leq d < 2^n$
+    \item $d$ has at most $n-1$ distinct prime factors, so the probability $p$ is a divisor of $d$ is at most $\frac{n-1}{|S|}=\frac{n-1}{n^2}=\frac{n}{n^2}-\frac{1}{n^2}=\frac{1}{n}-\frac{1}{n^2} \leq \frac{1}{n}$
+    \item Any correct algorithm requires $\Omega(n)$ bits by decision trees
+\end{itemize}
+
+\subsection{Partition of Graph}
+\begin{itemize}
+    \item Partition a graph randomly by assigning each vertex in the set $V_1$ or $V_2$ to get the expected number of edges crossing to be $\frac{|E|}{2}$
+    \item To improve slightly, pick one specific edge and force it to cross, then we get $\frac{|E|+1}{2}$ which is marginally better
+    \item If $|V|$ is even, we can select $V_1$ uniformly at random from all size $|V|/2$ subsets of $V$ and set $V_2$ as the complement
+    \item $Pr(u \in V_1)=\frac{1}{2}$
+    \item $Pr(v \in V_2 | u \in V_1)=1-Pr(v \in V_1 | u \in V_1)=1-\frac{|V|/2-1}{|V|-1}=\frac{|V|/2}{|V|-1}$
+    \item We can sum the symmetric case to get $E[X_e]=2\cdot Pr(u \in V_1, v \in V_2)=2\cdot Pr(u \in V_1)\cdot Pr(v \in V_2 | u \in V_1)=2 \cdot \frac{1}{2}\cdot \frac{|V|/2}{|V|-1}=\frac{|V|/2}{|V|-1}$
+    \item By linearity of expectation, $E[X]=\sum_{e \in E}E[X_e]=|E| \times\frac{|V|/2}{|V|-1}=\frac{|E|}{2}\times\frac{|V|}{|V|-1}$
+\end{itemize}
+
+\subsection{Reservoir Sampling}
+\begin{itemize}
+    \item Given a singly linked list, select a random node
+    \item Without knowing the size of the linked list beforehand, hard to ensure each node is chosen with the same probability
+    \item Reservoir sampling allows us to keep the uniform probability
+\end{itemize}
+\begin{verbatim}
+i = 0
+while cur != None:
+    i += 1
+    v = U(0, 1)
+    if v <= 1.0 / i:
+        ans = cur
+    cur = cur->next
+return ans
+\end{verbatim}
+
+\section{Dynamic Programming}
+\begin{itemize}
+    \item Divide problem into smaller overlapping subproblems
+    \item Solve the subproblems recursively with memoisation
+    \item Combine the subproblem solutions to get the solution of the full problem
+    \item Bottom Up: Compute the values in the array in some order, starting from base cases
+\end{itemize}
+
+\subsection{LCS}
+\begin{itemize}
+    \item $C$ is a subsequence of $A$ if $C$ can be obtained by removing elements from $A$
+    \item LCS: Given two arrays, output a longest common subsequence $C$, or equivalently, find a largest non-crossing matching
+    \item Brute Force: Check all possible subsequences of $A$ and see if they fit in $B$, takes $O(m\cdot 2^n)$ time
+    \item Recursive Approach: Base cases: $i=0$ or $j=0$
+    \item Inductive Step: Compute $LCS(n,m)$ given $LCS(n-1, m), LCS(n, m-1), LCS(n-1, m-1)$
+    \item If $a_n \neq b_m$, take the longer of $LCS(n-1, m), LCS(n, m-1)$
+    \item If $a_n = b_m =x$, then take $LCS(n-1, m-1) \circ x$
+    \item Use cut and paste to prove observation for equality case
+    \item Show $LCS(n,m)$ should terminate with $a_n$ when $a_n=b_m$
+    \item Suppose not and it ends with something else
+    \item We can then append $a_n$ and get a longer subsequence, which is a contradiction
+    \item Optimal Substructure: An optimal solution to a problem can be constructed from optimal solutions to its subproblems
+    \item With memoisation, takes $O(mn)$ time
+\end{itemize}
+
+\subsection{Knapsack}
+\begin{itemize}
+    \item Pack a set of items into a container with a capacity constraint to maximise the total value
+    \item Formally, output a subset $S \subseteq [n]$ such that $\sum_{i \in S}w_i \leq W$ maximises $\sum_{i \in S} v_i$
+    \item Suppose $S$ is an optimal solution
+    \item If $n \in S$, then $S\backslash\{n\}$ is an optimal solution to the subproblem of $n$ with $W-w_n$
+    \item If $n \notin S$, then $S$ is an optimal solution to the subproblem without $n$
+    \item If not, a better solution can be obtained by cut and paste, by replacing $S$ with an optimal solution to the subproblem
+    \item In the first case, we have $m[n, W]=m[n-1, W-w_n]+v_n$, and in the second case, we have $m[n, W]=m[n-1, W]$, giving $O(nW)$
+\end{itemize}
+
+\subsection{Change-Making Problem}
+\begin{itemize}
+    \item Find the minimum number of coins of specific $k$ denominations that add up to $n$ cents
+    \item $M[n]=1+min_{i \in [k]}M[n-d_i]$, $O(nk)$ time
+    \item Can use cut and paste on the optimal solution for $n-d_i$
+\end{itemize}
+
+\subsection{Cut and Paste}
+\begin{itemize}
+    \item Assume there is an optimal solution to $S$ to some problem instance
+    \item Look at the sub-solution to $S$ that corresponds to some smaller problem by cutting out some part of the optimal solution
+    \item If the sub-solution were not the optimal one for the subproblem, we could cut it out, and paste in the truly optimal solution for the sub problem
+    \item This produces a new solution which has strictly greater value
+    \item This contradicts the assumption that $S$ was optimal unless the sub-solution was also optimal
+    \item If an optimal solution did not use a specific choice, we can use cut and paste to build a different optimal solution that does
+\end{itemize}
+
+\subsection{Bellman Ford}
+\begin{itemize}
+    \item If a path $P(s,v)$ is the shortest path, then any subparth is also a shortest path
+    \item Let $L(v,i)$ be the weight of the shortest path $P(s,v)$ with $\leq i$ edges
+    \item We want to compute $L(v,n-1)$ as the longest simple path with $n-1$ edges
+    \item Either $L(v,i)=L(v, i-1)$ or $L(v,i)=min_{(x,v)\in E}L(x,i-1)+\omega(x,v)$, representing the optimal substructure property
+    \item We iterate $n-1$ times, where for each vertex, we relax each adjacent edge
+    \item WE can simplify this by just relaxing each edge without the by vertex part to get $O(|V||E|)$ time and $O(|V|)$ space
+\end{itemize}
+
+\section{Greedy Algorithms}
+\begin{itemize}
+    \item Recast the problem so that only one subproblem needs to be solved at each step
+    \item Often beats other methods but is often not applicable
+\end{itemize}
+
+\subsection{Fractional Knapsack}
+\begin{itemize}
+    \item Knapsack but we can take fractions of items
+    \item Optimal Substructure: If we remove $y$ kg of item $j$ from the optimal knapsack, then the remaining load must be optimal for weight at most $W-y$ kg from the remaining $n-1$ items and $w_j-y$ kg of item $j$
+    \item Cut and Paste: Let $X$ be the value of the optimal knapsack, and suppose that the remaining load after removing $y$ of item $j$ was not the optimal knapsack for $W-y$ from $n-1$ items and $w_j-y$ of item $j$
+    \item Then there is a knapsack with value $> X-v_j\cdot \frac{y}{w_j}$ with weight $\leq W-y$ among $n-1$ other items and $w_j-y$ of item $j$
+    \item Combining $y$ of $j$ gives knapsack with value $>X$ and weight $\leq W$ which is a contradiction
+    \item So there must be optimal substructure
+    \item Greedy Choice Property: Let $j^*$ be the item with maximum $v_j/w_j$. Then there exists an optimal knapsack containing $min(w_{j^*}, W)$ of item $j^*$
+    \item Suppose an optimal knapsack has $x_{j^*} < min(w_{j^*}, W)$. From the rest of the knapsack, pick $y$ such that $\sum y=min(w_{j^*}, W)-x_{j^*}$. Then we can replace these by $min(w_{j^*}, W)-x_{j^*}$ of item $j^*$, and total value does not decrease since $j^*$ has maximum ratio
+    \item Greedy Algorithm: Use the greedy choice property to take as much $j^*$ as possible, then repeat until we run out of weight, $O(n\ log\ n)$
+\end{itemize}
+
+\subsection{Greedy Algorithm Paradigm}
+\begin{itemize}
+    \item Cast the problem where we have to make a choice and are left with one subproblem to solve
+    \item Prove (using exchange argument) that there is always an optimal solution to the original problem that makes the greedy choice so the greedy choice is safe
+    \item Use optimal substructure (proof by contradiction or cut-and-paste argument) to show that we can combine an optimal solution to the subproblem with the greedy choice to get an optimal solution to the original problem
+\end{itemize}
+
+\subsection{Huffman Code}
+\begin{itemize}
+    \item Binary Coding: Mapping from alphabet set to binary string
+    \item Fixed Length Coding: Each alphabet is a binary string of fixed length, $m\lceil log_2\ n \rceil$ bits needed for $m$ alphabets with alphabet size $n$
+    \item Letter Frequency Variation: Give more frequent alphabets encoding with shorter bit strings
+    \item Average Bit Length: $ABL(\gamma)=\sum_{x\in A}f(x)\cdot|\gamma(x)|$ where $f$ is the frequency and $\gamma$ is the encoding
+    \item Need to be careful of ambiguity caused when the encoding of one letter is a prefix of another
+    \item Prefix Coding: A coding where the above ambiguity does not exist
+    \item Problem: Find a prefix coding $\gamma$ where $ABL(\gamma)$ is the minimum
+    \item Huffman Coding: Labeled binary tree where each child is either a $0$ or $1$ with a frequency, and leaf nodes represent alphabets
+    \item For each prefix code of a set of alphabets, there exists a binary tree where there is a bijective mapping between the alphabets and leaves, and the label of a path from root to leaf corresponds to the prefix code of the corresponding alphabet at the leaf
+    \item $ABL(\gamma)=\sum_{x\in A}f(x)\cdot depth_T(x)$
+    \item Observation 1: The ideal binary tree should be a full binary tree where every internal node has degree $2$, if not we have redundant nodes
+    \item More frequent alphabets should be closer to the root
+    \item Let $a_1,a_2,...,a_n$ be the alphabet in non-decreasing order of frequency ($a_1$ is least frequent)
+    \item Observation 2: The least frequent alphabet $a_1$ cannot be present at a higher level than the deepest one, since swapping it with a lower one cannot increase ABL
+    \item Observation 3: For $a_2$, it can be the sibling of $a_1$
+    \item Lemma: There exists an optimal prefix coding in which $a_1,a_2$ appear as siblings (not necessarily in all!)
+    \item Observation 4: For siblings $a_1$ and $a_2$, we can merge them into a new $f(a')$
+    \item $OPT_{ABL}(A)$: Minimum ABL over all prefix codes for alphabet $A$, $OPT(A)$: Prefix code for alphabet $A$ with $ABL=OPT_{ABL}(A)$
+    \item Let $A'=a_3,...a',...a_n$ be $n-1$ alphabets with $f(a')=f(a_1)+f(a_2)$
+    \item We claim that $OPT_{ABL}(A)=OPT_{ABL}(A')+f(a_1)+f(a_2)$, and this implies the algorithm is optimal
+    \item Algorithm
+    \begin{itemize}
+        \item If $|A|=2$, return a single node with $a_1,a_2$ as children
+        \item If not, repeatedly remove $a_1, a_2$ from $A$
+        \item Create letter $a'$ and calculate $f(a')=f(a_1)+f(a_2)$
+        \item Insert $a'$ into $A$
+        \item Update tree to $OPT(A)$
+        \item Replace leaf node $a'$ in tree with node containing children $a_1, a_2$
+        \item Heap for alphabet and frequencies is $O(log\ n)$ insertion and removal, overall $O(n\ log\ n)$
+    \end{itemize}
+    \item Now we need to prove $OPT_{ABL}(A)=OPT_{ABL}(A')+f(a_1)+f(a_2)$
+    \item Let $T'$ be the optimal binary tree for $OPT_{ABL}(A')$, then construct $T$ by replacing $a'$
+    \item This gives $ABL=OPT_{ABL}(A')+f(a_1)+f(a_2)$, with proof below
+    \begin{itemize}
+        \item Let $d$ be the depth of $a'$ in $T'$ with ABL $OPT_{ABL}(A')$
+        \item For the tree we constructed for $A$, we have $ABL=$
+    \end{itemize}
+\end{itemize}
+{\tiny
+\begin{align*}
+    &=\sum_{i=1}^n f(a_i) \cdot depth_T(a_i)\\
+    &= \sum_{i=3}^n f(a_i) \cdot depth_T(a_i)+f(a_1) \cdot (d+1) + f(a_2) \cdot (d+1)\\
+    &= \sum_{i=3}^n f(a_i)\cdot depth_T(a_i) + (f(a_1) + f(a_2)) \cdot d + f(a_1) + f(a_2) \\
+    &= \sum_{i=3}^n f(a_i) \cdot depth_T(a_i)+f(a') \cdot depth_{T'}(a')+f(a_1)+f(a_2) \\
+    &= \sum_{i=3}^n f(a_i) \cdot depth_{T'}(a_i) + f(a') \cdot depth_{T'}(a') + f(a_1)+f(a_2) \\
+    &= OPT_{ABL}(A')+f(a_1)+f(a_2)
+\end{align*}
+}
+\begin{itemize}
+    \item For $T'$ corresponding to $OPT_{ABL}(A')$, splitting $a'$ gives a coding with $ABL=OPT_{ABL}(A')+f(a_1)+f(a_2)$, and thus $OPT_{ABL}(A)\leq OPT_{ABL}(A')+f(a_1)+f(a_2)$ by construction
+    \item For $T$ corresponding to $OPT_{ABL}(A)$, replacing $a_1,a_2$ with $a'$ gives $ABL=OPT_{ABL}(A)-f(a_1)-f(a_2)$, and implies $OPT_{ABL}(A')\leq OPT_{ABL}(A)-f(a_1)-f(a_2)$ by construction as well
+    \item Combining them gives the recurrence we want by showing equality
+\end{itemize}
+
+\subsection{Interval Scheduling}
+\begin{itemize}
+    \item Given a set of intervals, find the largest non-overlapping set
+    \item Choose the interval that starts last, and recurse (alternatively, earliest end time)
+    \item Optimal Substructure: Suppose an optimal scheduling contains an interval $a_i$, then split the remaining intervals for the set before and after this activity, then the optimal scheduling must contain the optimal scheduling for both new subsets created
+    \item Greedy Choice Property: Greedily select the interval that starts last. Consider an optimal scheduling $S$ where $a$ is the interval that starts last in $S$. We can always replace $a$ with $a^*$ which is the interval that actually starts last. The new schedule is compatible with the same number of activities, so it is also optimal
+    \item Greedy Algorithm: Sort by start time in non-decreasing order, then iterate from the back and select the latest starting activity that is compatible
+\end{itemize}
+
+\subsection{MST}
+\begin{itemize}
+    \item Given an MST $T$ of a graph, if we remove any edge in $T$, it is partitioned into two substrees $T_1$ and $T_2$
+    \item Optimal Substructure: We know $w(T)=w(T_1)+w(u,v)+w(T_2)$, so if there was $T_1'$ with lower weight than $T_1$, then the union $T'$ will cause a contradiction
+    \item Greedy Choice: The least weight edge connecting $A$ to $V \backslash A$ must be in $T$
+    \item Suppose there is an MST $T$ without this edge, and consider the unique simple path between them in $T$
+    \item If we swap it out with the first edge on the path that connects a vertex in $A$ to a vertex in $V \backslash A$, we get a lighter weight spanning tree which is a contradiction
+\end{itemize}
+
+\subsection{Minimum Rectangle Cover}
+\begin{itemize}
+    \item Optimal Substructure: Start with an optimal solution, then remove some rectangle. If we remove it, we are left with a subproblem where we have to cover the rest of the points. If this subproblem is not optimal, then we can use the more optimal solution and add the removed rectangle back to get a more optimal solution, which is a contradiction
+    \item Greedy Choice: Cover the leftmost point with one rectangle left aligned to it. Suppose there is an optimal solution that covers the leftmost point differently, we can always slide this rectangle so that its leftmost side is aligned to the leftmost point like our greedily constructed rectangle and we still cover all points, so the greedy choice is safe
+    \item Solution: Sort points by non-increasing x-coordinate, then one pass and use the greedy strategy
+\end{itemize}
+
+\subsection{Minimum Operations to Halve Array Sum}
+\begin{itemize}
+    \item Optimal Substructure: We start with an optimal solution that halves the sum. After choosing some number $N$, it reduces $X-\frac{N}{2}$ to $\frac{X}{2}$. This subproblem must be optimal, if not we can take the more optimal solution and add back $\frac{N}{2}$ to have a more optimal solution, a contradiction
+    \item Greedy Choice: Halve the largest element $L$. Suppose there is an optimal solution which halves some other $N$, since $L \geq N$, halving $L$ will not be worse off and the greedy choice is safe
+    \item Use a heap to keep track of the current number, and run it until the total sum is halved
+\end{itemize}
+
+\section{Amortised Analysis}
+\begin{itemize}
+    \item $T(n)=\sum_{i=1}^nt(i)=nf(n)$ could be wrong if not all operations have the same cost
+    \item Amortised analysis shows that the average cost per operation can still be small even if a few operations might be expensive
+    \item Amortised analysis guarantees the average performance of each operation in the \textbf{worst case}
+\end{itemize}
+
+\subsection{Aggregate Method}
+\begin{itemize}
+    \item Binary Counter: Find total number of bit flips for $n$ increments of a $k$-bit binary counter
+    \item Let $t(i)$ be the number of bit flips in the i-th operation, then we have $T(n)=\sum_{i=1}^nt(i)$
+    \item In the worst case, $t(i)=k, T(n)=n\cdot k \in O(n \cdot k)$, but this is not a tight bound
+    \item Let $f(j)$ be the number of times the j-th bit flips, then $T(n)=\sum_{j=0}^{k-1}f(j)$. $f(0)=n, f(1)=n/2,..., f(j)=n/2^j$. This gives $T(n)=n\cdot (1+1/2+...+1/2^{k-1})$, $T(n) < n \cdot 2$
+    \item Then $k \approx log\ n$
+    \item The cost per increment is then $T(n)/n < 2 \in O(1)$
+    \item Lacks precision of the other methods which allow a specific amortised cost to be allocated to each operation
+\end{itemize}
+
+\subsection{Accounting Method}
+\begin{itemize}
+    \item Charge ith operation an amortised cost $c(i)$ with $\$1$ representing $1$ unit of time or work
+    \item This is consumed to perform the operation and any amount not used can be stored for the future
+    \item Impose an extra charge on inexpensive but frequent operations to pay for future expensive but rare operations
+    \item Balance must never be negative
+    \item Ensure $\sum_{i=1}^nt(i)\leq \sum_{i=1}^nc(i)$ to provide an upper bound
+    \item Binary Counter: Charge $\$2$ for $0\rightarrow1$, with $\$1$ going to this and the other $\$1$ paying for a future $1 \rightarrow0$
+    \item Every $1$ bit has $\$1$ in the bank at any point
+    \item These savings are used to pay for resetting $1 \rightarrow 0$
+    \item After $i$ increments, the amount of money in the bank is the number of $1$s in the binary representation of $i$, which cannot be negative
+    \item The amortised cost is thus $\$2 \in O(1)$ for each increment
+\end{itemize}
+
+\subsection{Potential Method}
+\begin{itemize}
+    \item $\phi$: Potential function, $\phi(i)$: Potential after $i$th operation
+    \item Important Conditions: $\phi(0)=0, \forall i, \phi(i)\geq0$
+    \item Amortised cost of $i$th operation $=$ Actual cost of $i$th operation + $\Delta\phi_i$ or $\phi(i)-\phi(i-1)$
+    \item Amortised cost of $n$ operations $=\sum_i$ Amortised cost of $i$th operation $=$ Actual cost of $n$ operations $+\phi(n)\geq$ Actual cost of $n$ operations, by telescoping
+    \item Upper bound actual cost using amortised cost
+    \item Select a suitable $\phi$ so that the costly operation $\Delta\phi_i$ is negative to the point where it nullifies the effect of actual cost, try to find a quantity that is decreasing during the expensive operation
+    \item Binary Counter: Since number of 1s decreases at the expensive operation, set this to be the potential
+    \item Actual Cost of $i$th increment $=1+$ Length of $1$ suffix
+    \item Actual Cost of $i$th increment $=l_i+1$, $\Delta\phi_i=-l_i+1$ since $\phi(i)=x-l_i+1, \phi(i-1)=x$
+    \item Amortised Cost of $i$th increment $=l_i+1-l_i+1=2 \in O(1)$
+\end{itemize}
+
+\subsection{Dynamic Table Insertion}
+\begin{itemize}
+    \item Resizable table which grows by reallocation e.g. C++ Vector
+    \item Naive: Grow table size by one each insertion, $O(n^2)$ for $n$ insertions
+    \item Doubling: Double table size when full, worst-case is $O(n)$ for one insertion
+    \item Heavy operation only occurs when $n-1$ is a power of $2$, otherwise it is $O(1)$
+    \item Aggregate Method: Let $t(i)$ be the cost of the ith insertion, it can be split between $t_1(i)=i$ if $i-1$ is an exact power of $2$, and $t_2(i)=1$ for all i
+    \item By the aggregate method,
+\end{itemize}
+\begin{align*}
+T(n)&=\sum_{i=1}^n(t_1(i)+t_2(i))\\
+T(n)&=\sum_{i=1}^nt_1(i)+\sum_{i=1}^nt_2(i)\\
+T(n)&=\sum_{j=0}^{log(n-1)}2^j+\sum_{i=1}^n1\\
+T(n)&=2^{log(n-1)+1}-1+n\\
+T(n)&\leq 2\cdot (n-1)+n\\
+T(n)&\leq 3 \cdot n
+\end{align*}
+\begin{itemize}
+    \item Thus the average cost is $3 \in O(1)$
+    \item Potential Method: Since table is always at least half-full, consider $\phi(i)=2i-size(T)\geq0$, since $size(T) \geq 0$
+    \item When table is not full, actual cost $=1$, $\Delta\phi_i=2$, amortised cost $=3$ since $\phi(i-1)=2(i-1)-l, \phi(i)=2i-l$
+    \item When table is full, actual cost $=i$, $\Delta\phi_i=3-i$, amortised cost $=3$ since $\phi(i-1)=i-1,\phi(i)=2$
+    \item Accounting: Charge $\$3$ per insert: 1 for actual insert, and 2 for future copies, which pays for future resizing 
+\end{itemize}
+
+\subsection{WA2 Counters}
+\begin{itemize}
+    \item Increment, if $C[i]\mod 3=0$, invoke Increment($i+1$), Increment($i+2$)
+    \item We want to show the amortised cost is $O(1)$
+    \item Assign a cost of $3$, and show the bank balance never goes negative
+    \item Show the balance is equal to $2\sum_i(C[i]\mod 3)$, base case holds
+    \item For induction, perform an increment and consume $1$ from the budget
+    \item If there is no recursive call, the bank balance increases by $2$
+    \item If there are recursive calls, then the bank balance decreases by $4$, and we have a total of $2+4=6$ available, so we can allocated $3$ to each recursive call
+\end{itemize}
+
+\section{Reductions and Intractability}
+\subsection{Reduction}
+\begin{itemize}
+    \item Example: The problem of longest palindromic subsequence of a string reduces to finding the LCS of a string and its reverse
+    \item Convert an instance $\alpha$ of $A$ to an instance $\beta$ of $B$, solve $\beta$, and use solution of $\beta$ to obtain solution of $\alpha$, then $A$ reduces to $B$
+    \item Suppose we have MAT-MULTI ($A \cdot B$) and MAT-SQRT ($C^2$)
+    \item Then MAT-SQR reduces to MAT-MULTI using $A=B=C$
+    \item Then MAT-MULTI reduces to MAT-SQR using $C=\big[\begin{smallmatrix}0 & A\\B & 0\end{smallmatrix}\big], C^2=\big[\begin{smallmatrix}AB & 0\\0 & BA\end{smallmatrix}\big]$
+    \item $p(n)$-time Reduction: $A$ can be reduced to $B$, and the conversion steps take at most $p(n)$ time
+    \item Running Time Composition: If there is a $p(n)$-time reduction from $A$ to $B$ and a $T(n)$-time algorithm to solve $B$, then there is a $T(p(n))+O(p(n))$ time algorithm to solve $A$
+    \item Polynomial Time Reduction: If there is an $O(n^c)$ time reduction from $A$ to $B$ for some constant $c$, then there is a polynomial time reduction from $A$ to $B$ or $A \leq_p B$
+    \item If there is a polynomial time algorithm for $B$, there is also one for $A$, contraposition is also true
+    \item If $B$ is easy, then so is $A$; if $A$ is hard, then so is $B$
+    \item Polynomial functions are closed under composition: If $T(n), p(n)$ are polynomial, then $T(p(n))$ is also polynomial
+    \item Polynomial time usually considers low $c$, and is a robust measure which is not reliant only computing models or hardware
+    \item When an algorithm takes polynomial time, we usually mean that the runtime is polynomial in the length of the encoding of the problem instance (number of bits, usually most natural encoding)
+    \item Psuedo-Polynomial Algorithm: Runs in time polynomial in numeric value of input (could be exponential in the length of the input)
+    \item Iterative Fibonacci is not a polynomial-time algorithm since it is exponential in terms of input bit length, but it is pseudopolynomial
+    \item Knapsack ($O(nW)$) is not while Fractional Knapsack ($O(n\ log\ n)$) is since input needs $O(n\ log\ W)$ bits
+\end{itemize}
+
+\subsection{Intractability}
+\begin{itemize}
+    \item Computational Complexity Theory: Studying sets of computational problems and not individual computational problems
+    \item Decision problem: Maps instance space to Yes/No
+    \item Optimisation Problem: Outputs a optimised value instead
+    \item We can convert an optimisation problem into a decision problem, so the decision problem is no harder than the optimisation problem
+    \item Similarly, we can use binary search on the optimisation problem to solve the decision problem
+    \item The decision problem can be solved in polynomial time iff the optimisation problem can be solved in polynomial time
+    \item Karp Reduction: Given decision problems $A,B$, a polynomial time reduction from $A$ to $B$, $A\leq_pB$, is a transformation from $\alpha$ to $\beta$ such that $\alpha$ is a YES for $A$ iff $\beta$ is a YES for $\beta$ and the transformation is polynomial time in the size of $\alpha$
+    \item If $A$ is "hard", so is $B$, if $B$ is "easy", so is $A$
+    \item Example: Vertex Cover (Subset of vertices where every edge is covered) $\leq_p$ Independent Set (Subset of vertices where no edge has both endpoints inside)
+    \item $X\subseteq V$ is a vertex cover iff $V\backslash X$ is an independent set
+    \item The transformation $(G,k) \rightarrow (G, |V|-k)$ from VC to IS can be done in polynomial time, so we just need to show $(G,k)$ is a YES iff $(G, |V|-k)$ is also a YES
+    \item It can also be proven that Independent Set $\leq_p$ Vertex Cover
+\end{itemize}
+
+\section{NP Class}
+\begin{itemize}
+    \item A verifier for a decision problem $X$ is an algorithm $A$ that takes in an instance $I$ of $X$ and a certificate / proposed solution $S$ and outputs YES/NO, verifying whether the certificate is right or wrong
+    \item $I$ is a YES instance of $X$ iff there exists a string $s$ such that $A$ outputs YES on inputs $(I,s)$
+    \item $s$ must be short and polynomial in the size of $I$ to keep verification efficient, $A$ must run in polynomial time
+    \item NP: The set of all decision problems with polynomial time verifiers, "Non-deterministic polynomial time"
+    \item Hamiltonian Cycle: Is there a cycle that visits each vertex exactly once
+    \item Certificate is the cycle itself, while the verifier checks the conditions in polynomial time, so HC is in NP
+\end{itemize}
+
+\section{P Class}
+\begin{itemize}
+    \item P: Polynomial time, the set of all decision problems which have an efficient polynomial-time algorithm
+    \item $P \subseteq NP$ since we can just run the algorithm to verify
+\end{itemize}
+
+\section{NP Hard and NP Complete}
+\begin{itemize}
+    \item NP Hard: $\forall A \in NP, A \leq_p X$, $X$ is at least as hard as any other problem in NP
+    \item NP Complete: $X$ is in NP and is NP Hard
+    \item Circuit Satisfiability: Given a DAG where vertices are logic gates and leaves are binary inputs, is there any binary input which outputs 1?
+    \item The certificate is the binary input, so C-SAT is in NP
+    \item For any problem in NP, consider the efficient verifier $Q$, which can be represented as a C-SAT DAG with output being the decision, so $\forall A \in NP, A \leq_p C-SAT$
+    \item Literal: Boolean variable or negation e.g. $x_i, \overline{x_i}$
+    \item Clause: Disjunction (OR) of literals e.g. $C_j=x_i \lor \overline{x_2} \lor x_3 \lor x_4$
+    \item Conjunctive Normal Form: Conjunction (AND) of clauses e.g. $\Phi = C_1 \land C_2 \land C_3$
+    \item CNF-SAT: Given a CNF formula, does it have a satisfying truth assignment?
+    \item 3-SAT: CNF-SAT where each clause has exactly 3 literals for different variables, e.g. $\Phi = (\overline{x_1} \lor x_2 \lor x_3) \land (x_1 \lor \overline{x_2} \lor x_3) \land (\overline{x_1}\lor x_2 \lor x_4)$
+    \item $C-SAT \leq_p CNF-SAT \leq_p 3-SAT$ so 3-SAT is NP-Complete
+    \item NP-Complete is a subset of NP which does not intersect P, NP-Hard intersects NP but not NP and contains NP-Complete
+    \item If any NP-complete problem can be solved in polynomial time, then $P=NP$
+\end{itemize}
+
+\subsection{Showing NP Completeness}
+\begin{itemize}
+    \item First show that $X \in NP$
+    \item Then pick a known problem $A$ which is NP-Complete and show $A \leq_p X$ so that $X$ is NP-Hard
+    \item Independent Set: No adjacent vertices, check if size $\geq k$
+    \item We can show $IS \in NP$ by using the independent set as a certificate and verifying / checking the size of it in polynomial time
+    \item Now we show $3-SAT \leq_p IS$
+    \item Make each clause a clique, and connect the complemented literals together
+    \item This gives us an IS instance with $k$ equal to the number of clauses
+    \item Similarly we can show the other direction, so $IS$ is NP-Complete
+    \item Since we know $IS \leq_p VC$, $VC$ is also NP complete
+    \item Clique (find a clique with minimum size) is NP complete
+    \item Hitting Set: Given a set of sets $S$, $H$ is hitting if $H \cap S_i \neq \emptyset$ for all $S_i$
+    \item The hitting set of size at most $k$ can act as a certificate and can be verified in polynomial time
+    \item $VC \leq_p HS$: Take an instance of vertex cover, then for each edge, make a set containing its endpoints
+    \item The transformation can be done in polynomial time, and the hitting set is $\{S_e\}$
+    \item $G$ has a vertex cover of size at most $k$ iff the other set has a hitting set of size at most $k$
+\end{itemize}
+
+\section{NP-Complete Problem List}
+\begin{itemize}
+    \item SAT, 3SAT: Given a Boolean formula (usually in CNF), is there an assignment of variables such that it evaluates to true? 3SAT is the special case where each clause has exactly 3 literals
+    \item Clique: Does a graph contain a clique of size $\geq k$?
+    \item IS, VC: Does a graph contain a set of $\geq k$ vertices which are not adjacent? Does a graph contain a subset $C \subseteq V$ of size $\leq k$ such that every edge in $E$ is covered by at least one vertex in $C$?
+    \item 3-Colourable: Can the vertices of a graph be coloured with $\leq 3$ colours so that no adjacent vertices have the same colour?
+    \item Hamiltonian Cycle / Path: Does a graph have a simple cycle / path that visits every vertex exactly once?
+    \item TSP: Given a complete weighted graph, is there a Hamiltonian Cycle with total cost $\leq K$?
+    \item Subset Sum, Partition: Given a set of integers, is there a subset with sum $T$? Is there a partition into two subsets of equal sum?
+    \item 3 Dimensional Matching: Given three sets and a subset of triples, is there a matching such that each element appears in exactly one triple? (Matching: Subset of cartesian product)
+    \item Set Cover: Given a collection of subsets, is there a selection of $\leq k$ of them whose union equals the universe?
+    \item 0-1 Knapsack: Given items with values and weights as well as a capacity and target value, is there a subset of items with total weight $\leq W$ and total value $\geq V$?
+\end{itemize}
+
+\subsection{NP-Completeness of Subset Sum}
+\begin{itemize}
+    \item We can simply verify the certificate, so it is in NP
+    \item We will show $3-SAT \leq_p SUBSET-SUM$
+    \item Given $n$ variables $x_i$ and $m$ clauses $c_j$
+    \item For each $x_i$, construct $t_i, f_i$ of $n+m$ digits
+    \item The digit position corresponding to this literal is 1, and for the clauses, it is 1 in $t_i$ if $x_i$ is in the clause, and 1 in $f_i$ if $\overline{x_i}$ is in the clause, the rest of the digits are 0
+    \item Construct $x_j, y_j$, where for each clause there are exactly 2 where the corresponding position is a 1, these are the slack numbers which we can use to top up
+    \item Now for the subset sum, we set each of the literals to be 1, and each of the clauses to be 3
+    \item Each literal or its complement can only be taken once
+    \item Each clause can only use at most 2 slack numbers, so it must have at least one satisfied literal
+\end{itemize}
+
+\subsection{WA2 Reductions}
+\begin{itemize}
+    \item Extend-MIS-in: Given $S \subseteq V$, is there an MIS $I$ of $G$ such that $S \subseteq I$
+    \item Extend-MIS-out: Given $S \subseteq V$, is there an MIS $I$ of $G$ such that $I \cap S = \emptyset$
+    \item Extend-MIS: Given $S_i \subseteq V, S_o \subseteq V, S_i \cap S_o = \emptyset$, is there an MIS $I$ of $G$ such that $S_i \subseteq I, I \cap S_o = \emptyset$
+    \item Extend-MIS-unique: Given $S_i \subseteq V, S_o \subseteq V, S_i \cap S_o = \emptyset$, is there exactly one MIS $I$ of $G$ such that $S_i \subseteq I, I \cap S_o = \emptyset$
+    \item Extend-MIS-in can be solved in polynomial time by verifying $S$'s independence
+    \item Extend-MIS $\leq_p$ Extend-MIS-out, by adding a new vertex $v'$ adjacent to each $v \in S_i$, then let $S'$ be the union of $S_o$ and these $v'$
+\end{itemize}
+
+\subsection{WA3 Reductions}
+\begin{itemize}
+    \item Define U-3-SAT to be a variant of 3-SAT where for each clause the number of literals that evaluate to TRUE is in $U$
+    \item U-3-SAT is in NP since we can count the number of literals and evaluate
+    \item $\{0\}$-3-SAT is in P
+    \item $\{0,3\}$-3-SAT is in P, construct a graphs where we add an edge between 2 literals in the same clause depending on their signs, then we can check that it is bipartite
+    \item $\{0,1,2\}$-3-SAT is NP-Complete since we can flip the truth assignment of every variable from $\{1,2,3\}$-3-SAT
+    \item min-MIS: Does $G$ have an MIS $S \subseteq V$ with $|S| \leq k$
+    \item min-VC: Does $G$ have a vertex cover $C \subseteq V$ with $|C| \leq k$
+    \item Extend-MIS-out is in NP since we can simply check for independence and maximality
+    \item 3-SAT $\leq_p$ Extend-MIS-out so it is NP Complete
+    \item Create a vertex for each literal, then for each variable, add a vertex (to $S$) and make a clique with the clause vertexes, so that either the literal or its complement is taken
+    \item For each clause add a vertex adjacent to each literal and add this clause vertex to $S$ so that at least one literal must be in the MIS
+    \item min-MIS is in NP since we can easily verify the certificate
+    \item min-VC $\leq_p$ min-MIS, so min-MIS is NP Complete
+    \item Let $G=(V,E), k'=|V|+k$, the construct a new graph $G'$
+    \item For each edge $e$, replace $e$ with $k'+1$ internally vertex-disjoint paths of length 2 between $u,v$
+    \item For each vertex $v$, add a new path $(v,v',v'')$
+    \item Suppose $C \subseteq V$ is a VC with $|C| \leq k$, construct an MIS $I$ of $G'$ as follows
+    \item For $v \in C$, add $v,v''$ to $I$
+    \item For $v \in V \backslash C$, add $v'$ to $I$
+    \item By construction, $I$ is independent, and is maximal since $C$ was a VC, then $|I|=|V|+|C| \leq k'$
+    \item Suppose $I$ is an MIS of $G'$ with $|I| \leq k'=|V|+k$, construct a VC $C$ of $G$ as follows
+    \item Each original edge was replaced by $k'+1$ paths of length 2, so if any of the middle vertices belong to $I$, then all of them do, then $|I| > k'$ which is a contradiction
+    \item So none of them can be in $I$, and every vertex must come from $(v,v',v'')$
+    \item If only $v'$ is in $I$, then do not include it
+    \item If $v,v''$ are in $I$, then include $v$
+    \item From the construction, $|C|=|I|-|V| \leq k$, and the maximality of $I$ implies that for every original edge at least one must be in $I$ so the corresponding vertex is added to $C$
+\end{itemize}
+
+\section{Linear Time Sorting}
+\begin{itemize}
+    \item Counting Sort (Unstable Version): Create an array with size corresponding to range, then iterate and output the correct number of each, complexity is $\Theta(n+k)$
+    \item Tradeoff is memory, especially if range of $k$ is large
+    \item Can be made stable, use prefix sums to find index where element belongs, iterate from back
+\end{itemize}
+\begin{verbatim}
+C = [0]*(k+1) # frequency lookup
+for i in A:
+    C[i] += 1
+for i in range(1, k+1):
+    C[i] += C[i-1] # compute prefix sum
+B = [0]*n # output array
+for i in range(n-1, -1, -1): # iterate in reverse
+    C[A[i]] -= 1 # decrease first
+    B[C[A[i]]] = A[i] # place A[i] at index C[A[i]]
+print(*B)
+\end{verbatim}
+\begin{itemize}
+    \item Radix Sort: Iterated Counting Sort, Sort from LSD to MSD using \textbf{stable} counting sort, correctness can be proved by induction
+    \item With $d$ digits, Radix Sort runs in $O(d \cdot (n+k))$ time
+    \item Setting $k=10$ might not be the best setup
+    \item Break a $b$-bit word into $\frac{b}{r}$ groups of $r$-bit words, so that there are $d=\frac{b}{r}$ passes, taking $O(\frac{b}{r}(n+2^r))$ time
+    \item Choose $r \approx log_2n$, giving total time of $O(\frac{b}{log_2n}\cdot(n+2^{log_2n}))=O(\frac{b \cdot n}{log_2n})$
+    \item If $b= log_2n^d$, then Radix sort runs in $O(d \cdot n)$ time
+\end{itemize}
+
+\section{Order Statistics}
+\begin{itemize}
+    \item Given unsorted array, find index of $i$th smallest element
+    \item Naive: Repeatedly find minimum and remove, $O(n^2)$ worst case
+    \item Sorting: Sort and return correct index, $\Theta(n\ log \ n)$
+    \item Lower Bound: Selection takes $\geq n$ steps, since we must at least consider each element before making a conclusion
+\end{itemize}
+
+\subsection{Quickselect}
+\begin{itemize}
+    \item Requires partition algorithm which runs in $\Theta(n)$
+    \item Randomly choose pivot, partition, then recurs on corresponding half
+    \item Partition returns final correct rank $k$ of randomly chosen pivot
+    \item If $k=i$, return pivot
+    \item If $k>i$, recurse on $[l, k-1]$
+    \item If $k<i$, recurse on $[k+1, r]$
+    \item $O(n)$ best case, $O(n^2)$ worst case without randomness
+    \item Let $X_k$ be the indicator random variable which is 1 for a $k:(n-k-1)$ split
+    \item Suppose the partition is a $k:(n-k-1)$ split, then $T(n)=T(max(k,n-k-1))+\Theta(n)$
+\end{itemize}
+\begin{align*}
+T(n)&=\sum_{k=0}^{n-1}X_k \cdot (T(max(k,n-k-1))+\Theta(n)) \\
+E[T(n)]&=E[\sum_{k=0}^{n-1}X_k \cdot (T(max(k,n-k-1))+\Theta(n))] \\
+E[T(n)]&=\sum_{k=0}^{n-1}E[X_k \cdot (T(max(k,n-k-1))+\Theta(n))] \\
+E[T(n)]&=\sum_{k=0}^{n-1} E[X_k] \cdot E[(T(max(k,n-k-1))+\Theta(n))] \\
+E[T(n)]&=\frac{1}{n}\sum_{k=0}^{n-1}E[T(max(k,n-k-1))]+\frac{1}{n}\sum_{k=0}^{n-1}\Theta(n) \\
+E[T(n)]&\leq\frac{2}{n}\sum_{k=\lfloor\frac{n}{2}\rfloor}^{n-1}E[T(k)]+\Theta(n) \\
+E[T(n)]&\leq\frac{2}{n}\sum_{k=\lfloor\frac{n}{2}\rfloor}^{n-1}c\cdot k+d\cdot n \\
+E[T(n)]&\leq\frac{2c}{n}(\frac{3n^2}{8})+d \cdot n \\
+E[T(n)]&\leq\frac{3c \cdot n}{4}+d\cdot n \\
+E[T(n)]&\leq c \cdot n - (\frac{c \cdot n}{4} - d \cdot n) \\ 
+E[T(n)]&\leq c \cdot n
+\end{align*}
+\begin{itemize}
+    \item We choose $c \geq 4d$
+\end{itemize}
+
+\subsection{Median of Medians}
+\begin{itemize}
+    \item Divide array into $\lfloor n/5 \rfloor$ groups of $5$ elements each
+    \item Find the median of each $5$ element group in constant time
+    \item Let $B$ be the $\lfloor n/5 \rfloor$ medians of each group
+    \item Set $x=B[Select(B, |B|, |B|/2)]$, the median of medians
+    \item Set $k=Partition(A, x)$, let $A'/A''$ be the elmeents $<x / > x$ respectively
+    \item Similar to quickselect, if $i=k$, return $k$
+    \item If $i<k$, return $Select(A', k-1, i)$
+    \item If $i>k$, return $Select(A'', n-k, i-k)$
+    \item Since we have at least $3 \cdot \lfloor \frac{n}{10} \rfloor$ elements $\geq x/ \leq x$, we recurse on at most $\frac{7n}{10}$ elements and have $T(n) \leq T(n/5)+T(7n/10)+\Theta(n) \Rightarrow T(n) \leq c \cdot n$ which is linear
+    \item In practice it has a high constant which makes it slower than randomised Quickselect
+    \item If we use groups of $3$ instead, the time complexity is now $O(n\ log\ n)$
+\end{itemize}
+
+\subsection{Dynamic Order Statistics}
+\begin{itemize}
+    \item Order statistics but with updates
+    \item Use BBST augmentation
+\end{itemize}
+
+\begin{center}
+    \begin{tabular}{lll}
+    \raisebox{-.5\height}{\includegraphics[scale=0.6]{profhalim.png}} & pls give me A+ prof thanks \\
+    \end{tabular}
+\end{center}
+
+\begin{center}
+    \begin{tabular}{lll}
+    \raisebox{-.5\height}{\includegraphics[scale=0.6]{profchang.png}} & pls give me A+ prof thanks \\
+    \end{tabular}
+\end{center}
+
+\begin{center}
+    \begin{tabular}{lll}
+    \raisebox{-.5\height}{\includegraphics[scale=0.6]{profprashant.png}} & pls give me A+ prof thanks \\
+    \end{tabular}
+\end{center}
+
+\end{multicols*}
+
+\end{document}
