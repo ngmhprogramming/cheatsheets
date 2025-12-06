@@ -1,0 +1,485 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\usepackage{background}
+\setlist{nosep}
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=0.4,
+angle=0,
+contents={}
+}
+
+\pdfinfo{
+  /Title (CS2103T.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{4}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{CS2103T}}
+            \\ \normalsize{AY25/26 Sem 1}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{Programming Paradigms}
+\begin{itemize}
+    \item Object Oriented Programming is a programming paradigm
+    \item An object has both state and behaviour
+    \item OOP views the world as a network of interacting objects
+    \item Every object has state and behaviour, along with interface and implementation
+    \item Objects interact by sending messages
+    \item Objects are an abstraction mechanism, providing encapsulation as well as packaging and information hiding
+    \item A class contains instructions for creating specific kinds of objects
+    \item Class level attributes are shared by all instances of a class
+    \item Enumerations provide a fixed set of values that can be considered as a data type
+    \item Connections between objects are known as associations, implemented with instance level variables
+    \item Navigability tells us if an object taking part in an association knows about the other
+    \item Navigability can be unidirectional or bidirectional
+    \item Multiplicity dictates how many objects take part in each association
+    \item A dependency is a need for one class to depend on another without having a direct association in the same direction
+    \item Composition represents a whole-part relationship; when the whole is destroyed, the parts are also destroyed
+    \item Aggregation represents a container-contained relationship, slightly weaker than composition
+    \item Containee can exist even if container is deleted
+    \item Association class represents additional information about an association
+    \item Inheritance allows you to define a new class based on an existing class with the superclass being more general than the subclass
+    \item Results in an is-a relationship, derived class is a subtype of the base class
+    \item Multiple inheritance is not allowed in Java
+    \item Method Overriding is when a subclass changes behaviour inherited from the parent class
+    \item Method Overloading is when there are multiple methods with the same name but different type signatures
+    \item An interface is a behaviour specification, resulting in an is-a relationship for the implementing class
+    \item An abstract class is a representation of commonalities amongst subclasses and cannot be instantiated
+    \item Abstract methods are methods without implementation
+    \item Dynamic Binding is when method calls are resolved at runtime, as opposed to Static Binding which resolves it at compile time
+    \item Overridden methods are resolved using dynamic binding, while Overloaded methods are resolved using static binding
+    \item Polymorphism allows you to write code targeting superclasses to be used on subclasses
+    \item Substitutability, Overriding, and Dynamic Binding combine to give polymorphism
+\end{itemize}
+
+\section{Requirements}
+\begin{itemize}
+    \item A brownfield project replaces an existing product while a greenfield project is developed from scratch
+    \item Stakeholders are individuals affected by the software project; they provide requirements
+    \item Functional requirements specify what the system should do
+    \item Non-Functional requirements specify the constraints under which the system is developed and operated
+    \item NFRs are easier to miss and are sometimes critical to the success of the software
+    \item Requirements can be prioritised based on the importance and urgency e.g. Essential, Typical, Novel
+    \item Requirements that are out of scope can be discarded
+    \item Requirements can be generated through methods like brainstorming, user surveys, observations, interviews, focus groups, prototyping, product surveys
+    \item Prototypes are mock ups or scaled down versions of the product
+    \item Prose is a textual description of a requirement
+    \item Feature lists are a list of features of a product grouped according to some specified criteria
+    \item User stories are short simple descriptions of a feature told from the perspective of the person who desires the new capability
+    \item As a [user type] I can [function] so that [benefit]; benefit can be omitted if obvious
+    \item More adjectives can be attached to the [user type] if needed
+    \item User stories can be written at various levels
+    \item High level user stories called epics cover bigger functionality and can be broken down to smaller user stories
+    \item Condition of satisfaction can be added to user stories
+    \item Other useful information includes priority, size, and urgency
+    \item User stories aid scoping, estimation, and scheduling
+    \item A use case is a description of a set of sequences or actions that a system performs to yield an observable result of value to an actor
+    \item It describes an interaction between the user and the system for a specific functionality of the system
+    \item Use cases capture functional requirements of a system and specified at various levels of detail
+    \item Actors are roles played by a user
+    \item Use cases only describe externally visible behaviour without the internal details
+    \item A step gives intention of the user rather than mechanics
+    \item The Main Success Scenario describes the most straightforward interaction for a given use case which assumes nothing goes wrong
+    \item Extensions are add on to the MSS that describe alternative flow of events
+    \item MSS should be self contained
+    \item A use case can include another use case
+    \item Preconditions specify the specific state the system is expected to be in before the use case starts
+    \item Guarantees specify what the use case promises to give at the end of operations
+    \item A glossary ensures that all stakeholders have a common understanding of noteworthy terms
+    \item Supplementary requirements can be used to capture requirements that do not fit elsewhere
+\end{itemize}
+
+\section{Design}
+\begin{itemize}
+    \item Product/External Design and Implementation/Internal design
+    \item Abstraction is a technique for dealing with complexity by only considering details relevant to the current perspective or task at hand
+    \item Data abstraction involves abstracting away lower level data items and thinking in terms of bigger entities
+    \item Control abstraction involves abstracting away details of actual control flow to focus on tasks at a higher level
+    \item Coupling is a measure of the degree of dependence between components or classes
+    \item High coupling is discouraged as it is harder to maintain, integrate, and test
+    \item X is coupled to Y if a change in Y could potentially require a change in X
+    \item Cohesion is a measure of how strongly related and focused the various responsibilities of a component are
+    \item Higher cohesion is better
+    \item A model is a representation of something else; providing a simple view of a complex entity because it only captures a selected aspect
+\end{itemize}
+
+\subsection{UML Diagrams}
+\begin{itemize}
+    \item Models can help to analyse a complex entity related to software development, communicate information among stakeholders, and act as a blueprint for creating software
+    \item Unified Modeling Language is a graphical notation to describe various aspects of a software system
+    \item UML class diagrams describe the structure of an OOP solution
+    \item There if no default visibility, it is simply unspecified
+    \item Generic classes can be shown as well
+    \item Associations are the main connections among the classes in a class diagram
+    \item Associations are shown using a solid line, or can be shown as an attribute instead but not both
+    \item Associations can have additional decorations such as labels or roles
+    \item Multiplicity dictates how many objects take part in each association, no default multiplicity exists
+    \item UML notes can add more information to a diagram
+    \item Class diagrams can show different relationships between classes
+    \item Association classes are denoted as connections to an association link using a dashed line
+    \item Object diagrams show object structure at a given point of time, and can be used to complement class diagrams
+    \item Conceptual class diagrams capture class structures in the problem domain
+    \item Subset of class diagram notation without specific details
+    \item Activity diagrams are used to model workflows
+    \item Activity diagrams capture activities through actions and control flows that make them up
+    \item Branch nodes show alternate paths with guard conditions
+    \item Merge nodes show the end of alternate paths
+    \item Fork nodes indicate the start of concurrent flows of control
+    \item Join nodes indicate the end of parallel paths
+    \item Rake indicates that part of activity is in a separate diagram
+    \item Swimlane diagrams are partitioned activity diagrams which can show who is doing which action
+    \item Sequence diagrams model the interaction between various entities in a system
+    \item Optional elements may be omitted if there is no ambiguity
+    \item Object deletion is shown with an X
+    \item Alt frames indicate alternative paths
+    \item Opt frames indicate optional paths
+    \item Par frames indicate parallel paths
+    \item Ref frame allows segment of interaction to be omitted and shown as a separate sequence diagram
+\end{itemize}
+
+\subsection{Software Architecture}
+\begin{itemize}
+    \item Software architecture describes the overall organisation of the system and can be viewed as a very high level design
+    \item Different architecture styles exist
+    \item In the n-tier style, higher layers make use of service provided by lower layers
+    \item The client-server style has at least one component playing the role of a server and at least one client component accessing the service of the server
+    \item The transaction processing style divides the workload of the system down to a number of transactions which are then given to a dispatcher that controls the execution of each transaction
+    \item The service-oriented architecture style builds applications by combining functionalities packaged as programmatically accessible services
+    \item The event-drive style controls the flow of the application by detecting events from event emitters and communicating those events to interested event consumers
+\end{itemize}
+
+\subsection{Software Design}
+\begin{itemize}
+    \item Design patterns are elegant reusable solutions to a commonly recurring problem
+    \item Patterns are described by context, problem, solution, anti-patterns, consequences, and other useful information
+    \item The singleton pattern dictates that certain classes should have no more than just one instance and use a factory together with class level fields
+    \item The facade pattern says that access to other components should be done without exposing internal details, can be done with a middleman class
+    \item The command pattern says that if a system needs to execute different tasks, we should use polymorphism for a general command object
+    \item The Model View Controller pattern represents separating an application into 3 components; the view which the user sees, the controller that catches events and sends updates, and the model which stores and maintains data
+    \item The observer pattern targets the problem where an object might be interested in being notified when changes occur to other objects, which can be implemented with an observer list and interface
+    \item Top-Down design involves designing the higher-level design first before fleshing out lower levels, useful when design big systems where the higher level needs to be stable first
+    \item Bottom-Up design involves designing the lower-level design first and putting them together later, not usually scalable, but might work when designing variations of existing systems of repurposing existing components
+    \item Agile design can be contrasted with full upfront design
+\end{itemize}
+
+\section{Implementation}
+\begin{itemize}
+    \item Integrated Development Environments help software engineers write code
+    \item Debugging is the process of discovering defects in the program
+    \item A guidelines is to maximise readability of code
+    \item Avoid long methods and deep nesting or arrowhead style code
+    \item Avoid complicated expressions, especially those having many negations and nested parentheses
+    \item Avoid magic numbers or literals
+    \item Make code as explicit as possible
+    \item Lay out code so that it adheres to logical structure
+    \item Do not trip up the reader
+    \item Keep it simple, stupid
+    \item Avoid premature optimisation
+    \item Keep to the Single Level of Abstraction Principle
+    \item Make the happy path prominent
+    \item Follow a coding standard which aims to make entire codebase look like it was written by one person
+    \item Name things well; use nouns for things and verbs for actions
+    \item Avoid unsafe shortcuts
+    \item Use the default branch
+    \item Don't recycle variables or parameters
+    \item Avoid empty catch blocks
+    \item Delete dead code
+    \item Minimise scope of variables and code duplication
+    \item Comment minimally but sufficiently
+    \item Do not repeat in comments; write comments targeting other programmers
+    \item Refactoring is the process of restructuring code in small steps without modifying its external behaviour
+    \item Refactoring is not rewriting or bug fixing
+    \item Code smells are indications that usually correspond to deeper problems in the system
+    \item Documentation can be for developer-as-user or developer-as-maintainer
+    \item A top-down breadth-first approach is easier to understand than a bottom-up one
+    \item Documentation should be accurate, comprehensive, and comprehensible
+    \item Focus on providing higher level information that is not found in code or comments
+    \item JavaDoc generates API documentation in HTML from comments in the source code
+    \item Exceptions are used to deal with unusual but not entirely unexpected situations
+    \item The exception handler catches a thrown exception and handles it
+    \item Assertions are used to define assumptions about the program state so that the runtime can verify them
+    \item Drastic action is taken when an assumption failure occurs
+    \item Assertions can be disabled without modifying the code
+    \item Logging is the deliberate recording of certain information during a program execution for future reference; useful for troubleshooting problems
+    \item Defensive programming operates under the assumption that if you leave room for things to go wrong, they will go wrong
+    \item Integration is the processes of combining parts of a software product to form a whole
+    \item Late and one time integration involves waiting until all components are completed before integration
+    \item Early and frequent involves integrating early and evolving each part in parallel in small steps
+    \item Big band integration involves integrating all components at the same time
+    \item Incremental integration involves integrating a few components at a time
+    \item Build automation tools automate the steps of the build process usually by means of build scripts
+    \item Continuous Integration integrates, builds, and tests automatically after each code change
+    \item Continuous Deployment is when changes are not only integrated continuously, but also deployed to end-users at the same time
+    \item Reusing tried and tested components can enhance the robustness of a new software system while reducing the manpower and time requirement although there might be some associated costs
+    \item An Application Programming Interface specifies an interface through which other programs can interact
+    \item A library is a collection of modular code that is general and can be used by other programs
+    \item A framework is a reusable implementation of a software providing generic functionality that can be selectively customised to produce a specific application
+    \item Libraries are meant to be used as is while frameworks are meant to be customised
+    \item A platform provides a runtime environment for application
+\end{itemize}
+
+\section{Quality Assurance}
+\begin{itemize}
+    \item Quality assurance is the process of ensuring that the software being built has the required levels of quality
+    \item Quality assurance is made out of validation (checking if requirements are correct) and verification (checking if requirements are implemented correctly)
+    \item Code reviews are the systematic examination of code with the intention of finding where the code can be improved
+    \item Examples include pull request, pair programming, and formal inspections
+    \item Static analysis is the analysis of code without actually executing it
+    \item Formal verification uses mathematical techniques to prove the correctness of a program, can be used to prove the absence of errors
+    \item Testing involves operating a system or component under specified conditions and observing or recording the results to make an evaluation of some aspect of the system or component
+    \item Testing involves executing a set of test cases
+    \item Test case failure is a mismatch between the expected behaviour and actual behaviour
+    \item Testability is an indication of how easy it is to test a software under testing
+    \item A regression is an unintended and undesirable effect created due to modification of a system
+    \item Regression testing is re-testing software to detect regressions
+    \item Developer testing is done by the developers themselves
+    \item Delaying testing until the full product is complete has a number of disadvantages
+    \item Unit testing involves testing individual units to ensure each piece works correctly
+    \item Stubs help to isolate the software being tested from its dependencies
+    \item Integration testing tests whether different parts of the software work together
+    \item A hybrid of unit and integration testing is used
+    \item System testing takes the whole system and tests it against the system specifications
+    \item System test cases are based on the specified behaviour of the system and includes testing against the NFRs too
+    \item Alpha testing is perfomed by the users under controlled conditions set by the software development team
+    \item Beta testing is performed by a selected subset of target users of the system in their natural work setting
+    \item Dogfooding is when creators use their own product
+    \item Scripted testing involves writing a set of test cases based on expected behaviour then performing testing based on that set of test cases
+    \item Exploratory testing devises test cases on the fly; creating new test cases based on results of the past test cases
+    \item Scripted testing is more systematic and hence more likely to discover more bugs given sufficient time
+    \item Acceptance testing involves testing the system to ensure it meets the user requirements
+    \item Test automation involves running test cases and determining their result programmatically
+    \item Input and output redirection can be used to semi-automate the testing of a CLI app
+    \item A test driver is the code that drives the software being tested
+    \item JUnit is a tool for automated testing of Java programs
+    \item Moving as much logic as possible out of the GUI can make testing it easier
+    \item Test coverage is a metric used to measure the extent to which testing exercises the code
+    \item Examples include function / statement / decision / condition / path / entry / exit coverage
+    \item Coverage can be measured using coverage analysis tools
+    \item Dependency injection is the process of injecting objects to replace current dependencies with a different object
+    \item Test Driven Development advocates writing the tests before writing the software while evolving functionality and tests in small increments
+    \item Exhaustive testing is not practical because testing requires a massive number of test cases
+    \item Every test case adds to the cost of testing
+    \item Testing should be effective (finds a high percentage of existing bugs) and efficient (has a high rate of success)
+    \item Each new test should target a potential fault that is not already targeted by existing test cases
+    \item A positive test case is designed to produce expected behaviour
+    \item A negative test case is designed to produce a behaviour that indicates an invalid situation
+    \item Black box testing involves designing test cases based on the specified external behaviour
+    \item White box testing involves designing test cases based on what is known about the software implementation
+    \item Gray box is a mix of both
+    \item Equivalence partitioning is a test case design technique that uses the above observation to improve the effectiveness and efficiency of testing
+    \item An equivalence partition is a group of test inputs that are likely to be processed by the software the same way
+    \item Avoid testing too many inputs from one partition and ensure all partitions are tested
+    \item Equivalence partitions are usually derived from the specification of the software
+    \item Boundary value analysis is a design heuristic based on the observation that bugs often result from incorrect handling of boundaries of equivalence partitions
+    \item It suggest that values near boundaries are more likely to find bugs
+    \item Typically you should choose one value from the boundary, one value just below the boundary, and one value just above the boundary
+    \item A software can take multiple inputs, but testing all possible combinations across all inputs is effective but not efficient
+    \item The all combinations strategy generates test cases for each unique combinations of test inputs
+    \item The at least once strategy includes each test input at least once
+    \item The all pairs strategy creates test cases so that for any given pair of inputs, all combinations between them are tested
+    \item The random strategy generates test cases using one of the other strategies then picks a random subset
+    \item Another heuristic is having each valid input at least once in a positive test case
+    \item Another heuristic is handling invalid inputs individually before combining them
+    \item We can mix multiple strategies together
+    \item Use cases can be used for system and acceptance testing
+\end{itemize}
+
+\section{Project Management}
+\begin{itemize}
+    \item Revision control is the process of managing multiple versions of a piece of information
+    \item A revision is the state of a piece of information at a specific point in time resulting from changes made to it
+    \item Revision Control Software are software tools that automate the process of revision control
+    \item Git is the most widely used RCS today while Github is a web-based project hosting platform for projects using Git
+    \item To put a folder under the control of Git, we intialise a repository in that folder
+    \item We stage an untracked file to tell Git that we want it to be included in the next snapshot
+    \item A modified a staged file it enters the modified state
+    \item Staging applies regardless of whether a file is currently tracked
+    \item Saving a snapshot is called committing and a saved snapshot is called a commit
+    \item A timeline of commits is called a branch
+    \item A Git data model consists of objects and refs
+    \item A Git revision graph is a visualisation of a repository revision history
+    \item Nodes represent commits while edges represents links between them
+    \item Refs name and keep track of various points in a repository history
+    \item A repository can be local or remote
+    \item Content can be pushed from one repository to another
+    \item We can omit files using a gitignore file
+    \item A fork is a copy of a remote repository created on the same hosting service
+    \item We can clone a repository to create a full copy of it locally
+    \item To sync changes from a remote repository we need to fetch changes from remote and merge to apply the changes also known as pull
+    \item Git lets you tag commits so they are easy to reference later
+    \item We can use Git diff to compare changes between two points in the revision history
+    \item Git stash allows to temporarily set aside uncommitted changes
+    \item Git reset moves the tip of the current branch to a specific commit
+    \item There are three types of resets: soft, mixed, hard
+    \item Git branches allow you to develop multiple versions of work in parallel which can be merged together
+    \item A fast forward merge moves the branch pointer to the tip of the other branch
+    \item A squash merge takes all changes from one branch to combine into a single commit on the destination branch
+    \item A merge conflict occurs when changes from two branches cannot be automatically combined
+    \item Cherry picking allows us to synchronise branches by applying specific commits from one branch to another
+    \item A centralised RCS uses a central remote repository that is shared
+    \item A distributed RCS allows multiple remote or local repositories that work together
+    \item In the forking workflow, the official code lives in a designated main repository while each developer works in their own fork and submits pull requests from separate branches back to the main repository
+    \item In the feature branch workflow, everyone uses the same remote repository but on different branches
+    \item The centralised workflow is similar but all changes are done in the master branch
+    \item The Software Development Lifecycle describes stages of software development
+    \item The sequential or waterfall model views software development as a linear process
+    \item When one stage of the process is completed, it produces artifacts to be used in the next stage
+    \item Works well for a project the produces software to solve a well understood problem but real world projects often tackle problems that are not well understood at the beginning
+    \item The iterative model advocates producing the software by going through several iterations which produce a new version of the product
+    \item In the breadth-first approach, an iteration evolves all major components and all functionality areas in parallel
+    \item In the depth-first approach an iteration focuses on fleshing out only some components or some functionality area
+    \item A project can be done as a mixture of both
+    \item Agile models are another model of development
+    \item Extreme Programming is an agile model which stresses customer satisfaction
+    \item Scrum is a process skeleton that contains set of practice and predefined roles
+    \item A scrum project is divided into iterations called sprints
+    \item A work breakdown structure depicts information about tasks and their details in terms of subtasks
+    \item The effort is traditionally measured in man hours and should have well defined tasks
+    \item A milestone is the end of a stage which indicates significant progress
+    \item A buffer is time set aside to absorb any unforeseen delays
+    \item Issue trackers are commonly used to track task assignment and progress
+    \item A Gantt chart is a 2D bar chart drawn as time vs tasks
+    \item Different teams have different team structures
+    \item Egoless teams are teams where every team member is equal in terms of responsibility and accountability
+    \item In a chief programmer team, there is a single authoritative figure; the chief programmer
+    \item In a strict hierarchy team, there is a strictly defined organisation among the team members
+\end{itemize}
+
+\section{Principles}
+\begin{itemize}
+    \item Single Responsibility Principle says that a class should have exactly one reason to change
+    \item Open Closed Principle says that a module should be open for extension but closed for modification
+    \item Liskov Substitution Principle says that derived classes must be substitutable for their base classes
+    \item SOLID is the above 3 together with Interface Segregation Principle and Dependency Inversion Principle
+    \item Separation of Concerns says that to achieve better modularity, we should separate the code into distinct sections such that each section addresses a separate concern
+    \item Law of Demeter says that an object should have limited knowledge of another object and it should only interact with objects that are closely related to it
+\end{itemize}
+
+\end{multicols*}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{damith.png}
+\end{figure}
+
+\end{document}

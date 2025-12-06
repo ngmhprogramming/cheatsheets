@@ -1,0 +1,860 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\usepackage{background}
+\setlist{nosep}
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=0.4,
+angle=0,
+contents={}
+}
+
+\pdfinfo{
+  /Title (CS2102.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{4}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{CS2102}}
+            \\ \normalsize{AY25/26 Sem 1}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{DBMS}
+\subsection{Transaction}
+\begin{itemize}
+    \item Finite sequence of database operations, constituting smallest logical unit of work from application perspective
+    \item Properties:
+    \begin{itemize}
+        \item Atomicity: Either all effects are reflected or none
+        \item Consistency: Guaranteed to yield correct database state
+        \item Isolation: Transaction is isolated from effect of concurrent transactions
+        \item Durability: Effects of commit are permanent even in case of failures
+    \end{itemize}
+    \item Problems with Concurrent Transactions: Lost updates (Effect of transaction overwritten), Dirty reads (Reading invalid data), Unrepeatable read (Value retrieved twice with differing values)
+    \item Serialisability: A concurrent execution of a set of transactions is serialisable if its execution is equivalent to some serial execution of the same set of transactions
+    \item Two executions are equivalent if they have the same effect on the data
+    \item DBMS supports concurrent executions for performance and enforces serialisability of concurrent executions for data integrity
+\end{itemize}
+
+\subsection{Architecture}
+\begin{itemize}
+    \item 3-Tier Architecture / Levels of Data Abstraction
+    \item External Schema: User or group-specific view on data
+    \item Logical Schema: Logical organisation of data forming a data model, unified representation of all data, supports logical data independence and physical data independence
+    \item Physical Schema: Organisation of data on disk and in memory, database as collections of fields, arrays, records, files, pages, etc.
+    \item Logical Data Independence: Ability to change logical schema without affecting external schemas
+    \item Physical Data Independence: Representation of data being independent from physical schema, can be changed without affecting logical schema
+    \item Data Model: Set concepts for describing data
+    \item Schema: Description of structure of DB using data model concepts
+    \item Schema Instance: Content of a DB at a particular time
+\end{itemize}
+
+\subsection{Relational Model}
+\begin{itemize}
+    \item Based on relations; tables with rows and columns
+    \item Relation Schema: Specifies attributes (columns) and data constraints (domain constraints etc.)
+    \item Domain: Set of atomic values
+    \item Domain of attribute $A_i$ is $dom(A_i)$, and each value $v$ is either $v \in dom(A_i) \lor v = null$ (unknown or unspecified)
+    \item Relation: Set of tuples, represented by relation schema $R(A_1,A_2,...,A_n)$
+    \item Each instance of a schema $R$ is $\subseteq \{(a_1,a_2,...,a_n)|a_i \in dom(A_i)\cup \{NULL\}\}$
+    \item $R.A_i$ is attribute $A_i$ of relation $R$
+    \item Relational Database Schema: Set of relation schemas + data constraints
+    \item Relational Database: Collection of tables
+    \item Integrity Constraints: Conditions that restrict what constitutes valid data, checked by DBMS
+    \item Structural Constraints: Domain constraints, Key constraints, Foreign Key constraints
+    \item Structural: Inherent to data model, not dependent on application
+    \item General Constraints: Dependent on specific application etc. triggers
+\end{itemize}
+
+\subsubsection{Key Constraints}
+\begin{itemize}
+    \item Superkey: Subset of attributes that uniquely identifies a tuple in a relation
+    \item Key: Superkey that is also minimal (No proper subset is a superkey)
+    \item Every relation has at least 1 superkey
+    \item Candidate Keys: Set of all keys for a relation
+    \item Prime Attribute: Attribute of candidate key
+    \item Primary Key: Selected candidate key for a relation, with added non-null constraint (entity integrity constraint), underlined in schema notation
+    \item Foreign Key: Subset of attributes of relation $A$ that refers to primary key of relation $B$
+    \item Each foreign key in $A$ must either be a null value or appear as a primary key in $B$
+    \item Foreign keys can be self-referential
+\end{itemize}
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Structural integrity constraints do not cover application-independent constraints
+    \item Integrity constraints are not mandatory
+    \item Performance might decrease due to additional checking of constraints, could improve due to creation of indexes which speed up retrieval
+\end{itemize}
+
+\section{SQL}
+\begin{itemize}
+    \item Structured Query Language
+    \item Domain-specific and declarative language
+    \item Interactive SQL: Directly writing SQL statements to an interface
+    \item Non-interactive SQL: Application written in host language with interfaces
+    \item Statement Level Interface: Mixture of host language and SQL statements
+    \item Call Level Interface: Entirely written in host language and SQL statements are executed with function calls
+    \item Interactive SQL: Directly writing SQL statements into interface such as Command Line or Graphical User Interfaces
+\end{itemize}
+
+\subsection{Commands}
+\begin{itemize}
+    \item DDL: Data Definition (CREATE, ALTER, DROP, RENAME, TRUNCATE)
+    \item DML: Data Manipulation (INSERT, UPDATE, DELETE, MERGE)
+    \item DQL: Data Query (SELECT)
+    \item DCL: Data Control (GRANT, REVOKE)
+    \item TCL: Transaction Control (BEGIN, COMMIT, ROLLBACK, SAVEPOINT)
+\end{itemize}
+
+\subsubsection{Create / Insert / Delete / Update}
+\begin{itemize}
+    \item Create:
+\end{itemize}
+\begin{verbatim}
+    CREATE TABLE Employees (
+        id INTEGER,
+        name VARCHAR(50),
+        age INTEGER,
+        role VARCHAR(50)
+    )
+\end{verbatim}
+\begin{itemize}
+    \item Basic Data Types: BOOLEAN, INTEGER, FLOAT8, NUMERIC [(p, s)], CHAR(n), VARCHAR(n), TEXT, DATE, TIMESTAMP...
+    \item Insert Into:
+\end{itemize}
+\begin{verbatim}
+    INSERT INTO Employees VALUES (101, 'Sarah', 25, 'dev');
+\end{verbatim}
+\begin{itemize}
+    \item Delete:
+\end{itemize}
+\begin{verbatim}
+    DELETE FROM Employees WHERE role = 'dev';
+\end{verbatim}
+\begin{itemize}
+    \item Update:
+\end{itemize}
+\begin{verbatim}
+    UPDATE Employees SET age = age + 1 WHERE name = 'Sarah';
+\end{verbatim}
+
+\subsection{Three-Valued Logic}
+\begin{itemize}
+    \item Result of comparing with null is unknown, while result of arithmetic with null is null
+    \item Values: True, False, Unknown
+    \item Use IS NULL to check if null value
+    \item Use IS DISTINCT FROM to check inequality, equivalent to <> if non-null
+    \item Conjunction: False > null > True
+    \item Disjunction: True > null > False
+\end{itemize}
+
+\subsection{Integrity Constraints}
+\begin{itemize}
+    \item Types of Constraints: Not-null, Unique, Primary key, Foreign key, General
+    \item Column Constraint: Applies to a single column, specified at column definition
+    \item Table Constraint: Applies to one or more columns, specified after column definitions
+    \item Assertion: Stand-alone command
+    \item Not-Null: Violated when there is a tuple where "id IS NOT NULL" evaluates to false
+    \begin{verbatim}
+    id vARCHAR(50) CONSTRAINT nn_id NOT NULL,
+    \end{verbatim}
+    \item Unique: Violated when for any two tuples, "(id1 <> id2) or (pname1 <> pname2)" returns false
+    \begin{verbatim}
+    id INTEGER CONSTRAINT u_id UNIQUE,
+    CONSTRAINT u_alloc UNIQUE (eid, pname)
+    \end{verbatim}
+    \item Primary Key: Selected key uniquely identifying tuples, Prime attributes cannot be null
+    \begin{verbatim}
+    id INTEGER PRIMARY KEY,
+    PRIMARY KEY (eid, pname)
+    \end{verbatim}
+    \item Foreign Key: Subset of attributes of $A$ refer to primary key of $B$, violated when foreign key does not appear as primary key in referenced relation and is not null
+    \begin{verbatim}
+    FOREIGN KEY (eid) REFERENCES Employees (id),
+    \end{verbatim}
+    \item Behaviour can be extended with ON DELETE / UPDATE <action>
+    \begin{itemize}
+        \item NO ACTION: rejects if it violates constraint
+        \item RESTRICT: similar, but can defer check of constraint
+        \item CASCADE: propagates to referencing tuples
+        \item SET DEFAULT: update foreign key to some default value
+        \item SET NULL: update foreign key to null
+    \end{itemize}
+    \item CHECK constraint: Most basic general constraint, specifies Boolean expression that column values must satisfy
+    \begin{verbatim}
+    CONSTRAINT valid_lifetime CHECK (start_year <= end_year)
+    \end{verbatim}
+    \item Assertion: CREATE ASSERTION, used for arbitrary constraints, cannot modify data, and not linked to specific table, most RDBMS do not support
+    \item All constraints can be specified named or unnamed
+    \item All column constraints can be specified as table constraints other than not null
+    \item Table constraints referring to a single column can be specified as a column constraint
+    \item Column and table constraints can be combined
+\end{itemize}
+
+\subsection{Deferrable Constraints}
+\begin{itemize}
+    \item By default, constraints are check immediately, and violations will cause rollbacks
+    \item Can defer constraints to end of transaction
+    \item Allows cyclic foreign key constraints
+    \item No need to care about order of statements, and performance boost when constraint checks are bottleneck
+    \item Troubleshooting is harder, data definition might be ambiguous, and queries might incur performance penalties when certain checks occur at run time
+    \begin{verbatim}
+    CONSTRAINT manager FOREIGN KEY (manager)
+    REFERENCES Employees (id)
+    DEFERRABLE INITIALLY IMMEDIATE/DEFERRED
+    ...
+    SET CONSTRAINT manager DEFERRED;
+    \end{verbatim}
+\end{itemize}
+
+\subsection{Modifying Schema}
+\begin{itemize}
+    \item Alter Table: e.g. Add/Drop Columns/Constraints, change table specifications
+\end{itemize}
+\begin{verbatim}
+    ALTER TABLE Projects ALTER COLUMN start_year DROP DEFAULT;
+    ALTER TABLE Projects ADD COLUMN budge NUMERIC DEFAULT 0.0;
+    ALTER TABLE Teams ADD CONSTRAINT eid_fkey FOREIGN KEY (eid)
+    REFERENCES Employees (id);
+\end{verbatim}
+\begin{itemize}
+    \item Drop Table: Without dependent objects, check if exists first; With dependent objects choose to cascade
+\end{itemize}
+\begin{verbatim}
+    DROP TABLE IF EXISTS Projects;
+    DROP TABLE Projects CASCADE;
+\end{verbatim}
+
+\section{Entity Relationship Model}
+\begin{itemize}
+    \item Data is described using entities and their relationships, with information described as attributes
+    \item Data constraints can also be modeled
+    \item Entity: Real world objects that are distinguishable from others
+    \item Entity Set: Collection of entities of the same type, represented by rectangles, typically nouns
+    \item Attribute: Specific information describing an entity, represented by a small circle
+    \item Key Attributes: Uniquely identify entity, indicated by filled circle
+    \item Derived Attribute: Derived from other attributes, indicated by dashed line
+    \item Composite Key Attributes: Attributes which together uniquely identify each entity, indicated by additional connecting line
+    \item Composite Attributes: Prefer splitting it up into components
+    \item Multivalued Attributes: Refer to a set or list of values, can either be single valued attributes or dedicated entity set
+\end{itemize}
+
+\subsection{Relationship Sets}
+\begin{itemize}
+    \item Relationship: Association between two or more entities
+    \item Relationship Set: Collection of relationships of the same type, represented by diamonds, can have their own attributes, typically verbs
+    \item Role: Descriptor of entity set's participation in relationship
+    \item Degree: How many entity roles participate in a relationship (2 and 3 most common)
+\end{itemize}
+
+\subsection{Relationship Constraints}
+\begin{itemize}
+    \item Cardinality: Upper bound of how many times entity can participate in relationship
+    \item Many-Many, Many-One, One-One
+    \item Participation: Lower bound to how many times entity can participate in relationship
+    \item Indicated by (min, max) labels: User (0, n) makes (1, 1) Booking means each user can make multiple bookings, but each booking is only made by exactly one user
+\end{itemize}
+
+\subsection{Dependency Constraints}
+\begin{itemize}
+    \item Weak entity set: Entity set without its own key, can only be uniquely indentified by considering primary key of owner entity
+    \item Identified by double-lined rectangles or diamonds
+    \item Many to one relationship from weak entity set to owner entity set, must have (1, 1) attachment to identifying relationship
+    \item Has partial key which uniquely identifies weak entity with context of owner entity
+    \item Relation connects to attribute of owner entity
+\end{itemize}
+
+\subsection{Aggregation}
+\begin{itemize}
+    \item Relationships between entity sets and relationship sets
+    \item Treat relationships as higher-level entities, indicated by rectangle around them
+\end{itemize}
+
+\subsection{Relational Mapping}
+\begin{itemize}
+    \item Mapping from ER model to relational schema
+    \item Straightforward mapping from entity sets to tables
+    \item Multivalued attributes: With fixed number of single-valued attributes, can decompose, if not create a new entity set with foreign key
+    \item Relationship sets: Model in new table, with key attributes of all participating entity sets as well as own relationship attributes
+    \item Use primary and foreign keys to capture cardinality and participation constraints
+    \item Weak entity sets: Need foreign keys an ON DELETE/UPDATE
+    \item Aggregation: Primary key of aggregation relationship, associated entity set, and descriptive attributes
+    \item ER diagram should capture as many constraints as possible without imposing unnecessary ones, similarly for relational schema
+\end{itemize}
+
+
+\section{More SQL}
+\begin{itemize}
+    \item Multiset / bag semantics (relational models are sets)
+    \item Query is done with SELECT statement
+    \item Basic Form:
+    \begin{verbatim}
+    SELECT [DISTINCT] target_list FROM relation_list
+    [WHERE conditions]
+    \end{verbatim}
+\end{itemize}
+
+\subsection{Simple Queries}
+\begin{itemize}
+    \item Use wildcard "*" to include all attributes
+    \item Use "expr BETWEEN x AND Y" for basic value range conditions
+    \item Use "AS" to rename attributes
+    \item Use "DISTINCT" to eliminate duplicates; IS DISTINCT FROM must evaluate to true for at least one attribute
+    \item WHERE clause imposes conditions
+    \item "\_" matches single character, "\%" matches zero or more, can use regexs as well
+\end{itemize}
+
+\subsection{Set Operations}
+\begin{itemize}
+    \item Union-Compatible: R and S have the same number of attributes, and corresponding attributes have same or compatible domains without implicit conversions
+    \item UNION, INTERSECT, EXCEPT (Set difference) can be used to combine results; use ALL to not eliminate duplicates
+    \item Column names follow left relation
+\end{itemize}
+
+\subsection{Join Queries}
+\begin{itemize}
+    \item Cartesian Join: Return all possible pairs across relations
+    \item Join: Cross product + attribute selection
+    \item Inner Join: Cartesian Join + Selection Condition + Attribute Selection
+    \item Natural Join: Join condition implied by attribute names, only defined for equality comparison, result only contains one instance of matching attributes, performed over al attributes, equivalent to Cartesian Join if there are no common attributes
+    \item Outer Join: Inner Join but also returns dangling tuples which might not have matches
+    \item LEFT OUTER JOIN = INNER JOIN + all remaining from left table
+    \item RIGHT OUTER JOIN = INNER JOIN + all remaining from right table
+    \item FULL OUTER JOIN = INNER JOIN + all remaining from both tables
+\end{itemize}
+
+\subsection{Subqueries}
+\begin{itemize}
+    \item In FROM clause: Consequence of closure property (result is also a table), must be enclosed in parentheses, table alias mandatory, column aliases optional
+    \item Expressions: IN, EXISTS, ANY/SOME, ALL
+    \item IN: Subquery must return exactly one column, can typically be replaced with inner join, NOT IN can typically be replaced with outer join, can manually specify subquery result
+    \item ANY/SOME: expr op ANY (subquery), subquery must return exactly one column, expr is compared to each row with op
+    \item ALL: Similar, but must be true for all subquery rows
+    \item Correlated Subquery: Uses value from outer query, could lead to slow performance, if subquery has null value, ALL condition can never evaluate to true
+    \item Naming ambiguities can cause problems, resolve using table aliases
+    \item Scoping Rules: Table alias declared in subquery can only be used in it or its own subqueries
+    \item If same table is declared in both a subquery and outside the innermost one is applied
+    \item EXISTS: Checks is subquery returns at least one tuple
+    \item Scalar Subquery: Subquery returns a single value, can be used as expression in queries
+    \item Row Constructors: Allow subqueries to return more than one attribute or column, must match subquery number of attributes
+\end{itemize}
+
+\subsection{Sorting and Rank Based Selection}
+\begin{itemize}
+    \item Use ORDER BY with ASC or DESC
+    \item Can sort by multiple attributes and with different orders in order
+    \item LIMIT returns a portion of the table
+    \item OFFSET specifies position of first tuple to be considered
+\end{itemize}
+
+\section{More More SQL}
+
+\subsection{Common SQL Constructs}
+\subsubsection{Aggregation}
+\begin{itemize}
+    \item Compute a single value from a set of tuples
+    \item e.g. MIN, MAX, AVG, COUNT, SUM
+    \item null might be treated differently
+    \item Data type affects applicability and return data type
+\end{itemize}
+
+\subsubsection{Grouping}
+\begin{itemize}
+    \item Use GROUP BY to partition relation into groups
+    \item Aggregation functions are applied over groups instead
+    \item Two tuples belong to the same group if for all involved pairs of attributes it IS NOT DISTINCT
+    \item If $A_i$ of $R$ appears in SELECT, it must either appear in GROUP BY or appear as input of an aggregation function in SELECT
+    \item Or satisfy global condition where primary key of $R$ appears in GROUP BY
+    \item HAVING: Conditions check for each group defined by a GROUP BY clause, typically involve aggregate functions
+    \item Must appear in GROUP BY clause, or as an input of the aggregation function for itself, or primary key of $R$ appears in GROUP BY clause
+    \item Evaluation: FROM > WHERE > GROUP BY > HAVING > SELECT > ORDER BY > LIMIT/OFFSET
+\end{itemize}
+
+\subsubsection{Conditional Expression}
+\begin{itemize}
+    \item CASE: Similar to switch statement, list of WHEN THEN with ELSE base case, only one result to be returned
+    \item COALESCE: Returns first non-NULL value in list of input arguments
+    \item NULLIF: Returns NULL if both values are equal, if not returns first value
+\end{itemize}
+
+\subsection{Structuring Queries}
+\begin{itemize}
+    \item Common Table Expression: Temporary named query, allowing structure for queries to improve readability
+    \item WITH ctename AS ctebody ...
+    \item View / Virtual Table: Permanently named query, result of a query is not permanently stored, can be used like normal tables
+    \item Use CREATE VIEW AS ... to make a VIEW
+    \item Can be used almost like a normal table, with restrictions for INSERT, UPDATE, DELETE
+    \item Updatable View: Only one entry in FROM clause, no WITH, DISTINCT, GROUP BY, HAVING, LIMIT, OFFSET, UNION, INTERSECT, EXCEPT, ALL, aggregate functions
+\end{itemize}
+
+\subsection{Extended Concepts}
+\begin{itemize}
+    \item SQL only supports existential quantification (EXISTS)
+    \item Universal Quantification: Transform query to EXISTS using logical equivalences
+    \item Recursive Queries: Each query for X stops requires X joins
+    \item Use CTEs for recursive queries
+\end{itemize}
+\begin{verbatim}
+    WITH RECURSIVE cte_name AS (
+        Q1
+        UNION [ALL]
+        Q2 (cte_name)
+    )
+    SELECT * FROM cte_name;
+\end{verbatim}
+\begin{verbatim}
+    WITH RECURSIVE flight_path AS (
+        SELECT from_code, to_code, 0, AS stops
+        FROM connections
+        WHERE from_code = 'SIN'
+        UNION ALL
+        SELECT c.from_code, c.to_code, p.stops + 1
+        FROM flight_path p, connections c
+        WHERE p.to_code = c.from_code
+        AND p.stops < 2
+    )
+    SELECT DISTINCT to_code, stops
+    FROM flight_path
+    ORDER BY stops ASC;
+\end{verbatim}
+
+\def\ojoin{\setbox0=\hbox{$\bowtie$}%
+  \rule[-.02ex]{.25em}{.4pt}\llap{\rule[\ht0]{.25em}{.4pt}}}
+\def\leftouterjoin{\mathbin{\ojoin\mkern-5.8mu\bowtie}}
+\def\rightouterjoin{\mathbin{\bowtie\mkern-5.8mu\ojoin}}
+\def\fullouterjoin{\mathbin{\ojoin\mkern-5.8mu\bowtie\mkern-5.8mu\ojoin}}
+
+\section{Relational Algebra}
+\begin{itemize}
+    \item Formal method to process and query relations
+    \item Operators:
+    \begin{itemize}
+        \item Unary: Selection ($\sigma$), Projection ($\pi$), Renaming ($\rho$)
+        \item Binary: Union ($\cup$), Intersection ($\cap$), Difference ($-$), Product ($\times$), Inner Join ($\bowtie$), Outer Join ($\leftouterjoin, \rightouterjoin, \fullouterjoin$)
+    \end{itemize}
+    \item Operands = Relations, Operators = Transforming input relations into output relation
+    \item Closure: All inputs and outputs of operators are relations, allows for nesting of relational operators forming expressions and query trees
+\end{itemize}
+
+\subsection{Unary Operators}
+\subsubsection{Renaming}
+\begin{itemize}
+    \item Renaming Relation: $\rho(R, S)$
+    \item Renaming Attributes: $\rho(R, R(a_1\rightarrow b_1,...))$
+    \item Renaming relation and attributes: $\rho(R, S(a_1 \rightarrow b_1,...))$
+    \item New names are only valid within scope of expression
+\end{itemize}
+
+\subsubsection{Selection}
+\begin{itemize}
+    \item $\sigma_c(R)$ selects all tuples from relation $R$ satisfying $c$ (evaluates to true)
+    \item Precedence: Parentheses, Comparison, Negation, Conjunction, Disjunction
+    \item $\sigma_{[c]}(R)$ selects all tuples from $R$ that satisfy $c$ based on the principle of acceptance
+\end{itemize}
+
+\subsubsection{Projection}
+\begin{itemize}
+    \item Operator: $\pi_\ell(R)$ projects all attributes of a relation specified in $\ell$, with order mattering
+    \item $\ell$ does not allow duplicates, and must be attributes of $R$
+\end{itemize}
+
+\subsection{Binary Operators}
+\subsubsection{Set Operators}
+\begin{itemize}
+    \item UNION, INTERSECT, EXCEPT
+    \item Relations must be union-compatible: Have same number of attributes, and corresponding attributes have the compatible domains
+\end{itemize}
+
+\subsubsection{Cross Product}
+\begin{itemize}
+    \item Relation formed by combining all pairs of tuples
+    \item Most queries requiring cross product also require attribute selection
+\end{itemize}
+
+\subsubsection{Joins}
+\begin{itemize}
+    \item Join operators combine cross product, selection, and possibly projection
+    \item Avoid generating all tuples of cartesian product
+    \item Inner Joins: Include only tuples satisfying condition
+    \item Outer Join: Include tuples that do not satisfy the condition
+\end{itemize}
+
+\subsubsection{Inner Joins}
+\begin{itemize}
+    \item $\theta$-join: $R \bowtie_\theta S=\sigma_\theta (R \times S)$
+    \item Equi Join: $\theta$-join but only the $=$ operator can be used
+    \item Natural Join: Equi Join is performed over all common attributes, output does not duplicate common attributes, more formally $R \bowtie S=\pi_\ell (R \bowtie c_{\rho(b_i \leftarrow a_i,..)}(S))$ where $A$ is the set of common attributes, $c$ selects common attributes, and $\ell$ is the list of all attributes in $R$ and those in $S$ but not in $R$
+\end{itemize}
+
+\subsubsection{Outer Joins}
+\begin{itemize}
+    \item Dangle: $dangle(R \bowtie_\theta S)=$ set of dangling tuples in $R$ wrt to $R \bowtie_\theta S$
+    \item Null: $null(R)=$ n-component tuple of null values where $n$ is the number of attributes of $R$
+    \item Left: $R_1 \leftouterjoin_\theta R_2 = R_1 \bowtie_\theta R_2 \cup (dangle(R_1 \bowtie_\theta R_2) \times \{null(R_2)\})$
+    \item Right: $R_1 \rightouterjoin_\theta R_2 = R_1 \bowtie_\theta R_2 \cup (\{null(R_1)\} \times dangle(R_2 \bowtie_\theta R_1))$
+    \item Full: $R_1 \fullouterjoin_\theta R_2 = R_1 \bowtie_\theta R_2 \cup (dangle(R_1 \bowtie_\theta R_2) \times \{null(R_2)\}) \cup (\{null(R_1)\} \times dangle(R_2 \bowtie_\theta R_1))$
+    \item Natural Outer Join: Only equality is used, join performed over all attributes in common, output contains common attributes only once
+    \item Use $\equiv$ to check equality with $null$
+\end{itemize}
+
+\section{SQL Procedures and Functions}
+\begin{itemize}
+    \item Creation and execution of code directly within the database
+    \item Procedures do not have returns while functions do
+\end{itemize}
+
+\subsection{SQL Functions}
+\begin{verbatim}
+CREATE OR REPLACE FUNCTION calc_age(dob DATE)
+RETURNS INTEGER AS $$
+DECLARE
+    years INTEGER;
+BEGIN
+    years := <something>;
+    IF <something>
+    THEN years := years - 1;
+    END IF;
+    RETURN years;
+END;
+$$ LANGUAGE plpgsql;
+\end{verbatim}
+\begin{itemize}
+    \item Can use SELECT on result of invocation like normal
+    \item Can use WHILE condition LOOP ... END LOOP
+    \item Can use RAISE to provide messages of different level, RAISE EXCEPTION aborts current transaction
+    \item DEBUG, LOG, INFO, NOTICE, WARNING, EXCEPTION
+    \item Can return a single tuple from a table by specifying table name as return type
+    \item Can specify OUT parameter and return a RECORD, there are also INOUT parameters
+    \item Input must match number of IN parameters, SELECT must match OUT columns
+    \item Can return a table similarly but use SETOF table
+    \item Can return a table using TABLE(...) with the specified attributes
+    \item Can use FOUND to check result of previously executed query
+\end{itemize}
+
+\subsection{SQL Procedures}
+\begin{itemize}
+    \item Function that does not return any value
+    \item Use SELECT INTO var to set local variable
+\end{itemize}
+\begin{verbatim}
+CREATE OR REPLACE PROCEDURE
+download(cid VARCHAR(16), gname VARCHAR(32), gver CHAR(3))
+AS $$
+DECLARE age INTEGER;
+BEGIN
+ SELECT calc_age(c.dob) INTO age FROM customers c
+ WHERE c.customerid = cid;
+ IF gname <> 'Domainer' OR AGE >= 21 THEN
+ INSERT INTO downloads VALUES (cid, gname, gver);
+ END IF;
+END;
+$$ LANGUAGE plpgsql;
+\end{verbatim}
+\begin{itemize}
+    \item Cursor: Pointer to row, can move in different directions and modes, must be closed
+    \item NEXT / FORWARD, LAST, PRIOR / BACKWARD, FIRST, ABSOLUTE n, RELATIVE n, SCROLL, NO SCROLL
+    \item Declare, Open, Fetch, Check if found, Close
+    \item Fetch performs a move then retrieval
+    \item Can use RETURN NEXT in loop to build output TABLE
+\end{itemize}
+\begin{verbatim}
+CREATE OR REPLACE FUNCTION max_increase(gname VARCHAR(32))
+RETURNS NUMERIC AS $$
+DECLARE
+ cur CURSOR (vname VARCHAR(32)) FOR
+  SELECT g.price FROM games g WHERE g.name = vname
+  ORDER BY g.version ASC;
+ res NUMERIC; prev NUMERIC; curr NUMERIC;
+BEGIN
+ OPEN cur(vname := gname);
+ res := 0; prev := 0;
+ LOOP
+ FETCH cur INTO curr;
+ EXIT WHEN NOT FOUND;
+ IF (curr - prev) >= res THEN res := (curr - prev); END IF;
+ prev := curr;
+ END LOOP;
+ CLOSE cur;
+ RETURN res;
+END; $$ LANGUAGE plpgsql;
+\end{verbatim}
+
+\subsection{Triggers}
+\begin{itemize}
+    \item Stable Function: Always returns the same result given the same input
+    \item CHECK requires functions that are immutable or stable, and cannot be deferred
+    \item Trigger: Procedure or function executed when database event occurs on table
+    \item Trigger checks if event occurred while trigger function is the action executed
+\end{itemize}
+\begin{verbatim}
+CREATE CONSTRAINT TRIGGER tr21
+AFTER INSERT OR UPDATE ON downloads
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE PROCEDURE fr21();
+
+CREATE OR REPLACE FUNCTION fr21()
+RETURNS TRIGGER AS $$
+BEGIN
+ IF EXISTS (
+  SELECT c.customerid
+  FROM customers c NATURAL JOIN downloads d
+  WHERE d.name = 'Domainer'
+  AND EXTRACT(year FROM AGE(c.dob)) < 21
+ ) THEN
+  RAISE EXCEPTION 'Underaged!'; -- STOP!
+ END IF;
+ RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+\end{verbatim}
+\begin{itemize}
+    \item Trigger Event: Can be INSERT, UPDATE, DELETE
+    \item Trigger Timing: Check BEFORE or AFTER
+    \item Trigger Granularity: Changes to each ROW or STATEMENT
+    \item Only AFTER trigger can be deferred, need keyword CONSTRAINT
+    \item Return has no effect on AFTER trigger, but we can use it to modify rows being operated on for BEFORE
+    \item OLD / NEW refer to state of row before / after operation
+    \item TG\_OP stores row operation
+    \item INSTEAD OF ... ON view can be used to perform operation on a VIEW
+    \item Can use WHEN to decide when trigger is activated, but cannot have SELECT; OLD for INSERT; NEW for DELETE; or INSTEAD OF
+    \item Granularity: Can be FOR EACH ROW or STATEMENT
+    \item ROW: AFTER / BEFORE (tables), INSTEAD OF (views)
+    \item STATEMENT: AFTER / BEFORE (tables and views), INSTEAD OF (not allowed)
+    \item Order of Activation: BEFORE STATEMENT, BEFORE ROW, AFTER ROW, AFTER STATEMENT, alphabetical order
+\end{itemize}
+
+\section{Anomalies and Functional Dependencies}
+\begin{itemize}
+    \item Source of Anomalies: Some columns are uniquely determined by other columns
+    \item Can be translated into an integrity constraint known as a functional dependency
+    \item Functional Dependency: An instance $r$ of relation $R$ satisfies the functional dependencies $\sigma$ of the form $X \rightarrow Y, X \subseteq R, Y \subseteq R$, iff two tuples of $r$ agree on $X$ implies they agree on $Y$
+    \item $X \rightarrow Y$ means X functionally determines $Y$, or $Y$ is functionally dependent on $X$
+    \item Set Functional Dependency: A set of FDs is satisfied iff all FDs in $\Sigma$ are satisfied
+    \item Valid instance: Satisfies $\Sigma$
+    \item Violation: Two tuples of $r$ agree on $X$ but not on $Y$
+    \item Holds: A set of FDs $\Sigma$ holds on a relation $R$ if $R$ is the set of valid instances which satisfy $\Sigma$
+    \item Triviality: For $X \rightarrow Y$, $Y \subseteq X$, Non-Trivialilty: $Y \not\subseteq X$
+    \item Completely Non-trivial: $Y \neq \emptyset, Y \cap X = \emptyset$, no common attributes
+    \item Superkey: Let $R$ be a relation, and $S \subseteq R$ be a set of attributes of $R$. $S$ is a superkey of $R$ iff $S \rightarrow R$, which is a superset of a key
+    \item Candidate Key: $S \rightarrow R$, for all $T \subset S$, $T$ is not a superkey, it is a minimal superkey
+    \item Primary Key: Candidate key chosen by designer
+    \item Prime Attribute: Attribute that appears in some candidate key of $R$ with $\Sigma$
+    \item Closure of $\Sigma$: The closure of $\Sigma$, $\Sigma^+$ is the set of all functional dependencies logically entailed by the function dependencies in $\Sigma$
+    \item Closure of $S$: The closure of $S \subseteq R$, $S^+$, is the set of all attributes functionally dependent on $S$
+    \item Armstrong Axioms:
+    \begin{itemize}
+        \item Reflexivity: $\forall X \subseteq R, \forall Y \subseteq R, ((Y \subseteq X) \Rightarrow (X \rightarrow Y))$ (trivial FDs)
+        \item Augmentation: $\forall X \subseteq R, \forall Y \subseteq R, \forall Z \subseteq R ((X \rightarrow Y) \Rightarrow (X \cup Z) \rightarrow (Y \cup Z))$ (add to both sides)
+        \item Transitivity: $\forall X \subseteq R, \forall Y \subseteq R, \forall Z \subseteq R, ((X \rightarrow Y \land Y \rightarrow Z) \Rightarrow (X \rightarrow Z))$ (short-circuit)
+        \item Completeness: All functional dependencies that hold can be obtained using Armstrong axioms
+    \end{itemize}
+    \item Attribute Closure (Algorithm 1):
+\end{itemize}
+\begin{verbatim}
+ O = Sigma;
+ G = S;
+ while (X implies Y in O) and (X subset G) {
+     O = O - {X implies Y}
+     G = G union Y
+ }
+ return G
+\end{verbatim}
+\begin{itemize}
+    \item Equivalent $\Sigma$: Two sets of FDs are equivalent iff they have the same closure, then they are both covers of each other
+    \item Cover: $F$ covers $G$ if every FD in $G$ can be derived from $F$
+    \item Two sets of FDs are equivalent iff all FDs in one are a logical consequence of FDs in the other and vice versa
+    \item Minimal: RHS of every FD is minimal, LHS of every FD is minimal, $\Sigma$ is minimal
+    \item A minimal cover is both minimal and a cover
+    \item Minimal: RHS of every FD has one attribute, cannot remove any attribute from the LHS, and cannot remove any FDs from $\Sigma$
+    \item Minimal Cover: Both minimal and a cover (equivalent)
+    \item Canonical Cover: $\Sigma$ is a canonical cover of $\Sigma'$ if there is $\Sigma_1$ which is a minimal cover of $\Sigma'$ and we produce $\Sigma$ by regrouping all FDs with same LHS in $\Sigma_1$; we find a minimal cover and merge the RHS if LHS is equal
+    \item Every set of FDs has a minimal cover which might not be unique
+    \item Minimal Cover (Algorithm 2):
+    \begin{enumerate}
+        \item Simplify RHS of every FD
+        \item Simplify LHS of every FD
+        \item Simplify set $\Sigma$
+    \end{enumerate}
+    \begin{itemize}
+        \item Step 2: For $X \rightarrow \{A\}$, $B \in X$ can be removed if $X$ without $B$ still implies $A$
+        \item Step 3: For $X \rightarrow Y$, it can be removed if it is still implied by the remaining FDs
+    \end{itemize}
+    \item Canonical Cover (Algorithm 3): After Step 3, regroup all FDs with same LHS
+    \item Tip 1: Start from smallest cardinality
+    \item Tip 2: If an attribute does not appear in any RHS, it must be a part of all candidate keys
+\end{itemize}
+
+\section{Boyce-Codd Normal Form}
+\begin{itemize}
+    \item Normal Forms: Recognise designs that enforce FDs by means of SQL constraints to protect against data anomalies
+    \item Normalisation: Transform a poor design into a design that enforces FDs by means of main SQL constraints
+    \item BCNF: A non-key field must provide a fact about the key, the whole key, and nothing but the keys
+    \item A relation $R$ with $\Sigma$ is in BCNF iff for every FD $X \rightarrow \{A\} \in \Sigma^+$, $X \rightarrow \{A\}$ is trivial or $X$ is a superkey
+    \item Binary Decomposition: Pair of tables with $R = R_1 \cup R_2$, can be expanded to general decomposition
+    \item Lossless-Join Decomposition: Natural join of two fragments equals the initial table
+    \item A binary decomposition of $R$ is lossless-join if $R = R_1 \cup R_2$ and $(R_1 \cap R_2) \rightarrow R_1 / R_2$; find $R_\cap, R_\cap^+$, check if $R_1 \subseteq R_\cap^+$ or the other
+    \item A general decomposition is lossless-join if there exists at least one sequence of binary lossless-join decomposition that generates that decomposition
+    \item Projected Functional Dependencies: $\Sigma'$ of projected FDs on $R'$ from $R$, $R'\subseteq R$, is the set of FDs where $\forall X \rightarrow Y \in \Sigma^+$, $X \subseteq R' \land Y \subseteq R'$, both sides are contained, denoted $\Sigma|_{R'}$
+    \begin{enumerate}
+        \item List all subsets of attributes
+        \item Compute the attribute closures
+        \item Intersect RHS with $R'$
+        \item RHS - LHS
+        \item Construct FDs
+    \end{enumerate}
+    \item Dependency Preserving Decomposition: $\Sigma^+=(\Sigma|_{R_1}\cup...\cup \Sigma|_{R_n})^+$
+    \item Algorithm: Repeatedly pick a violating FD and use it to decompose the relation into two
+    \item Algorithm 4: Decompose violating $X \rightarrow Y$ (non-trivial and not superkey) into $R_1=X^+, R_2=(R-X^+)\cup X$ then repeat
+    \item The algorithm is a lossless-join decomposition, and will terminate, might not be dependency-preserving
+\end{itemize}
+
+\section{Third Normal Form}
+\begin{itemize}
+    \item BCNF might not be dependency preserving
+    \item Third Normal form relaxes BCNF requirements for prime attributes
+    \item 3NF: For every FD $X \rightarrow \{A\} \in \Sigma^+$, $X \rightarrow \{A\}$ is trivial, $X$ is a superkey, or $A$ is a prime attribute
+    \item Algorithm 5: We can synthesise a schema in 3NF from a minimal cover of the set of FDs, for each FD $X \rightarrow Y$ in the minimal / canonical cover, create $R_i = X \cup Y$ unless it already exists or is subsumed
+    \item If a key does not appear, pick any candidate key and create a relation with it
+    \item The algorithm guarantees a lossless-join, dependency-preserving decomposition in 3NF
+    \item $4NF \subseteq BCNF \subseteq 3NF \subseteq 2NF \subseteq 1NF$, $1NF \neq 2NF \neq 3NF \neq BCNF \neq 4NF$
+\end{itemize}
+
+\section{Revision}
+\begin{itemize}
+    \item Function: Use SELECT, Procedure: Use CALL
+    \item DECLARE varname, datatype;
+    \item Assign with varname := expression;
+    \item Use IF THEN ELSIF THEN ELSE END IF
+    \item LOOP EXIT label WHEN condition; statement; END LOOP
+    \item WHILE condition LOOP statement END LOOP;
+    \item CREATE TRIGGER name timing event ON table FOR EACH granularity WHEN condition EXECUTE FUNCTION func()
+    \item BEFORE, AFTER, INSTEAD OF
+    \item INSERT, DELETE, UDPATE
+    \item FOR EACH ROW, FOR EACH STATEMENT
+    \item OLD, NEW
+    \item CONSTRAINT, DEFERRABLE, INITIALLY DEFERRED, INITIAllY IMMEDIATE, put before FOR EACH
+\end{itemize}
+
+\end{multicols*}
+
+\end{document}

@@ -1,0 +1,761 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\usepackage{background}
+\setlist{nosep}
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=0.3,
+angle=0,
+contents={}
+% {\includegraphics[width=\paperwidth,height=\paperheight]{tux.png}}
+}
+
+\pdfinfo{
+  /Title (CS2106.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{CS2106}}
+            \\ \normalsize{AY25/26 Sem 1}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{Introduction}
+\begin{itemize}
+    \item Operating System: Program that acts as an intermediary between a computer user and computer hardware
+    \item First Computers: No OS, directly interact and change hardware, minimal overhead, but inefficient and not portable
+    \item Mainframes: Accept programs in physical form, only support batch processing, very costly
+    \item Batch OS: Execute user program / job one at a time, still interacts with hardware directly, with additional information for OS such as required resources and job specification
+    \item Batch processing is inefficient: CPU idle when performing I/O
+    \item Can use multiprogramming to load multiple jobs at once to pipeline, overlapping computation and I/O
+    \item Time-Sharing OS: Allow multiple users to interact with machine using terminals / teletypes, user job scheduling gives illusion of concurrency, supports memory management
+    \item Virtualisation: each program executes as if it has all resources to itself
+    \item Personal OS: Machine dedicated to user, not timeshared
+\end{itemize}
+
+\subsection{Motivation}
+\begin{itemize}
+    \item Abstraction: Hide low level details and present common high level functionality to user
+    \item Large variation in hardware configurations and low-level details which user might not be interested in
+    \item Resource Allocator: OS manages all resources and arbitrates conflicting requests for efficient and fair use
+    \item Control Program: OS controls execution to prevent errors and improper use, providing security, isolation and protection
+    \item Improves Program Portability and Efficiency
+\end{itemize}
+
+\subsection{OS Structure}
+\begin{itemize}
+    \item OS is software that runs in kernel mode with direct access to hardware resources
+    \item Other software executes in user mode with limited access to hardware resources
+    \item User programs call OS using system call interface
+    \item Kernel is a program with special features to deal with hardware and provide the syscall interface, with special code for interrupt handlers and device drivers
+    \item Kernel code cannot use syscalls, normal libraries, or I/O
+    \item Programming Language for OS: Historically in assembly, but now in higher level languages like C/C++, hardware architecture dependent
+    \item Code Organisation: Machine independent / dependent HLL / assembly code
+\end{itemize}
+
+\subsection{OS Structures}
+\begin{itemize}
+    \item Monolithic: Kernel is one big special program, various services and components are integral part
+    \item Good performance but complicated internal structure with highly coupled components
+    \item Microkernel: Small and clean, only provides basic and essential facilities such as IPC, address space and thread management
+    \item Higher level services are built on top, and run as server process outside of OS, using IPC to communicate
+    \item More robust and extendible, with better isolation and protection, but lower performance
+    \item Layered Systems: Generalisation of Monolithic System, organising components into hierarchy of layers with lowest being hardware and highest being user interface
+    \item Client-Server Model: Variation of microkernel, with two classes of processes; Client process request service from server process, which is built on top of microkernel, can even be on different machines
+\end{itemize}
+
+\subsection{Virtual Machines}
+\begin{itemize}
+    \item Allows us to run multiples OSes on the same hardware at the same time, as well as debug / monitor them
+    \item Virtual Machine: Software emulation / virtualisation of hardware, created and managed by hypervisor / Virtual Machine Monitor
+    \item Type 1 Hypervisor: Provides individual virtual machines to guest OSes, bare metal hypervisor directly on hardware
+    \item Type 2 Hypervisor: Runs in host OS, guest OS runs inside virtual machine
+\end{itemize}
+
+\section{Process Abstraction}
+\subsection{Memory Context: Function Call}
+\begin{itemize}
+    \item Important Steps
+    \begin{itemize}
+        \item Setup parameters
+        \item Transfer control to callee
+        \item Setup local variables
+        \item Store result if applicable
+        \item Return to caller
+    \end{itemize}
+    \item Control Flow issues: Need to jump to function body, and resume when function call is done; minimally need PC of caller
+    \item Data Storage issues: Need to pass parameters to the function, and capture return result, function might also have local variables
+    \item Need a new region of memory that is dynamically used by function invocations
+    \item Stack Memory: New memory region to store information for a function invocation, described by a stack frame
+    \item Stack Frame contains ra / PC, arguments / parameters, storage for local variables, other info
+    \item Stack Pointer: Points to first unused location, usually in a specialised register
+    \item Function Call Convention (Different ways to setup stack frame)
+    \begin{itemize}
+        \item Prepare to make call: Caller passes parameters with registers or stack, then saves return PC on stack
+        \item Transfer control to callee: Callee saves old stack pointer, allocates space for local variables, and adjusts stack pointer to new stack top
+        \item On returning from function call: Callee places return result in register, and restores saved stack pointer
+        \item Transfer control back to caller using saved PC: Caller utilises return result, and continues execution
+    \end{itemize}
+    \item Other information: Frame pointer, saved registers
+    \item Frame Pointer: Facilitates access of various stack frame items, might be dedicated register, points to fixed location in a stack frame so that other items can be accessed as a displacement from it, each stack frame has one
+    \item Saved registers: Use memory to hold GPR values when exhausted, so it can be used and restored, known as register spilling
+    \item Function can spill registers it intends to use before function starts, to be restored at end of function
+    \item Updated Steps
+    \begin{itemize}
+        \item Prepare to make call: Caller passes parameters with registers or stack, then saves return PC on stack
+        \item Transfer control to callee: Callee saves registers used by callee, old stack pointer, old frame pointer, allocates space for local variables on stack, and adjusts stack pointer to new stack top, adjusts frame pointer
+        \item On returning from function call: Callee restores saved registers, FP, SP, places return result in register
+        \item Transfer control back to caller using saved PC: Caller utilises return result, and continues execution
+    \end{itemize}
+    \item Stack Frame Illustration:
+    \begin{itemize}
+        \item Free Memory
+        \item Local Variables
+        \item Parameters
+        \item Saved Registers
+        \item Saved SP (Top of previous stack frame)
+        \item Saved FP (Base address of previous stack frame)
+        \item Return PC
+        \item Previous stack frame
+    \end{itemize}
+\end{itemize}
+
+\subsection{Dynamically Allocated Memory}
+\begin{itemize}
+    \item Memory space acquired during execution time
+    \item Blocks allocated at runtime cannot be placed in data region
+    \item Blocks with no definite deallocation timing cannot be placed in stack region
+    \item Create separate heap memory for dynamic allocation
+    \item Heap memory is harder to manage due to variable size and allocation/deallocation, and adverse scenarios can be constructed
+    \item Text memory: For instructions
+    \item Data memory: For global variables
+\end{itemize}
+
+\subsection{Process Management}
+\begin{itemize}
+    \item To switch between programs, OS requires information regarding execution of current program to be stored, and replaced with new information for next program to run
+    \item Need abstraction to describe a running program, known as process
+    \item Process Abstraction: Process / Task / Job is a dynamic abstraction for executing program, includes memory, hardware, OS context
+    \item Process ID: Used to distinguish processes from each other, unique
+    \item Process State: Processes can be either running, or not running, but can also be in a ready state
+    \item Process Model: Set of states and transitions
+    \item 5-Stage Model
+    \begin{itemize}
+        \item New process created, undergoes intialisation
+        \item Ready: Process is waiting to be run
+        \item Running: Process is being executed on CPU
+        \item Blocked: Process waiting / sleeping for event, cannot execute until event is available e.g. syscall, I/O
+        \item Terminated: Process finished execution, might need OS cleanup
+    \end{itemize}
+    \item Queuing Model: OS has ready and blocked queue with processes inside, awaiting execution
+\end{itemize}
+\begin{center}
+    \includegraphics[width=\linewidth]{5states.png}
+\end{center}
+
+\subsection{Process Table and Control Block}
+\begin{itemize}
+    \item Process Control Block (PCB) or Process Table Entry: Entire execution context for a process
+    \item Kernel maintains PCB for all processes in a table
+    \item Issues: Scalability and Efficiency
+\end{itemize}
+
+\subsection{System Calls}
+\begin{itemize}
+    \item API to OS, not same as normal function call, must change from user mode to kernel mode
+    \item API is dependent on OS
+    \item In C/C++, system calls can be invoked almost directly with library version acting as function wrapper
+    \item Some library functions are more user friendly and serve as function adapters, not one to one
+    \item General System Call Mechanism
+    \begin{itemize}
+        \item User program invokes library call using normal function call mechanism
+        \item Library call (usually in assembly) places system call number in designated location such as register
+        \item Library call executes special instruction (TRAP) to switch from user to kernel mode, saves CPU state
+        \item Appropriate system call handler is determined, using system call number as index, handled by dispatcher
+        \item System call handler is executed
+        \item System call handler ends, restores CPU state, returns to library call, switch back to user mode
+        \item Library call returns to user program via normal function return mechanism
+    \end{itemize}
+\end{itemize}
+
+\subsection{Exception and Interrupt}
+\begin{itemize}
+    \item Exceptions can be caused by executing machine level instructions, e.g. Arithmetic / Memory Access errors
+    \item Exceptions are synchronous, occurring due to execution
+    \item Exception handler is executed, similar to a forced function call
+    \item Interrupts are external events that can interrupt the execution of a program, usually hardware related
+    \item Interrupts are asynchronous, independent of program execution
+    \item Program execution is suspended, and an interrupt handler must be executed
+    \item Control transfer to handler routine automatically, before being returned to
+\end{itemize}
+
+\subsection{Process Abstraction in Unix}
+\begin{itemize}
+    \item Processes are identified by integer Process IDs
+    \item Information: Process State (Running, Sleeping, Stopped, Zombie), Parent PID, Cumulative CPU time
+    \item Process creation: Using fork()
+    \item Creates a new child process which is duplicate of current executable image, data is a copy of parent (copy on write)
+    \item Child only differs in PID, PPID, and fork() return value (PID of new process for parent, 0 for child)
+    \item Both continue execution after fork()
+    \item For a different program, can use exec() variations instead
+    \item \verb|execl(path, arg0, arg1, NULL)|: Replace current executing process image with a new one, code replacement, PID and other information intact, pass in path and arguments
+    \item Master process: init, created in kernel at boot up, has PID 1, forms process tree
+    \item Use exit() to end execution of process, 0 is normal exit
+    \item On finish, most system resources used are released such as file descriptors, while basic process resources are not like PID and status as well as process accounting info since process table entry might still be needed
+    \item Parent Child Synchronisation: Parent process waits for immediate child process to terminate using \verb|wait(int *status)|
+    \item Wait is blocking until at least one child terminates, and cleans up remainder of child system resources, has other variations as well
+    \item On process exit, zombie is created since not all process info is deleted, wait() cleans it up
+    \item Orphan: Parent terminates before child process: init becomes psuedo parent, then child termination sends signal to init which cleans it up with wait()
+    \item Zombie: Child process terminates before parent, who did not wait(): Child becomes a zombie, and can fill up process table
+\end{itemize}
+
+\subsubsection{Implementation of fork()}
+\begin{itemize}
+    \item Makes an almost exact copy of parent process
+    \begin{itemize}
+        \item Create address space of child process
+        \item Allocate new PID
+        \item Create kernel process data structures like entry in process table
+        \item Copy kernel environment of parent process such as priority
+        \item Initialise child process context like PID, PPID, CPU time
+        \item Copy memory regions from parent such as Program, Data, Stack, but this is expensive
+        \item Acquire shared resources like open files, current working directory
+        \item Initialise hardware context for child processes by copying registers from parent process or others
+        \item Add child process to scheduler queue to wait to be run
+    \end{itemize}
+    \item Memory Copy is expensive, as potentially the whole memory space needs to be copied
+    \item However, child process will not access the whole memory range immediately, and shared version can be used if read only
+    \item Copy on Write: Only duplicate a memory location when written to
+    \item Memory is stored in memory pages and managed on a page level instead
+\end{itemize}
+
+\section{Process Scheduling}
+
+\subsection{Concurrent Execution}
+\begin{itemize}
+    \item Concurrent Processes: Multiple processes progress in execution at the same time, could be virtual or physical
+    \item Timeslicing: Using 1 CPU, interleave instructions from both processes
+    \item Multitasking needs to change context between processes, which incurs overhead
+    \item Multiprocessor: Timeslicing on multiple CPUs at the same time
+    \item Scheduling: How to organise processes to run
+    \item Scheduler: Part of OS which makes scheduling decision
+    \item Scheduling Algorithm: Algorithm used by scheduler
+    \item Process Behaviour: Each process requires different amounts of CPU time for CPU-Activity and IO-Activity, can be either CPU/IO-Bound
+    \item Processing Environment: Batch Processing (No interaction required, no need to be responsive), Interactive (User actively interacts with system, needs to be responsive and consistent in responses), Real Time Processing (Have deadline to meet, usually periodic)
+    \item Scheduling Algorithms: Influenced by processing environment, common criteria are Fairness (Each get fair share of CPU time, no starvation), Utilisation (All parts of computing system should be utilised)
+    \item Scheduling Policies: Non-Preemptive / Cooperative (Process stays running until it blocks or gives up CPU), Preemptive (Process given fixed time quota to run, and gets suspended after quota is up)
+    \item Scheduling Process
+    \begin{itemize}
+        \item Scheduler triggered, OS takes over
+        \item If context switching is needed, context of current running process is saved and placed on blocked or ready queue
+        \item Pick a suitable process to run based on scheduling algorithm
+        \item Setup context for this process, and let it run
+    \end{itemize}
+\end{itemize}
+
+\subsection{Scheduling for Batch Processing}
+\begin{itemize}
+    \item No user interaction, non-preemptive scheduling is predominant
+    \item Criteria: Turnaround time (Total time taken, considers waiting time), Throughput (Rate of task completion), CPU Utilisation (Percentage of time CPU spends working)
+    \item First Come First Served (FCFS)
+    \begin{itemize}
+        \item Tasks stored in queue based on arrival time
+        \item Earliest one is run until done or blocked
+        \item Blocked task is removed from queue, and placed at back when ready again
+        \item Guaranteed to have no starvation, each task will eventually be run
+        \item Waiting time can be reduced with simple reordering by having longer tasks later
+        \item Convoy effect: CPU-Bound task run first, before IO-Bound tasks, which waste time waiting before being immediately blocked
+    \end{itemize}
+    \item Shortest Job First (SJF)
+    \begin{itemize}
+        \item Select task with the smallest total CPU time
+        \item However, total CPU time needs to be known in advance which might have to be guessed
+        \item Minimises average waiting time, but might cause starvation due to bias towards short jobs
+        \item Prediction is done using previous CPU-Bound phases
+        \item Exponential Average: $P_{n+1}=\alpha \cdot A_n+(1-\alpha)\cdot P_n$, using actual and past CPU time consumption
+    \end{itemize}
+    \item Shortest Remaining Time (SRT)
+    \begin{itemize}
+        \item Preemptive, use shortest remaining time
+        \item New job with shorter remaining time can skip queue, old jobs might get pushed back
+    \end{itemize}
+\end{itemize}
+
+\subsection{Scheduling for Interactive Systems}
+\begin{itemize}
+    \item Criteria: Response Time, Predictability (Variation in response time)
+    \item Preemptive scheduling algorithms are used to ensure good response time, and scheduler needs to run periodically
+    \item Timer interrupt handler is used to ensure scheduler can run periodically without being stopped by other programs
+    \item Interval of Timer Interrupt (ITI): Typically a few ms, OS scheduler invoked on every timer interrupt
+    \item Time Quantum: Execution duration given to a process, multiple of ITI, large range of values, can be variable
+    \item Round Robin
+    \begin{itemize}
+        \item Tasks stored in FIFO queue
+        \item Task is picked up and run until time slice / quantum is elapsed or if it gives up early
+        \item Task is moved to back of queue to wait for another run, or in another queue if blocked
+        \item Preemptive version of FCFS
+        \item Response Time Guarantee: Given $n$ tasks and quantum $q$, time before a task gets CPU is bounded by $(n-1)q$
+        \item Timer interrupt is needed to check on quantum expiry
+        \item Choice of time quantum is important as it affects CPU utilisation and waiting time
+    \end{itemize}
+    \item Priority Scheduling
+    \begin{itemize}
+        \item Some processes are more important than others, assign priority values to them, select highest priority task
+        \item Can be preemptive where higher priority processes can jump in or non-preemptive where late tasks have to wait
+        \item Low priority process might starve if CPU is hogged
+        \item Can be solved by decreasing priority of currently running process after each time quantum, or give current running process a time quantum
+        \item Priority Inversion: Lower priority task ends up blocking higher priority task when medium priority task keeps blocking it, and they share resources
+    \end{itemize}
+    \item Multi Level Feedback Queue (MLFQ)
+    \begin{itemize}
+        \item Adaptive, learns process behaviour, minimises response and turnaround time
+        \item Rules
+        \begin{itemize}
+            \item If $p_a>p_b$, $a$ runs
+            \item If $p_a=p_b$, $a$ and $b$ run in RR
+            \item New job has highest priority
+            \item If a job fully utilises its time slice, its priority is reduced
+            \item If a job gives up or blocks, its priority is retained
+        \end{itemize}
+    \end{itemize}
+    \item Lottery Scheduling
+    \begin{itemize}
+        \item Give out lottery tickets to processes for various system resources, winner is granted the resource
+        \item Responsive, and newly created process can participate in the next lottery
+        \item Provides level of control; tickets can be distributed to child processes, important processes can be given more tickets
+    \end{itemize}
+\end{itemize}
+
+\subsection{Cases from Tutorial}
+\begin{itemize}
+    \item Lengthy CPU phase followed by IO intensive phase: Priority can sink during CPU intensive phase, so it might not get enough in the next phase; Solve by moving all process in the system to the highest priority periodically
+    \item Process repeatedly gives up CPU just before time quantum, retains priority indefinitely; Solve by accumulating CPU usage across time quanta
+\end{itemize}
+
+\section{Inter-Process Communication}
+\begin{itemize}
+    \item Allow cooperating processes to share information
+    \item Shared Memory
+    \begin{itemize}
+        \item First process creates shared memory region
+        \item Second process attaches this to its own memory space
+        \item Processes can now communicate using this memory region
+        \item OS is only involved in creation and attaching
+        \item Efficient and provides ease of use
+        \item Synchronisation of access is needed and implementation might be harder
+        \item For POSIX SHM in *nix, need to destroy after use; only if not attached to any process
+        \begin{verbatim}
+    int shmid = shmget(IPC_PRIVATE, 40, IPC_CREAT | 0600);
+    int *shm = (int*) shmat(shmid, NULL, 0);
+    shmdt((char*) shm);
+    shmctl(shmid, IPC_RMID, 0);
+        \end{verbatim}
+    \end{itemize}
+    \item Message Passing
+    \begin{itemize}
+        \item First process prepares a message and sends it to another process
+        \item Second process can receive and process this message, usually provided as syscalls
+        \item Additional properties like naming and synchronisation are needed
+        \item Message has to be stored in kernel memory space, operations require OS
+        \item Naming Scheme: Direct Communication: Sender or receiver explicitly names other party, one link per pair of communicating processes e.g. Unix domain socket (filepath)
+        \item Naming Scheme: Indirect Communication: Messages sent or received from message storage known as mailbox or port, can be shared across multiple processes e.g. Unix message queue
+        \item Synchronisation Behaviours: Blocking Primitives: Synchronous, process is blocked until message is sent or received
+        \item Synchronisation Behaviours: Non-Blocking Primitives: Asynchronous, sender resumes immediately, receiver does not wait and gets indication of status
+        \item Portable and easy to synchronise
+        \item Inefficient and harder to use
+    \end{itemize}
+    \item Unix Pipes
+    \begin{itemize}
+        \item Unix processes have 3 default communication channels: stdin, stdout, stderr
+        \item Pipes can be used to link input and output channels to one another, shared between two processes, data is FIFO
+        \item Pipe is a circular bounded byte buffer with implicit synchronisation, writer waits if full, reader waits if empty
+        \item Variants can have multiple readers and writers
+        \item Pipes can be half-duplex: Unidirectional, one write and one read end, or full-duplex: Bidirectional, both read and write
+        \item For pipe(), array of file descriptors is returned with reading and writing end along with 0 for success status
+        \item Can pipe standard communication channels, use dup() or dup2()
+        \begin{verbatim}
+    int pipeFd[2];
+    pipe(pipeFd);
+    write(pipeFd[WRITE_END], str, strlen(str)+1);
+    int len = read(pipeFd[READ_END], buf, sizeof(buf));
+    close(pipeFd[READ_END]);
+    // close end not being used
+        \end{verbatim}
+    \end{itemize}
+    \item Unix Signal
+    \begin{itemize}
+        \item Asynchronous notification regarding an event sent to a process or thread
+        \item Recipient must handle signal using a default set of handlers or user supplied handler
+        \item UNIX examples include Kill, Interrupt, Memory Error etc.
+        \item \verb|signal(SIGSEGV, handler)|, \verb|void handler(int signo)|
+    \end{itemize}
+\end{itemize}
+
+\section{Threads}
+\begin{itemize}
+    \item Processes are expensive to create and context switch between
+    \item Communication also relies on IPC
+    \item Each process starts with a single thread of control, and more can be added
+    \item Threads share memory context (text, data, heap) and OS context (PID and other resources)
+    \item Identified by thread id, and have unique registers and stack
+    \item Thread switching is more lightweight as only register and stack needs to be swapped (hardware context) v/s process context switch (OS, hardware, memory context)
+    \item Less resources are needed to manage, and no need for IPC, can also take advantage of multiple CPUs
+    \item However, need to guarantee correctness and determine correct behaviour of parallel execution
+    \item Affects process operations
+\end{itemize}
+
+\subsection{Thread Models}
+\begin{itemize}
+    \item User Thread: Implemented as a user library, runtime system in process will handle thread related operations, kernel is not aware of threads in process
+    \item Can have multithreaded program on any OS, generally more configurable and flexible
+    \item Since scheduling is performed at process level, whole process gets blocked at once, cannot exploit multiple CPUs
+    \item Kernel Thread: Implemented in OS, handled as system calls, and thread-level scheduling is possible
+    \item More than 1 thread in the same process can run at the same time on multiple CPUs
+    \item Thread operations are slower and more resource intensive as system calls
+    \item Generally less flexible, and might be expensive or overkill
+    \item Hybrid Thread Model: Have both, OS schedules kernel threads only, user thread can bind to kernel thread, offers greater flexibility
+    \item Threads started as a software mechanism, but have hardware support on modern processors in the form of multiple sets of registers allowing them to run in parallel on the same core, known as simultaneous multi-threading (SMT)
+\end{itemize}
+
+\subsection{POSIX Threads}
+\begin{itemize}
+    \item Standard defined by IEEE, but implementation is not specified
+    \item pthread library, with methods like create, exit, join
+    \begin{verbatim}
+    int pthread_create(
+        pthread_t* tidCreated,
+        const pthread_attr_t* threadAttributes,
+        void* (*startRoutine) (void*),
+        void* argForStartRoutine);
+    int pthread_exit(void* exitValue);
+    int pthread_join(pthread_t threadID, void **status);
+    \end{verbatim}
+\end{itemize}
+
+\section{Synchronisation}
+\begin{itemize}
+    \item When multiple processes share resources, can cause synchronisation problems
+    \item Execution of single process is deterministic, while execution of concurrent process may be non-deterministic due to race conditions involving modifying / access of the same variable
+    \item Designate code segment with race condition as critical section where only one process can execute in there at a time
+    \item Properties
+    \begin{itemize}
+        \item Mutual Exclusion: If a process is executing in the critical section, all other process are prevented from entering
+        \item Progress: If no process is in a critical section, one of the waiting process should be granted access
+        \item Bounded Wait: After a process requests to enter critical section, there exists an upper bound of number of times other processors can enter before it
+        \item Independence: Process not executing in critical section should never block other processes
+    \end{itemize}
+    \item Incorrect Synchronisation can cause
+    \begin{itemize}
+        \item Deadlock: All processes are blocked and no progress is made
+        \item Livelock: Processes keep changing state to avoid deadlock and make no other progress but are not blocked
+        \item Starvation: Some processes never get to make progress because they are perpetually denied necessary resources
+    \end{itemize}
+    \item Can have assembly / HLL implementations or high level abstraction
+    \item Assembly Level Implementation
+    \begin{itemize}
+        \item TestAndSet: Atomic instruction (single machine operation) provided by processor to aid synchronisation
+        \item Loads content from memory location into register, stores 1 into memory location
+        \item Performed as a single machine operation
+        \item Example Usage:
+        \begin{verbatim}
+        void EnterCS(int* Lock) {
+            while(TestAndSet(Lock) == 1);
+        }
+        void ExitCS(int* Lock) {
+            *Lock = 0;
+        }
+        \end{verbatim}
+        \item Works, but uses busy waiting
+        \item Variants like Compare and Exchange, Atomic Swap, Load Link / Store Conditional exist
+    \end{itemize}
+    \item High Level Language Implementation
+    \begin{itemize}
+        \item Peterson's Algorithm
+        \begin{verbatim}
+    Want[0] = 1;
+    Turn = 1;
+    while(Want[1] && Turn == 1);
+    // CS
+    Want[0] = 0;
+
+    Want[1] = 1;
+    Turn = 0;
+    while (Want[0] && Turn == 0);
+    // CS
+    Want[1] = 0;
+        \end{verbatim}
+        \item Assumes updating \verb|Turn| is atomic
+        \item Causes busy waiting due to repeated while loop
+        \item Lower level so potentially more error prone, also not very general
+    \end{itemize}
+    \item High Level Abstraction
+    \begin{itemize}
+        \item Semaphore: General synchronisation mechanism; only behaviour is specified rather than implementation
+        \item Provides a way to block / sleep processes or unblock / wake them up
+        \item Semaphore contains an integer value and has two atomic semaphore operations, "counts how many resources are available"
+        \item Wait() blocks if not positive, and decrements
+        \item Signal() increments, and wakes up sleeping processes if any, never blocks
+        \item Invariant: $S_{current}=S_{initial}+signal(S)-wait(S)$ where it refers to number of signal() executed and wait() completed
+        \item Can have general or binary semaphores, with general semaphores used for convenience
+        \item Example: Wait before CS, Signal after completion, known as mutex
+        \item Deadlock is still possible with incorrect use of semaphores e.g. multiple overlapping semaphores
+        \item Common Alternative: Conditional variable, allow task to wait for certain event to happen, has ability to broadcast (wake up all waiting tasks), related to monitor
+    \end{itemize}
+\end{itemize}
+
+\subsection{Classic Synchronisation Problems}
+\begin{itemize}
+    \item Producer Consumer
+    \begin{itemize}
+        \item Processes share a bounded buffer of size $K$, producers insert items in buffer, consumers remove items from buffer
+        \begin{verbatim}
+    // busy waiting
+    count = in = out = 0
+    mutex = S(1)
+    cP = TRUE
+    cC = False
+    // producer
+    while (TRUE) {
+        while(!canProduce);
+        wait(mutex);
+        if (count < K){
+            // remove item
+            canConsume = TRUE;
+        } else {
+            canProduce = FALSE;
+        }
+        signal(mutex);
+    }
+    // consumer
+    while (TRUE) {
+        while(!canConsume);
+        wait(mutex);
+        if (count > 0) {
+            // insert item
+            canProduce = TRUE;
+        } else {
+            canConsume = FALSE;
+        }
+        signal(mutex);
+    }
+
+    // blocking version
+    count = in = out = 0
+    mutex = S(1)
+    notFull = S(k)
+    notEmpty = S(0)
+    // producer
+    while (TRUE) {
+        wait(notFull);
+        wait(mutex);
+        // remove item
+        signal(mutex);
+        signal(notEmpty);
+    }
+    // consumer
+    while (TRUE) {
+        wait(notEmpty);
+        wait(mutex);
+        // insert item
+        signal(mutex);
+        signal(notFull);
+    }
+        \end{verbatim}
+        \item Similarly for consumer process
+        \item Similar logic, but allows processes to go to sleep to save processing power
+    \end{itemize}
+    \item Readers Writers
+    \begin{verbatim}
+    // writer
+    while (TRUE) {
+        wait(roomEmpty);
+        // modify
+        signal(roomEmpty);
+    }
+    // reader
+    while (TRUE) {
+        wait(mutex);
+        nReader++;
+        if (nReader == 1)
+            wait(roomEmpty);
+        signal(mutex);
+        // read
+        wait(mutex);
+        nReader--;
+        if (nReader == 0)
+            signal(roomEmpty);
+        signal(mutex);
+    }
+    \end{verbatim}
+    \begin{itemize}
+        \item Processes share a data structure, writers must have exclusive access, reader can access with other readers
+        \item Writer waits for room to be empty, then writes
+        \item Reader waits for mutex, then waits for room empty, before reading then signalling
+    \end{itemize}
+    \item Dining Philosophers
+    \begin{itemize}
+        \item Each philosopher has a left and right chopstick, and needs both to eat
+        \item Tanenbaum Solution
+        \begin{verbatim}
+        // mutex = 1;
+        void philosopher(int i) {
+            while (TRUE) {
+                think();
+                takeChpStcks(i);
+                eat();
+                putChpStcks(i);
+            }
+        }
+        void takeChpStcks(i) {
+            wait(mutex);
+            state[i] = HUNGRY;
+            safeToEat(i);
+            signal(mutex);
+            wait(s[i]);
+        }
+        void safeToEat(i) {
+            if (state[i] == HUNGRY &&
+                state[LEFT] != EATING &&
+                state[RIGHT] != EATING) {
+                state[i] = EATING;
+                signal(s[i]);
+            }
+        }
+        void putChpStcks(i) {
+            wait(mutex);
+            state[i] = THINKING;
+            safeToEat(LEFT);
+            safeToEat(RIGHT);
+            signal(mutex);
+        }
+        \end{verbatim}
+        \item With an empty seat, deadlock is impossible
+    \end{itemize}
+\end{itemize}
+
+\subsection{Synchronisation Implementations}
+\begin{itemize}
+    \item POSIX Semaphore: wait() and signal() implemented
+    \item pthread has mutex as a binary semaphore with lock and unlock
+    \item Also has conditional variables with wait, signal, and broadcast
+    \item Most HLL have some level of thread and synchronisation support
+\end{itemize}
+
+\end{multicols*}
+
+\end{document}
