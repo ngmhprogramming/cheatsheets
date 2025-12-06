@@ -1,0 +1,432 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\usepackage{background}
+\setlist{nosep}
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=0.4,
+angle=0,
+contents={}
+% contents={\includegraphics[width=\paperwidth,height=\paperheight]{image.png}}
+}
+
+\pdfinfo{
+  /Title (MA2214.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{MA2214}}
+            \\ \normalsize{AY25/26 Sem 1}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{Basic Counting Principles}
+\textbf{Listing} List every object, then establish a bijection between it and $[n]=\{1,...,n\}$ which has $n$ elements.
+
+\textbf{Addition Principle (AP)} For events $E_k$ with $n_k$ ways to occur, if they are pairwise disjoint, the number of ways where at least one event occurs is $\sum_{i=1}^kn_i$, and if $E=E_1\sqcup...\sqcup E_r$ then $|E|=\sum_{i=1}^rn_i$.
+
+\textbf{Multiplication Principle (MP)} For an event $E$ which can be decomposed into $r$ ordered events $E_1,...,E_k$, where $E_k$ has $n_k$ ways to occur, then there are $\prod_{i=1}^k n_i$ ways for $E$ to occur, and if $E=E_1\times...\times E_r$, then $|E|=n_1...n_r$.
+
+\textbf{r-Permutation} An r-permutation of $A$ is a way of arranging any $r$ of the objects of $A$ in a row, with number denoted as $P_r^n=\frac{n!}{(n-r)!}$ by MP.
+
+\textbf{Principle of Complementation (CP)} If $A\subseteq$ a finite universal set $U$, then $|U\backslash A|=|U|-|A|$.
+
+\textbf{Principle of Division} If we can partition instances of an event $E$ into disjoint r-element groups which each gives rise to a unique $E'$, then $|E'|=\frac{|E|}{r}$.
+
+\textbf{Circular Permutation} An r-circular permutation of $A$ is a circular permutation of $r$ distinct objects taken from $A$, denoted $Q_r^n=\frac{P_r^n}{r}$.
+
+\textbf{Combination} An r-combination of $A$ is an r-element subset of $A$, denoted by $C_r^n={n \choose r}=\frac{P_r^n}{r!}=\frac{n!}{r!(n-r)!}$. Additionally, ${n \choose r}={n \choose n-r}$.
+
+\textbf{Combinatorial Identities}
+\begin{itemize}
+    \item ${n \choose r} = {n-1 \choose r-1}+{n-1 \choose r}$ (Either take the current element, or choose $r$ from the set without the current element)
+    \item ${n \choose r} = \frac{n}{r}{n-1 \choose r-1}$ (Move $r$ over, then LHS becomes choosing $r$ then a leader while RHS becomes choosing the leader then remaining $r-1$)
+    \item ${n \choose r} = \frac{n-r+1}{r}{n \choose r-1}$
+    \item ${n \choose r}=\frac{n}{n-r}{n-1 \choose r}$
+    \item ${n \choose m}{m \choose r}={n \choose r}{n-r \choose m-r}$
+\end{itemize}
+
+\textbf{Principle of Inclusion and Exclusion} $|A_1 \cup A_2 \cup... \cup A_q|=\sum_{i=1}^q |A_i|-\sum_{i<j}|A_i \cap A_j|+\sum_{i<j<k}|A_i\cap A_j \cap A_k|...+(-1)^{q-1}|A_1\cap...\cap A_q|$
+
+\textbf{Euler's $\varphi$ Function} $\varphi(n)$ denotes the number of integers between $1$ and $n$ which are coprime to $n$, and $\varphi(n)=n(1-\frac{1}{p_1})...(1-\frac{1}{p_k})=n\prod_{i=1}^k(1-\frac{1}{p_i})$
+
+\textbf{Injection Principle} If there is a injection from $A$ to $B$, then $|A| \leq |B|$
+
+\textbf{Surjective Principle} If there is a surjection from $A$ to $B$, then $|A|\geq |B|$
+
+\textbf{Bijection Principle} If there is a bijection from $A$ to $B$, then $|A|=|B|$
+
+\section{Twelvefold Way}
+\begin{center}
+    \includegraphics[width=1\linewidth]{twelvefold.png}
+\end{center}
+\begin{itemize}
+    \item Injective: Each box has at most one object
+    \item Surjective: Each box has at least one object
+    \item $S(r,n)$: Stirling numbers of the second kind
+    \item $p(r, n)$: Number of partitions of $r$ identical objects into exactly $n$ identical boxes
+\end{itemize}
+
+% \begin{itemize}
+%     \item Distinct Objects, Distinct Boxes
+%     \begin{itemize}
+%         \item No Restriction: $n^r$
+%         \item Injective: $P_r^n = \frac{n!}{(n-r)!}$
+%         \item Surjective: $n!\ S(r,n)$
+%     \end{itemize}
+%     \item Distinct Objects, Identical Boxes
+%     \begin{itemize}
+%         \item No Restriction: $\sum_{k=0}^nS(r,k)$
+%         \item Injective: $r \leq n:1, r>n:0$
+%         \item Surjective: $S(r,n)$
+%     \end{itemize}
+%     \item Identical Objects, Distinct Boxes
+%     \begin{itemize}
+%         \item No Restriction: ${r+n-1 \choose r}$
+%         \item Injective: $n \choose r$
+%         \item Surjective: $r-1\choose n-1$
+%     \end{itemize}
+%     \item Identical Objects, Identical Boxes
+%     \begin{itemize}
+%         \item No Restriction: $\sum_{k=1}^np(r,k)$
+%         \item Injective: $r \leq n: 1, r>n:0$
+%         \item Surjective: $p(r,n)$
+%     \end{itemize}
+%     \item Injective: Each box has at most one object
+%     \item Surjective: Each box has at least one object
+%     \item $S(r,n)$: Stirling numbers of the second kind
+%     \item $p(r,n)$: Number of partitions of $r$ identical objects into $n$ identical boxes
+% \end{itemize}
+
+\textbf{Non-Negative Integer Solutions} For the linear equation $x_1+...+x_n=r$ where $x_i\geq 0$, the number of solutions is ${r+n-1 \choose r}$ using stars and bars.
+
+\textbf{Multiset} $M=\{r_1\cdot a_1, r_2\cdot a_2,...,r_n\cdot a_n\}$ where $r_i$ is the repetition number of object $a_i$. $\infty \cdot a$ is used to indicate infinite copies of an object.
+
+\textbf{Multiset Permutations} The number of r-permutations of $\{\infty\cdot a_1,...,\infty \cdot a_n\}$ is $n^r$. If $r=\sum_1^n r_i$, the number of permutations of $M$, $P(r;r_1,...,r_n)=\frac{r!}{r_1!...r_n!}$
+
+\textbf{Combinations with Repetition} A $m$ element multi-subset of $M$ is a subset $\{m_1\cdot a_1,...,m_n\cdot a_n\}$ where $\sum_1^nm_i=m$. The number of r-element multi-subsets is given by ${r+n-1 \choose r}$.
+
+\textbf{Stirling Numbers of the Second Kind} $S(r,n)$ or $r \brace n$ counts the number of ways to partition a set of $r$ distinct objects into $n$ \textbf{non-empty}, unlabeled subsets. Base Cases: $S(0,0)=1, S(r,0)=0, r>0, S(0, n)=0, n>0, S(r,n)=0, r <n$. Recursive Definition: $S(r,n)=nS(r-1,n)+S(r-1, n-1)$; either the rth element is in its own subset or it joins an existing subset.
+
+\textbf{Explicit formula for Stirling Numbers of the Second Kind} $S(r,n)=\frac{1}{n!}\sum_{j=0}^n(-1)^{n-j}{n \choose j}j^r$. Derived from $n!\cdot S(r,n)=\sum_{j=0}^n(-1)^j{n \choose j}(n-j)^r$, where LHS is number of surjective functions from $r$ elements to $n$ elements, while RHS is the same by considering PIE on the set of functions avoiding element $i$. $S(n,k)\sim \frac{k^n}{k!}$ as $n \rightarrow \infty$
+
+\textbf{Partitions of an Integer} A partition of $r$ is writing $r$ as a sum of positive integers where order does not matter. The number of partitions of $r$ is $p(r)$, and  $p(r,n)$ if into $n$ sums.
+\begin{itemize}
+    \item $p(0,0)=1, p(r,0)=0, p(0,n)=0$
+    \item $p(r, n)=p(r-1, n-1)+p(r-n, n)$: Either one summand is 1, or all of them are at least 2 so we can subtract 1 from all.
+\end{itemize}
+
+\textbf{Ferrers Diagram} Graphical representation of integer partition as rows of dots or boxes, left-aligned, ordered in non-increasing order.
+
+\textbf{Conjugate Partition} To get a conjugate partition, we can simply transpose it. The number of partitions of $r$ into $n$ parts is thus the same as the number of partitions of $n$ into $r$ parts.
+
+\textbf{Uses of Partitions} We can use partitions to analyse time complexity especially when the algorithm involves subdivisions.
+
+\textbf{Polynomials}
+\begin{itemize}
+    \item A polynomial with coefficients in $A$ and variable $x$ is an expression $P(x)=a_nx^n+a_{n-1}x^{n-1}+...+a_1x+a_0$ where $n$ is non-negative, $a_i \in A, a_n \neq 0$. $\mathbb{Z}[x]$ is the collection of polynomials where $A=\mathbb{Z}$.
+    \item Polynomials for a commutative ring under addition and multiplication.
+    \item To evaluate a polynomial at a constant $c$, sub $x=c$. Evaluation preserves the ring structure of polynomials.
+\end{itemize}
+
+\textbf{Sequences to Polynomials} For a finite sequence $a_0,a_1,...,a_n$, we associate it with the polynomial $P(x)=a_0+a_1x+...+a_nx^n$. This is linear and bijective.
+
+\textbf{Binomial Coefficients} ${n \choose r}=\frac{n!}{r!(n-r)!}$'s are known as the binomial coefficients.
+
+\textbf{Binomial Theorem} $\forall n\geq 0,(x+y)^n=\sum_{r=0}^n{n \choose r}x^{n-r}y^r$. Consider the string of length $n$ with letters $x$ or $y$. This can be used to prove identities by subbing in appropriate values for $x, y$.
+
+\textbf{Example Identities} $\sum_{r=0}^n(-1)^r{n \choose r}=0$ using $(1+(-1))^n$, ${n \choose 0}+{n \choose 2}+...+{n \choose 2k}={n \choose 1}+{n \choose 3}+...+{n \choose 2k+1}=2^{n-1}$
+
+\textbf{Another Identity} $\sum_{r=1}^n r {n \choose r}=n \cdot 2^{n-1}$ by differentiating $(1+x)^n$ and subbing in $x=1$
+
+\textbf{Multinomial Coefficients} Consider ${n \choose {n_1, n_2,...,n_m}}$ where their sum is $n$. Then ${n \choose {n_1,n_2,...,n_m}}={n \choose n_1}{n - n_1 \choose n_2}...=\frac{n!}{n_1!n_2!...n_m!}$.
+
+\textbf{Multinomial Theorem} For $n,m \in \mathbb{N}, (x_1+x_2+...+x_m)^n=\sum{n \choose {n_1,n_2,...,n_m}}x_1^{n_1}x_2^{n_2}...x_m^{n_m}$ where we consider all $m$-ary sequences of nonnegative integers summing to $n$.
+
+\section{Ordinary Generating Functions}
+
+\textbf{Power Series}
+\begin{itemize}
+    \item A power series with coefficients in $A$ and variable $x$ is an expression of the form $\sum_{n=0}^\infty a_nx^n=a_0+a_1x+a_2x^2+...$ where $a_n \in A$. $\mathbb{Z}[[x]]$ is the collection of power series where $A=\mathbb{Z}$.
+    \item Addition is performed coefficient-wise. Multiplication is defined by the Cauchy product $(\sum_{n=0}^\infty a_nx^n)(\sum_{n=0}^\infty b_nx^n)=\sum_{n=0}^\infty(\sum_{k=0}^na_kb_{n-k})x^n$. Power series form a commutative ring over $\mathbb{R}$ or $\mathbb{C}$ under addition and multiplication.
+    \item To evaluate a power series $F(x)=\sum_{n=0}^\infty a_nx^n$ at a constant $c$, substitute $x=c$ where $|c|<R$, the radius of convergence. Evaluation is only valid inside the radius of convergence and preserves the ring structure of power series.
+\end{itemize}
+
+\textbf{Sequences to Power Series} For an infinite sequence $a_0,a_1,a_2,...$, it is associated with the power series $F(x)=a_0+a_1x+a_2x^2+...=\sum_{n=0}^\infty a_nx^n$. This is linear and bijective, and $F(x)$ is the generating function for the sequence.
+
+\textbf{Cauchy Product of Series} The product of two series $F(x)G(x)$ corresponds to the sequence $c=(c_0, c_1, c_2,...), c_r=\sum_{k=0}^ra_kb_{r-k}$. For multiple series, the product corresponds to $c_r=\sum_{k_1+k_2+...+k_m=r}a_{k_1}^{(1)}a_{k_2}^{(2)}...a_{k_m}^{(m)}$.
+
+\textbf{Encoding Sets} For $A^{(i)}\subseteq \mathbb{Z}_{\geq 0}$, define $F^{(i)}(x)=\sum_{k \in A^{(i)}}x^k$. Let $F(x)=F^{(1)}(x)\cdot...\cdot F^{(m)}(x)$. Then the coefficient $c_r$ of $x^r$ in $F(x)$ counts solutions of $x_1+x_2+...+x_m=r$, $x_i \in A^{(i)}$.
+
+\textbf{Weighted Sums} To count solutions of $x_1+2x_2+...+mx_m=r$, we can use generating functions with weights in exponents. For $x_i$ with coefficient $i$, associate $F^{(i)}(x)=\sum_{k\in A^{(i)}}x^{ik}$. Then $F(x)=F^{(1)}(x)...F^{(m)}(x)$ and the coefficient $c_r$ of $x^r$ counts solutions.
+
+\textbf{Cumulative Sums} Let $F(x)=\sum_{n=0}^\infty a_n x^n$. Then $(1+x+x^2+...)\cdot F(x)=(a_0)+(a_0+a_1)x+...$ encodes $c_r=a_0+...+a_r$.
+
+\textbf{Constrained Equation} $x_1 \geq 1 \Rightarrow F_1(x)=x+x^2+x^3+..., x_2 \leq 2 \Rightarrow F_2(x)=1+x+x^2$. The genfunc is $F(x)=F_1(x)F_2(x)...$. Then we can use coefficients to find the number of solutions. Useful tip: For $(1+x+...)^2$, the coefficient of $x^k$ is $k+1$
+
+\textbf{Dividing Genfuncs} Division is costly, use partial fraction decomposition instead, e.g. $\frac{1}{1-x}=\sum_{n=0}^\infty x^n$, $\frac{1}{1-2x}=\sum_{n=0}^\infty 2^n x^n$.
+
+\textbf{Partition Genfunc} The genfunc for number of partitions $p(n)$ is $\sum_{n=0}^\infty p(n)x^n=\prod_{k=1}^\infty(1+x^k+x^{2k}+...)=\prod_{k=1}^\infty \frac{1}{1-x^k}$.
+
+\textbf{Euler's Partition Theorem Again} $D(x)=\prod_{k=1}^\infty (1+x^k)$, $O(x)=\prod_{k=1}^\infty \frac{1}{1-x^{2k-1}}$. Using $1+x^k=\frac{1-x^{2k}}{1-x^k}$, we get what we want.
+
+\textbf{Exponential Generating Functions} The EGF for a sequence $(a_r)$ is $a_0+a_1\frac{x}{1!}+...+a_r\frac{x^r}{r!}+...=\sum_{r=0}^\infty a_r\frac{x^r}{r!}$. $a_r=r! c_r$ where $c_r$ is the rth coefficient of the genfunc.
+
+\textbf{OGF v/s EGF} OGF are applicable in distribution or arrangement problems where ordering of objects involved is immaterial. EGF are useful in counting arrangements of objects where ordering is taken into account.
+
+\textbf{General EGF Formula} Let $a_r$ denote the number of r-permutations of the multi-set $\{n_1 \cdot b_1, ... , n_k \cdot b_k\}$. Then the EGF is $(1+\frac{x}{1!}+...+\frac{x^{n_1}_{b_1}}{n_1!})...(1+\frac{x}{1!}+...+\frac{x^{n_k}_{b_k}}{n_k!})$.
+
+\section{Recurrence Relations}
+
+\textbf{Relating Indexes}
+\begin{itemize}
+    \item ${n+1\choose k}={n \choose k}+{n \choose k-1}$
+    \item $\left[n + 1 \atop k\right]=n \left[n \atop k \right]+\left[n \atop k-1\right]$ (Stirling number of the first type, permutations of $n$ elements with $k$ disjoint cycles)
+    \item $\left \{ n+1 \atop k \right\}=k\left \{ n \atop k \right \}+\left \{n \atop k-1\right\}$ (Stirling number of the second type, partition of $n$ elements into $k$ nonempty subsets)
+\end{itemize}
+
+\textbf{Recurrence Relation} Relates current term to some previous terms, with base cases known as initial conditions.
+
+\textbf{Difference Equation} Write in the form $\Delta a_n=a_{n+1}-a_n$.
+
+\textbf{Linear Homogeneous Recurrence Relations} Recurrence relation with the form $c_0a_n+c_1a_{n-1}+...+c_ra_{n-r}=0$. A function with $a_n=f(n)$ is a solution of the recurrence relation.
+
+\textbf{Characteristic Equation} For a linear homogeneous recurrence relation, replace $a_i$ by $x^i$, then divide by $x^{n-r}$ to get the characteristic equation. Any root of this equation is a characteristic root.
+
+\textbf{LHRR Theorem} If $\alpha_1,...,\alpha_r$ are the distinct characteristic roots of our RR, then $a_n=A_1(\alpha_1)^n+...+A_r(\alpha_r)^n$ where $A_i$ is constant are general form of solutions to our RR. We can sub in the initial condition after we find the general form to find the suitable solution.
+
+\textbf{Complex Roots} The solution to a LHRR might have complex roots which can be expressed using $e^{ix}=cos\ x+isin\ x$.
+
+\textbf{LHRR Theorem Again} If $\alpha_1,...,\alpha_k$ are the distinct characteristic roots such that $\alpha_i$ has multiplicity $m_i$, the general form of the solution of our recurrence relation is $a_n=(A_{11}+A_{12}n+...+A_{1m_1}n^{m_1-1})(\alpha_1)^n+...+(A_{k1}+A_{k2}n+...+A_{km_k}n^{m_k-1})(\alpha_k)^n$.
+
+\textbf{General Linear Recurrence Relation} A recurrence relation of the form $c_0a_n+c_1a_{n-1}+...+c_ra_{n-r}=f(n)$ is an rth order linear recurrence relation. An LHRR is a linear recurrence relation where $f(n)=0$. If $g_1(n), g_2(n)$ are solutions for above, then $h(n)=g_1(n)-g_2(n)$ is a solution of the corresponding LHRR.
+
+\textbf{Solving General Linear Recurrence Relations}
+\begin{itemize}
+    \item Find the general solution $h(n)$ of the corresponding LHRR.
+    \item Find a particular solution $g_0(n)$ of the linear recurrence relation. It can be chosen as a function of a similar type.
+    \item The general family of solutions of $g_0(n)$ of the original recurrence relation is given by $g(n)=g_0(n)+h(n)$.
+    \item Find the specific solution that fits the given initial conditions.
+    \item For a polynomial of degree $d$, try a polynomial of degree $d$ (or higher if the homogeneous solution contains polynomial terms)
+    \item For an exponential function $k^n$, try $C\cdot k^n$ (or $C\cdot n^m \cdot k^n$ if $k$ is a root of the characteristic equation with multiplicity $m$)
+    \item For a combination of these forms, try a combination of the corresponding trial solutions
+\end{itemize}
+
+\textbf{Example Recurrence Relation}
+\begin{itemize}
+    \item Solve $a_n-3a_{n-1}+2a_{n-2}=2^n$ with $a_0=3, a_1=8$
+    \item First solve the LHRR $a_n^{(h)}-3a_{n-1}^{(h)}+2a_{n-2}^{(h)}=0$
+    \item The characteristic equation is $r^2-3r+2=0, r=1,2$
+    \item We get $a_n^{(h)}=A\cdot 1^n + B \cdot 2^n=A+B \cdot 2^n$
+    \item Now find a particular solution by trying $a_n^{(p)}=C \cdot n \cdot 2^n$ since $f(n)=2^n$ and $2$ is a root of the characteristic equation
+    \item Substituting gives us $Cn2^n-3C(n-1)2^{n-1}+2C(n-2)2^{n-2}=2^n$ and solving gives $C=2$
+    \item $a_n^{(p)}=2n \cdot 2^n=n \cdot 2^{n+1}$
+    \item The general solution is $a_n=a_n^{(h)}+a_n^{(p)}=A+B\cdot 2^n+n \cdot 2^{n+1}$
+    \item Applying initial conditions gives $A=2, B=1$
+    \item The final solution is $a_n=2+(2n+1)2^n$
+\end{itemize}
+
+\textbf{$g_0(n)$ Chart}
+\begin{itemize}
+    \item $Ak^n$, $k$ is not characteristic root: $Bk^n$
+    \item $Ak^n$, $k$ is characteristic root with multiplicity $m$: $Bn^mk^n$
+    \item $\sum_{i=0}^tp_in^i$, $1$ is not characteristic root: $\sum_{i=0}^tq_in^i$
+    \item $\sum_{i=0}^tp_in^i$, $1$ is a characteristic root of multiplicity $m$: $n^m\sum_{i=0}^tq_in^i$
+    \item $An^tk^n$, $k$ is not a characteristic root: $(\sum_{i=0}^tq_in^i)k^n$
+    \item $An^tk^n$, $k$ is a characteristic root of multiplicity $m$: $n^m(\sum_{i=0}^tq_in^i)k^n$
+\end{itemize}
+
+\textbf{Solving Linear Recurrence Relations with GF}
+\begin{itemize}
+    \item Transform equation into linear equation for generating function
+    \item Solve linear equation and simplify the answer, often involving partial fractions
+    \item Fibonacci: $a_0=0, a_1=1,a_n=a_{n-1}+a_{n-2}$
+    \item Define $A(x)=\sum_{n=0}^\infty a_nx^n$.
+    \item Then $A(x)-x-0=\sum_{2}^\infty a_nx^n=\sum_{2}^\infty(a_{n-1}+a_{n-2})x^n=x\sum_{1}^\infty a_nx^n+x^2\sum_{0}^\infty a_nx^n=x\cdot A(x) + x^2 \cdot A(x)$.
+    \item We have $A(x)-x=x\cdot A(x)+x^2 \cdot A(x) \Rightarrow A(x)=\frac{x}{1-x-x^2}$.
+    \item We have $1-x-x^2=(1-r_1x)(1-r_2x)$, and $A(x)=\frac{1}{\sqrt{5}}(\frac{1}{1-r_1x}-\frac{1}{1-r_2x})$. Then we get $a_n=\frac{1}{\sqrt{5}}(r_1^n-r_2^n)$ by comparing coefficients.
+\end{itemize}
+
+\textbf{Partial Fractions}
+\begin{itemize}
+    \item Distinct Linear Factors: $\frac{P(x)}{(1-r_1x)(1-r_2x)...(1-r_kx)}=\sum_{i=1}^k\frac{A_i}{1-r_ix}$
+    \item Each term expands as $\frac{1}{1-rx}=\sum_{n=0}^\infty r^n x^n$
+    \item Repeated Roots: If a factor has multiplicity $m$: $\frac{P(x)}{(1-rx)^m}=\frac{B_1}{1-rx}+...+\frac{B_m}{(1-rx)^m}$
+    \item Expansion gives terms of the form $\frac{1}{(1-rx)^j}=\sum_{n=0}^\infty{n+j-1 \choose j-1} r^nx^n$
+    \item Use $x=\frac{1}{r_i}$ to eliminate and solve for other coefficients
+\end{itemize}
+
+\textbf{System of Linear Recurrence Relations}
+\begin{itemize}
+    \item Domino Tiling: Tile $2 \times n$ board using $1 \times 2$ and $1 \times 1$ tiles
+    \item Let $a_n$ be complete tilings, and $b_n$ be tilings with a missing square
+    \item $a_n=b_n+a_{n-1}+b_{n-1}+a_{n-2}$
+    \item $b_n=a_{n-1}+b_{n-1}$
+    \item Use substitution to eliminate one sequence, then spam genfunc
+\end{itemize}
+
+\section{Tutorial Stuff}
+\textbf{More Identities}
+\begin{itemize}
+    \item $P_r^n=nP_{r-1}^{n-1}$
+    \item $P_r^n=(n-r+1)P_{r-1}^n$
+    \item $P_r^n=\frac{n}{n-r}P_r^{n-1}$
+    \item $P_r^{n+1}=P_r^n+rP_{r-1}^n$
+    \item $P_r^{n+1}=r!+r(P_{r-1}^n+P_{r-1}^{n-1}+...+P_{r-1}^r)$: Either take the last $r$ elements, or choose where to place $n+1$, then don't take $n+1,n,n-1,...,i+1$, then take $i$
+\end{itemize}
+
+\textbf{Divisibility Argument}
+\begin{itemize}
+    \item Prove $(n+1)(n+2)...(2n)$ is divisible by $2^n$
+    \item Pairing $2n$ people tells us $\frac{(2n)!}{n!\cdot2^n}$ is an integer. So $\frac{(2n)!}{n!\cdot2^n} \cdot 2^n$ which is what we want is also an integer.
+\end{itemize}
+
+\textbf{Even Function} For any function $f(k)$, $\sum_{k=0, even}^n f(k)=\sum_{k=0}^n\frac{1^k+(-1)^k}{2}f(k)$
+
+\textbf{Summation Genfunc} For $a_r=b_0+b_1+...+b_r$, the genfunc is $\frac{B(x)}{1-x}$
+
+\textbf{Power Series} $\frac{1}{(1-x)^r}=\sum_{n=0}^\infty {n+r-1 \choose r-1}x^n$, $1+x+x^2+...+x^n=\frac{1-x^{n+1}}{1-x}$, $1+x^n=\frac{1-x^{2n}}{1-x^n}$
+
+\textbf{Generalised Binomial Theorem} ${n \choose r} = \frac{n(n-1)...(n-r+1)}{r!}$.
+
+% stopped here
+
+\subsection{Combinatorial Identities}
+\textbf{ID1} $\sum_{r=0}^n{n \choose r}=2^n$ using $(1+1)^n$.
+
+\textbf{ID2} $\sum_{r=0}^n(-1)^r{n \choose r}={n \choose 0}-{n\choose 1}+...+(-1)^n{n \choose n}=0$ using $(1-1)^n$.
+
+\textbf{ID3} ${n\choose 0}+{n \choose 2}+...+{n \choose 2k}+...={n \choose 1}+{n \choose 3}+...+{n \choose 2k+1}+...=2^{n-1}$ by differentiating binomial theorem.
+
+\textbf{ID4} $\sum_{r=1}^nr{n \choose r}=n\cdot 2^{n-1}$.
+
+\textbf{ID5} $\sum_{r=1}^n r^2{n \choose r}=n(n+1)2^{n-2}$ by double differentiating binomial theorem.
+
+\textbf{Example 5.8} $\sum_{r=1}^n r^3{n \choose r}=n^2(n+3)2^{n-3}$.
+
+\textbf{Example 5.9} $\sum_{r=0}^n(-1)^rr{n \choose r}=0$.
+
+\textbf{Example 5.10} $\sum_{r=0}^{n-1}{2n-1\choose r}=2^{2n-2}$.
+
+\textbf{Example 5.11} $\sum_{r=0}^n{2n \choose r}=2^{2n-1}+\frac{1}{2}{2n \choose n}$.
+
+\textbf{Vandermonde's Identity / ID6} $\sum_{i=0}^r{m \choose i}{n \choose r-i}={m\choose 0}{n \choose r}+{m \choose 1}{n \choose r-1}+...+{m \choose r}{n \choose 0}={m+n \choose r}$ using $(1+x)^{m+n}=(1+x)^m(1+x)^n$.
+
+\end{multicols*}
+
+\end{document}
