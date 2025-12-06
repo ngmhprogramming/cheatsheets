@@ -1,0 +1,596 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\usepackage{background}
+\setlist{nosep}
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=0.4,
+angle=0,
+contents={}
+% contents={\includegraphics[width=\paperwidth,height=\paperheight]{image.png}}
+}
+
+\pdfinfo{
+  /Title (CS2109S.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+% \renewcommand{\section}{\@startsection{section}{1}{0mm}%
+%                                 {-1ex plus -.5ex minus -.2ex}%
+%                                 {0.5ex plus .2ex}%x
+%                                 {\normalfont\large\bfseries}}
+% \renewcommand{\section}{\@startsection{section}{2}{0mm}%
+%                                 {-1explus -.5ex minus -.2ex}%
+%                                 {0.5ex plus .2ex}%
+%                                 {\normalfont\normalsize\bfseries}}
+% \renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+%                                 {-1ex plus -.5ex minus -.2ex}%
+%                                 {1ex plus .2ex}%
+%                                 {\normalfont\small\bfseries}}%
+% \renewcommand{\subsubsection}{\@startsection{subsubsection}{4}{0mm}%
+%                                 {-1ex plus -.5ex minus -.2ex}%
+%                                 {1ex plus .2ex}%
+%                                 {\normalfont\small\bfseries}}%
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+  {0.1ex} % space before
+  {0.1ex} % space after
+  {\normalfont\large\bfseries}}
+
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+  {0.1ex} % space before
+  {0.1ex} % space after
+  {\normalfont\normalsize\bfseries}}
+
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+  {0.1ex} % space before
+  {0.1ex} % space after
+  {\normalfont\small\bfseries}}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{4}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{CS2109S}}
+            \\ \normalsize{AY25/26 Sem 1}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+\vspace{-0.5em}
+
+\section{Introduction}
+\begin{itemize}
+    \item PEAS: Performance Measure, Environment, Actuators, Sensors
+    \item A rational agent chooses actions that maximise performance measure
+    \item Agent percepts with sensors and performs actions with actuators
+    \item Environments:
+    \begin{itemize}
+        \item Fully Observable (v/s Partially Observable): Agent's sensors give it access to complete state of environment, no need to keep track of state and no hidden information
+        \item Single agent (v/s Multi agent): Presence of multiple agents in environment
+        \item Deterministic (v/s Stochastic): Next state of environment is completely determined by current state and action executed by agent; if other rational agents actions matter it is also strategic, ignore uncertainty from actions of other agents even though agent cannot predict others actions
+        \item Deterministic: Given a state and set of actions, we can precisely determine the next state
+        \item Stochastic: Given a state and set of actions, we cannot determine the exact next state, but we know the probability of reaching each possible next state
+        \item Episodic (v/s Sequential): Experience is divided into atomic episodes of agent perceiving then performing an action, and decision making is only dependent on the current episode
+        \item Static (v/s Dynamic): Environment is unchanged while an agent is deliberating; semi-dynamic if environment does not change but agent's performance score does
+        \item Discrete (v/s Continuous): Limited number of distinct, clearly defined percepts and actions
+        \item Tic-Tac-Toe: Fully Observable, Deterministic, Strategic, Static, Sequential, Multi-agent
+    \end{itemize}
+\end{itemize}
+
+\subsection{Intelligent Agents}
+\begin{itemize}
+    \item Agent program implements agent function that maps from percept histories to actions
+    \item Agent structures in increasing complexity:
+    \begin{itemize}
+        \item Simple reflex agent: Choose action based on current world state
+        \item Goal-based agent: Keeps track of state for decision making to reach goal
+        \item Utility-based agent: Chooses action which maximises utility
+        \item Learning agent: Critiques performance standard, changes decision making to learn
+        \item Others: Model-based reflex agent, or combinations
+    \end{itemize}
+    \item Exploitation v/s Exploration: Balance between learning more about world and maximising gain based on current knowledge
+\end{itemize}
+
+\subsection{Designing an Agent}
+\begin{itemize}
+    \item Search Problem: Goal is to find a state or path to a state from a set of possible states by exploring various possibilities
+    \item Agent needs a goal, model of environment, and search algorithm
+    \item Problem Formulation: States, Initial State, Goal / Test State, Actions, Transition Model, Action Cost Function
+    \item Representation Invariant: Ensure that abstract states have corresponding concrete states with restrictions
+    \item Every state has a set of actions, with branching factor $b$ if number of actions is less than $b$
+    \item Transition Model: Uses transition function to produce next state given state and action
+\end{itemize}
+
+\section{Searching}
+\begin{itemize}
+    \item Path Cost: Cost of a path from any state to any state
+    \item Optimal Path Cost: Cost of lowest cost path from any state to any state
+    \item Complexity: Time (Number of nodes generated or expanded) or Space (Maximum number of nodes in memory)
+    \item Completeness: Algorithm will find a solution for every problem instance (if one exists)
+    \item Optimal: When an algorithm outputs a solution, it is guaranteed to be optimal (the best possible)
+\end{itemize}
+
+\section{Uninformed Search}
+
+\subsection{BFS}
+\begin{itemize}
+    \item Maintain a frontier queue, and repeatedly expand shallowest unexpanded node
+    \item Time and Space Complexity: Exponential wrt depth of optimal solution
+    \item Complete if graph is finite
+    \item Optimal if step cost is same everywhere
+\end{itemize}
+
+\subsection{Uniform Cost Search}
+\begin{itemize}
+    \item BFS but with non-identical edge weights
+    \item Use a priority queue with path cost instead
+    \item Time and Space Complexity: Exponential wrt tier of optimal solution
+    \item Complete if $>0$ step cost everywhere and finite total cost
+    \item Optimal if $>0$ step cost everywhere
+\end{itemize}
+
+\subsection{DFS}
+\begin{itemize}
+    \item Use a stack to maintain nodes, expand deeper nodes first
+    \item Time Complexity: Exponential wrt max depth of tree
+    \item Space Complexity: Polynomial wrt max depth of tree
+    \item Not Complete when depth of search tree is infinite
+    \item Not Optimal when solution is at shallower depth
+    \item Complete with visited memory
+\end{itemize}
+
+\section{Informed Search}
+\begin{itemize}
+    \item Has some form of information on search e.g. how good a state is
+    \item Heuristic: Estimate of optimal path cost from any state to the goal state, e.g. straight line distance or Manhattan distance
+    \item Best First Search: Use a priority queue, and evaluate in order of evaluation function of a state
+    \item A* Search: Evaluation function $f(n)=g(n)+h(n)$, where $g$ is the cost to reach node $n$, and $h$ is the estimated cost from $n$ to goal
+    \item Time and Space Complexity: Exponential
+    \item Complete if edge costs are positive and branching factor is finite
+    \item Optimality depends on heuristic
+    \item Admissible Heuristic: For every node, $h(n) \leq h^*(n)$, where $h^*(n)$ is the optimal path cost to the goal state from $n$; heuristic never overestimates cost to reach goal
+    \item Theorem: If $h(n)$ is admissible, A* without visited memory is optimal
+    \item Consistent Heuristic: For every node, every successor $n'$ generated by action $a$ satisfies $h(n) \leq c(n,a,n')+h(n')$, $h(G)=0$, essentially triangle inequality
+    \item Consistency implies Admissibility
+    \item Theorem: If $h(n)$ is consistent, A* with visited memory is optimal
+    \item Relaxed Problem: Has fewer restrictions, optimal solution to relaxed problem is an admissible heuristic
+    \item If $h_1(n) \geq h_2(n)$ for all nodes, then $h_1$ dominates $h_2$, and is better for search if admissible
+\end{itemize}
+
+\subsection{Search Strategies}
+\begin{itemize}
+    \item Some search algorithms might not terminate without visited memory
+    \item Can set a strict limit on resources an algorithm can use
+    \item Gives rise to a search with polynomial memory which is complete and optimal
+    \item Depth Limited Search: Limit search depth, backtrack when limit is hit
+    \item Time Complexity: Exponential wrt depth limit
+    \item Space Complexity: Polynomial wrt depth limit if used with DFS
+    \item Not complete or optimal (if used with DFS)
+    \item Iterative Deepening Search: Search with increasing depth limits, returning a solution if found
+    \item Time Complexity: Exponential wrt depth of optimal solution
+    \item Space Complexity: Polynomial if used with DFS
+    \item Complete and optimal (if step cost is same everywhere)
+\end{itemize}
+
+\subsection{Local Search}
+\begin{itemize}
+    \item Traverse state space by considering only locally-reachable states, repeatedly moving to better ones
+    \item Typically incomplete and suboptimal
+    \item Any-time property: Longer runtimes often have better solutions
+    \item States represent potential solutions which might not be actual states
+    \item Goal Test checks if a current state is the desired solution
+    \item Successor Function generates neighboring states by modifying the current state
+    \item Evaluation Function: Mathematical Function used to assess the quality or desirability of a state which we either want to minimise or maximise
+    \item Hill Climbing: Repeatedly move to the best successor until the current state is the best
+\end{itemize}
+
+\subsection{Adversarial Search}
+\begin{itemize}
+    \item Multi-agent problems involve multiple agents which could be either cooperative or competitive
+    \item Adversarial Games: Agents compete against each other; Zero-Sum: One player's gain is the other player's loss
+    \item Turn-Taking Games: Next state of environment also depends on action of strategic opponents
+    \item Game Tree represents all possible states and moves, and outcome is displayed below each terminal node
+    \item Utility Function: Outputs value of a state from the perspective of our agent, which wants to maximise it
+    \item Utility of non-terminal states is typically not known in advance and must be computed
+\end{itemize}
+
+\subsubsection{Minimax}
+\begin{itemize}
+    \item Assumes all players play optimally
+    \item Player A: max, Player B: min
+    \item Time Complexity: Exponential wrt maximum depth
+    \item Space Complexity: Polynomial
+    \item Complete if tree is finite
+    \item Optimal if against optimal opponent
+    \item Theorem: Minimax computes the optimal strategy for both players assuming both play optimally
+    \item Theorem: If the opponent deviates from optimal play, the utility obtained by Player A is never less than the utility they would obtain against an optimal opponent
+    \item Minimax explores the entire game tree in a depth first manner which can be costly
+    \item Alpha-Beta Pruning: A variant of minimax which decreases the number of nodes that need to be evaluated
+    \item $\alpha$: Highest value for A so far
+    \item $\beta$: Lowest value for A so far
+    \item On Player B's turn, if an action leads to a worse outcome, then the rest of the actions are irrelevant since the node will have at most that outcome which Player A does not want
+    \item On Player A's turn, if an action leads to a better outcome, then the rest of the actions are irrelevant since the node will have at least that outcome which Player B is not interested in
+    \item Initialise $\alpha=-\infty, \beta=+\infty$
+    \item At a max node, set $v$ to be $max(v, v_i)$. Then set $\alpha=max(\alpha, v)$. If $\alpha \geq \beta$, prune remaining nodes.
+    \item At a min node, set $v$ to be $min(v, v_i)$. Then set $\beta = min(\beta, v)$. If $\alpha \geq \beta$, prune remaining nodes.
+    \item $\alpha, \beta$ are not returned by reference!
+    \item Theorem: Alpha-Beta pruning does not alter the minimax value and optimal move computed; it only reduces number of nodes evaluated
+    \item Theorem: With good move ordering, runs in $O(b^{\frac{m}{2}})$
+    \item Cutoff: Apply a strategy to halt search in middle due to computational constraints
+    \item Estimate value of mid-game states with evaluation function which assigns a score to a game state
+    \item A heuristic function estimates utility of a state, which should fall somewhere between the minimum and maximum possible utility for any state
+    \item Derived from relaxed game, expert knowledge, or learnt from data
+    \item Theorem: In a finite two-player, zero-sum game, minimax with cutoff and an evaluation function returns a move that is optimal with respect to the evaluation function at the cutoff (but not necessarily the true value)
+\end{itemize}
+
+\begin{verbatim}
+def max_value(state, a, b):
+    v = -INF // +INF
+    for next_state in expand(state):
+        v = max(v, min_value(next_state, a, b))
+        // min(max)
+        a = max(a, v) // b = min(b, v)
+        if v >= b: return v // if v <= a:
+return v
+\end{verbatim}
+
+\section{Machine Learning and Decision Trees}
+
+\subsection{Machine Learning}
+\begin{itemize}
+    \item Some problems are intractable: They do not have an efficient solution for all cases
+    \item Other problems are difficult because formulating the rules in a way that computers can process is hard
+    \item A learning agent learns a function to identify patterns in the data and make decisions rather than explicitly solving it
+    \item Machine Learning is a subfield of AI where computers learn without being explicitly programmed
+    \item Supervised: Learn from labeled data (input-output pairs) to find a mapping from inputs to outputs
+    \item Unsupervised: Learn from unlabeled data (input only) to find patterns or structure
+    \item There is also semi-supervised or reinforcement learning
+\end{itemize}
+
+\subsection{Supervised Learning}
+\begin{itemize}
+    \item Data: Set of input-output (ground truth) pairs
+    \item Model: Function that predicts output using input features
+    \item Loss: Function used to assess model's performance
+    \item Learning algorithm seeks to minimise loss of a model over a training dataset
+    \item Model is evaluated on a test set using performance measures to estimate the generalisation of the model
+    \item Classification: Predict a discrete label based on input features; output is a categorical value; Regression: Predict a continuous numerical value based on input features; output is a real number
+    \item A model or hypothesis refers to a function that maps from inputs to outputs and can be learned by a learning algorithm
+    \item Performance measure is a metric evaluating how well the model performs
+    \item A loss function quantifies the difference between the model's predictions and true outputs
+    \item Examples of performance measures include mean squared error or mean absolute error for regression, and accuracy for classification
+    \item For binary classification, we can look at the confusion matrix for true/false positives/negatives: "The prediction is [+/-] and it is [T/F]"
+    \item $Accuracy=\frac{TP+TN}{TP+FN+FP+TN}$
+    \item $Precision=\frac{TP}{TP+FP}$ if false positives are costly
+    \item $Recall=\frac{TP}{TP+FN}$ if false negatives are costly
+    \item $F1=\frac{2}{1/P+1/R}$
+    \item A learning algorithm takes a training set of input-output pairs and finds a model which approximates the true relationship between inputs and outputs
+\end{itemize}
+
+\subsection{Decision Trees}
+\begin{itemize}
+    \item We are given a set of data points consisting of features and a target variable which are categorical
+    \item A decision tree takes in an input vector of categorical attributes and outputs a predicted category
+    % \item Internal nodes represent tests on features, Branches correspond to outcomes of tests, Leaf nodes assign predictions
+    % \item A decision is made by checking the attribute value at each node and following it to the leaf node
+    \item Prefer more compact decision trees, although they are less likely to be consistent with training data by chance
+    % \item Finding the optimal decision tree is NP-Hard, but it can be made tractable by greedy heuristics
+    \item At each step, choose the feature that yields the greatest immediate information gain
+    \item Entropy: Measure of uncertainty or randomness in a set of data, or number of bits used to represent it
+    \item Entropy: $H(P(v_1),...P(v_n))=-\sum_{i=1}^nP(v_i)log_2P(v_i)$
+    \item Common Entropies: $H(1)=0, H(1/2, 1/2)=1, H(1/3, 2/3)=0.918, H(3/5, 2/5)=0.971$
+    \item For binary outcomes, $H(\frac{p}{p+n},\frac{n}{p+n})=-\frac{p}{p+n}log_2\frac{p}{p+n}-\frac{n}{p+n}log_2\frac{n}{p+n}$
+    \item Specific Conditional Entropy: $H(Y|X=x)$ is the entropy of $Y$ conditioned that $X=x$, defined as $H(Y|X=x)=H(P(y_1 | x),...,P(y_k|x))$, only looking at a subset of samples
+    \item Conditional Entropy: $H(Y|X)$ is the entropy of $Y$ when the value of $X$ is known, defined as $H(Y|X)=\sum_{x \in X}P(X=x)H(Y|X=x)$
+    \item Information Gain: Measure of reduction in uncertainty after knowing the value of a specific variable, defined as $IG(Y;X)=H(Y)-H(Y|X)$
+    \item Choose attributes with the highest information gain
+    \item Stop splitting when all rows have same classification
+    \item Theorem (Representational Completeness): For any finite set of consistent examples with discrete features and a finite set of label classes, there exists a decision tree that is consistent with the examples
+    \item However, noise or outliers might cause learned decision tree to be unnecessarily complex or overfitting
+    \item Pruning can produce simple trees e.g. Max depth, Min Sample Leaves
+    % \item Max Depth: Limits maximum depth / length of longest path from a root node to a leaf node
+    % \item Min Sample Leaves: Set a minimum threshold for the number of samples required to be in a leaf node
+    \item Partition continuous valued attributes into discrete intervals
+    \item For missing values, come up with a way to populate them
+    % \item For missing values, can do things such as assigning most common value of attribute, or same thing but only those with same output etc.
+\end{itemize}
+
+\section{Linear Regression}
+\begin{itemize}
+    \item Suppose each data point consists of features and a target variable, all of which are real numbers
+    \item Given another data point without a target, we want to find a function that can predict a target for this new data point
+    \item Linear Model: $h_w(x)=w_0x_0+w_1x_1+...+w_dx_d$ where $w_i$ are weights and $x_0=1$ is a dummy variable
+    \item $h_w(x)=w^Tx=\sum_{j=0}^dw_jx_j$
+    \item We want the linear model with the lowest loss on data, with a common measure being MSE
+    \item MSE: $J_{MSE}(w)=\frac{1}{2n}\sum_{i=1}^n(h_w(x^{(i)})-y^{(i)})^2$
+    \item The gradient of $h$ is $\triangledown h(w)=[\frac{\delta h(w)}{\delta w_1}...\frac{\delta h(w)}{\delta w_d}]^T=[x_1...x_d]^T$
+    \item To minimise a function $f(w)$, we find the point where $\triangledown f(w) = 0$, so for our multidimensional function, we want $\frac{\delta f(w)}{\delta w_i}=0$ for all $w_i$
+    \item Minimum loss: $\triangledown J_{MSE}(w)=0$
+    \item Normal Equation: Use $w=(X^TX)^{-1}X^TY$, derived from $X^T(Xw-Y)=0$
+    \item However, the cost is $O(d^3)$ for inversion, and requires $(X^TX)^{-1}$ to be invertible
+    \item Gradient Descent: Start at a random $w$, and update $w$ with a step in opposite direction of gradient repeatedly until some termination criterion is satisfied
+    \item $w_j=w_j-\gamma\frac{\delta J(w_0,...)}{\delta w_j}$ where $\gamma>0$ is the learning rate
+    \item Convexity: For a line segment connecting any two distinct points on the graph, the line lies on or above the graph between two points
+    \item Theorem: The MSE loss function is convex
+    \item Linearly Dependent Features: A feature which can be expressed as a linear combination of other features
+    \item Theorem: If the features in the training data are linearly independent, the function is strictly convex
+    \item Theorem: For a linear regression model with MSE, gradient descent will converge to a global minimum provided the learning rate is chosen appropriately, which is unique if the features are linearly independent
+    \item Larger features have greater updates to weights, so we need to scale them
+    \item Min-max Scaling: $x_i'=\frac{x_i-min(x_i)}{max(x_i)-min(x_i)}$
+    \item Standardisation: $x_i'=\frac{x_i-\mu_i}{\sigma_i}$, using normal distribution
+    \item Alternatively have different learning rate for each weight
+    \item Gradient descent can be very slow since it requires the entire dataset; can get stuck at local minimum or plateau on non-convex optimisation
+    \item Batch Gradient Descent: Consider all training examples
+    \item Mini-Batch Gradient Descent: Consider a subset of training examples at a time, cheaper per iteration, noisy gradient can help escape local minima
+    \item Stochastic Gradient Descent: Select a random training example at a time
+    \item $n$ points, needs maximum degree of $n-1$
+\end{itemize}
+
+\subsection{Feature Transformation}
+\begin{itemize}
+    \item Transform $d$ dimensional feature into $M$ dimensional, usually $M \geq d$ using a function e.g. polynomial, log, exp
+    \item Theorem: The convexity of linear regression with MSE is preserved with feature transformation
+    \item Model is usually $\hat{h}(x)=h(\phi(x))$, where $\phi$ is the feature transformation function and $h$ is the predictor
+\end{itemize}
+
+\section{Logistic Regression}
+\begin{itemize}
+    \item Given a set of data points with features and a target variable, but this time they are described by real numbers, and the target is either a positive or negative class
+    \item This is a classification problem (binary in this case)
+    \item Sigmoid Function: $\sigma(x)=\frac{1}{1+e^{-x}}$, which is differentiable with derivative $\sigma'(x)=\sigma(x)(1-\sigma(x))$
+    \item Logistic Model: Function of the form $h_w(x)=\sigma(w_0x_0+...+w_dx_d)=\sigma(w^Tx)$ where $x_0=1$ is a dummy variable
+    \item The model's output is the probability of an input to be class 1, giving the confidence score of the model
+    \item Example: Outputs $h_w(x)=P(Fail | x)=0.8$ means it predicts the probability of failure to be $0.8$
+    \item To decide which class an input belongs to, compare the probability output with a given threshold
+    \item Decision Boundary: Surface that separates different classes in the feature space, which is intersection between model's function and decision threshold
+    \item Theorem: MSE is non-convex for logistic regression
+    \item Cross-Entropy: Measures difference between two probability distributions over same set of outcomes, suppose $P$ is the true probability distribution and $Q$ is our model, then we have $H(P,Q)=-\sum_xP(x)log\ Q(x)$
+    \item Binary Cross Entropy: Special case where there are only two possible outcomes, so $H(P,Q)=-P(1)log\ Q(1) - P(0)log\ Q(0)$
+    \item BCE Loss: $J_{BCE}(w)=\frac{1}{n}\sum_{i=1}^n BCE(y^{(i)}, h_w(x^{(i)}))$
+    \item Theorem: The BCE loss function is convex
+    \item Partial derivative equation does not have a closed form
+    \item Theorem: For a logistic model with BCE, gradient descent is guaranteed to converge to a global minimum provided the learning rate is chosen appropriately
+    \item Data is linearly separable when a single linear decision boundary separates the different classes
+    \item When it is not, the decision boundary required needs to be non-linear or more complex, which can be done with feature transformation
+    \item Theorem: The convexity of a logistic model with BCE is preserved with feature transformation
+    \item Multi-Class Classification: Either one vs one or one vs rest
+    \item One vs One: Classifier for every pair of classes, need $K(K-1)/2$ of them, class with most votes is selected
+    \item One vs Rest: Treat all other classes as single combined class, need $K$ of them, classifier with highest probability determines the class
+    \item Multi-Label Classification: Labels might no be mutually exclusive
+    \item Binary Relevance: Train one binary classifier per label
+    \item Classifier Chain: Feed predictions of previous labels as features for subsequent labels which can capture dependencies although dependent on order
+    \item Label Powerset: Treat each unique set of labels as a single multiclass label
+\end{itemize}
+
+\subsection{Topics in Supervised learning}
+\begin{itemize}
+    \item Generalisation: Model's ability to perform on unseen data
+    \item Dataset Quality: Data should be relevant and balanced, but might contain noise
+    \item Having more data typically leads to better performance
+    \item Model Complexity: Size and expressiveness of model functions; higher model complexity allows for more sophisticated modeling of relationships
+    \item A simple model is good for a simple ground truth but bad for complex ground truth (high bias, underfitting), retraining often leads to same model (low variance)
+    \item Complex model overfits with scarce data, while it can fit better when data is abundant (low bias), retraining can lead to vastly different models (high variance)
+    \item High Complexity: As high error on unseen data, which reduces and converges as data quantity exists
+    \item Low Complexity: High error on both unseen and training data even as data quantity increases
+    \item As model complexity increases, error decreases on unseen then increases again followed by decreasing again due to overparameterisation
+    \item Hyperparameters: Settings that control behaviour of training algorithm but are not learned e.g. learning rate, feature transformations
+    \item Hyperparameter Tuning: Optimising hyperparameters of a machine learning model to improve its performance (using validation set for evaluation)
+    \item Techniques: Grid search, Random search, Local search, Successive halving, Bayesian optimisation
+\end{itemize}
+
+% stopped here
+
+% \section{Support Vector Machines}
+% \begin{itemize}
+%     \item Maximise margin between classification boundary and values
+%     \item Define appropriate decision rule: $w\cdot x + b \geq 0$, then +
+%     \item Find equation of margin $=\frac{2}{||w||}$ given by $\frac{w\cdot x^+-w\cdot x^-}{||w||}$
+%     \item Derive maximisation of margin, $max_w\frac{2}{||w||} $ or $min_w||w||$, $\widehat{y}^{(i)}(w \cdot x^{(i)}+b)-1\geq 0$
+%     \item $||u||$ is the magnitude of the vector, $u\cdot v = u^Tv=p||v||$ where $p$ is the projection of $u$ onto $p$
+%     \item If data is not linearly separable, introduce slack variable $\xi^{(i)}$
+%     \item $w\cdot x^++b \geq 1 -\xi^{(i)}$, aim for $min\frac{1}{2}||w||^2+C\sum_i\xi^{(i)}$ such that $\widehat{y}(w\cdot x^{(i)}+b)-1 \geq 0-\xi^{(i)}$
+% \end{itemize}
+
+% \subsection{Kernel Methods and Kernel Trick}
+% \begin{itemize}
+%     \item Rather than defining high degree polynomials, define polynomial with degree $d$ and $n^d$ terms as $\phi(u) \cdot \phi(v)=K(u,v)=(u\cdot v)^d$
+%     \item Gaussian Kernel: $K(u,v)=\phi(u)\cdot\phi(v)=e^{-\frac{||u-v||^2}{2\sigma^2}}$
+%     \item With kernel trick, do not need to compute transformed features explicitly, and can have SVM with infinite dimensional features
+%     \item Compute new features based on proximity to landmarks
+%     \item Generate similarities to landmarks then use logistic regression
+%     \item Not all similarity functions yield valid kernels, need to satisfy Mercer's theorem
+% \end{itemize}
+
+% \subsection{Hyperparameter Tuning}
+% \begin{itemize}
+%     \item The expected error of a model is $J_D(h)=\frac{1}{N}\sum_{i=1}^Nerror(h(x^{(i)}),y^{(i)}), (x^{(i)},y^{(i)})\in D$
+%     \item Pick hyperparameters, train model, then evaluate
+%     \item Tuning Methods:
+%     \begin{itemize}
+%         \item Grid Search: Exhaustively try all possible hyperparameters
+%         \item Random Search: Randomly select hyperparameters
+%         \item Successive Halving: Use all possible hyperparameters but with reduced resources, increase resources with smaller set
+%         \item Bayesian Optimisation: Estimate optimisation space of hyperparameters
+%         \item Eovlutionary Algorithms: Use evolutionary algorithms to select a population
+%     \end{itemize}
+% \end{itemize}
+
+% \section{Neural Networks}
+% \begin{itemize}
+%     \item Perceptron: $\widehat{y}=g(\sum_{i=1}^nw_ix_i)$ where $g$ is a non-linear activation function
+%     \item Can add in bias term $w_0$
+%     \item Activation Functions: Step, Sigmoid, tanh, ReLU
+%     \item Perceptron Learning Algorithm:
+%     \begin{itemize}
+%         \item Initialise $w_i$
+%         \item For each instance $i$ with features $x^{(i)}$, classify $\widehat{y}^{(i)}=sgn(w^Tx^{(i)})$
+%         \item Select one misclassifed instance and update weights
+%         \item Repeat until convergence or max iterations
+%     \end{itemize}
+%     \item Perceptron Update Rule: $w=w+\eta(y-\widehat{y})x$, $\eta$ is learning rate
+%     \item When there is misclassification, $w'$ will be close to $\pi/2$
+%     \item Perceptrons are less robust then SVMs, and cannot converge on non-linearly separable data
+%     \item Gradient Descent: $w=w-\eta(\widehat{y}-y)\widehat{y}(1-\widehat{y})x$
+%     \item A neural network is a multi-layer perceptron
+% \end{itemize}
+
+% \section{Backpropagation}
+% \begin{itemize}
+%     \item Layer Activation: $a=g(f(x)), f(x)=w\cdot x$, $a^{[l]}=g^{[l]}((w^{[l]})^Ta^{[l-1]})$ for layer $l$
+%     \item Forward Propagation: $\widehat{y}(x)=g^{[l]}(f^{[l]}(....g^{[1]}(f^{[1]}(x^{[0]}))))$
+%     \item Tensor: Multi-dimensional matrix containing elements of a single type
+%     \item Matrix Form: $\widehat{y}'(w^{[l]})=a^{[l-1]}(\delta^{[l]})^T, \delta^{[l]}=g'^{[l]}(f^{[l]})W^{[l+1]}\delta^{[l+1]}$
+%     \item Backward Propagation: $\widehat{y}'(w^{[l]})=a^{[l-1]}(\delta^{[l]})^T, \delta^{[l]}=[g'^{[l]}(f^{[l]})]\circ (W^{[l+1]}\delta^{[l+1]})$
+%     \item Backpropagation efficiently computes gradient by avoiding duplicate calculations, not computing unnecessary intermediate values, and computing the gradient of each layer
+%     \item Many libraries support automated differentiation for common functions
+% \end{itemize}
+
+% \section{Deep Learning}
+% \begin{itemize}
+%     \item Deep Neural Networks are neural networks with $\geq3$ layers
+%     \item Convolution: Consider a group of pixels at at time rather than individually
+%     \item Multiply by kernel map for group and sum to get feature value
+%     \item $(f*g)(t)\int_{-\infty}^\infty f(x)g(x-t)dx$, $x[m,n]*h[m,n]=\sum_{j=-\infty}^\infty\sum_{i=-\infty}^\infty x[i,j]*h[m-i,n-j]$
+%     \item Flip first then multiply and sum, if not we are doing 2D correlation
+%     \item Padding: Losing pixels at edge of image, add border of zeroes
+%     \item Stride: Computing adjacent filters might be slow, skip some steps, get a smaller feature map
+%     \item Convolution Layer: $A^{[l]}=g^{[l]}(W^{[l]}*A^{[l-1]})$, weights are kernels, activation is a 3D matrix which is concatenation of feature maps
+%     \item Hyperparameters: Number of kernels, kernel size, padding, stride
+%     \item Pooling Layer: Downsamples feature maps, helps to train later kernels to detect higher-level features, reduces dimensionality
+%     \item Softmax: $P(y=j)=\frac{e^{w_j}}{\sum_{i=0}^ke^{w_i}}$
+%     \item Overfitting: Use regularisation, drop out some activations randomly, or perform early stopping on training
+%     \item Vanishing Gradients: With back propagation, multiply many gradients approximately zero, weights don't change
+%     \item Exploding Gradients: Gradients keep getting larger, causing gradient descent to diverge
+%     \item Mitigate with proper weight initialisation, using non-saturating activation functions like ReLU, batch normalisation, gradient clipping
+% \end{itemize}
+
+% \section{Unsupervised Learning}
+% \begin{itemize}
+%     \item Clustering: Like classification, but groups are not known
+%     \item K-Means: Randomly initialise $K$ centroids, then repeatedly get index of cluster centroids, then assign data points to nearest centroid
+%     \item $x^{(i)}$: $i$th training data point
+%     \item $\mu_k$: cluster centroid $k$
+%     \item $c^{(i)}$: index of cluster centroid closest to $x^{(i)}$
+%     \item $J(c^{(1)},...,c^{(m)},\mu_1,...,\mu_k)=\frac{1}{m}\sum_{i=1}^m||x^{(i)}-\mu_{c^{(i)}}||^2$
+%     \item Try many times, and pick lowest loss
+%     \item $K$-Medoids: For each cluster, pick the point with minimum average distance to all other data points in the cluster
+%     \item Picking $K$: Elbow Method: look at graph of loss and find elbow point, Business Need
+%     \item Hierarchical Clustering: Every data point is a cluster, repeatedly find pairs of points that are nearest to each other and not in same cluster and merge
+%     \item Dendogram: Shows merging of clusters
+%     \item Many options for computing similarity, but high space and time complexity
+%     \item Dimensionality Reduction: Transforming a set of data points to another set of data points with fewer dimensions which captures most properties of it
+%     \item Principal Component Analysis: Find plane to project points on which information is "preserved"
+%     \item Singular Value Decomposition: $X=U\Sigma V^T$, $U$: left singular vectors, $\Sigma$: singular values, $V^T$: right singular values
+%     \item PCA: $\Sigma=\frac{1}{m}\Sigma_{i=1}^m(x^{(i)})(x^{(i)})^T$, $U_{reduce}$ is the first $k$ vectors of $U$, $z^{(i)}=U_{reduce}^Tx^{(i)}$
+%     \item PCA takes average squared projection error, and to pick $k$, choose minimum $k$ such that variance in data is mostly retained
+%     \item PCA provides compression and visualisation
+% \end{itemize}
+
+% \section{AI and Ethics}
+% \begin{itemize}
+%     \item Bias: Reporting Bias, Selection Bias, Automation bias
+%     \item Harms: Representation: Identity of marginalised group is denied in ways that reaffirm their marginalised position, Allocation: Members of a marginalised group are refused access or opportunities
+%     \item Ethics: Remove or control sensitive fields in training, ensuring that outcomes are fair with respect to sensitive fields
+%     \item Algorithmic Bias: People are more likely to assume that algorithms are objective or error-free, and are more likely to be implemented with no appeals process in place
+%     \item Sharing Data: Transparency around collection of data and how it would be used, and proper management
+% \end{itemize}
+
+\end{multicols*}
+
+\end{document}
