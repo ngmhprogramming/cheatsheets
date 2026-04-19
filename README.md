@@ -12,6 +12,8 @@ i think plain cheatsheets are boring so `funny` has cheatsheets with funny backg
 
 if you found this repository helpful please drop a star and tell your friends :)
 
+MY CHEATSHEETS ARE FREE TO USE! STOP UPLOADING IT TO STUDOCU (PLEASE DON'T PAY FOR THEM!!!)
+
 # contents
 
 | Module  | Semester | Title                                   | Resources                                                                                                                                                                                                                                                                                                                                                                                                                      |
