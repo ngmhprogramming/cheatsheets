@@ -1,0 +1,455 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\usepackage{background}
+\setlist{nosep}
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=0.4,
+angle=0,
+contents={
+  % \includegraphics[width=\paperwidth,height=\paperheight]{eldon.png}
+  }
+}
+
+\pdfinfo{
+  /Title (QF1100.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{QF1100}}
+            \\ \normalsize{AY25/26 Sem 2}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{Theory of Interest}
+
+\textbf{Principal Amount} Sum of money for investment.
+
+\textbf{Interest} Time value of money.
+
+\textbf{Accumulation Function} Accumulated value of $\$1$ at time $t$, with $a(0)=1$.
+
+\textbf{Simple Interest} Linear Growth: $a(t)=1+rt$.
+
+\textbf{Compound Interest} Exponential Growth: $a(t)=(1+r)^t$.
+
+\textbf{Frequency of Compounding} If an interest is paid $p$ times a year, $p$ is the frequency of compounding, $r^{(p)}$ is the nominal interest rate, and the interest paid each time is $\frac{r^{(p)}}{p}$.
+
+\textbf{Effective Annual Interest Rate} $a(1)=1+r_e=(1+\frac{r^{(p)}}{p})^p$, with accumulation function $a(t)=(1+r_e)^t=(1+\frac{r^{(p)}}{p})^{pt}$. The effective interest rate is always greater than the nominal rate.
+
+\textbf{Equivalent Interest Rates} Two nominal interest rates are equivalent iff they yield the same accumulation amount over a year, i.e. $1+r_e$ is equivalent.
+
+\textbf{Continuous Compounding} For a positive interest rate, $lim_{x \rightarrow\infty}(1+\frac{r}{x})^x=e^r$. Interest is compounded continuously when the frequency of compounding tends to infinity. The accumulation function is $a(t)=e^{r^{(\infty)}t}, t \geq 0$.
+
+\textbf{Force of Interest} The force of interest, is $\delta(t)=\frac{a'(t)}{a(t)}=\frac{d}{dt}[\ln(a(t))]$.
+\begin{itemize}
+    \item When $\delta(t)=\delta, a(t)=e^{\delta t}$, $\delta$ is the continuously compounded rate of interest.
+    \item For simple interest, $\delta(t)=\frac{r}{1+rt}$.
+    \item For compound interest, $\delta(t)=\ln(1+r)$.
+\end{itemize}
+From definition, $a(s,t)=\exp(\int_s^t\delta(u)du)$. This implies the principle of consistency: $a(t_0, t_n)=a(t_0, t_1)a(t_1,t_2)...a(t_{n-1},t_n)$.
+
+\section{Present Value}
+
+\textbf{Present Value} The present value of a payment $c$ at time $t \geq0$ is $\frac{c}{a(t)}$. Finding the present value of a future payment is known as discounting.
+
+\textbf{PV of Cash Flow Stream} For a cash flow which is a series of payments, the present value $PV(C)=\sum_{i=1}^n\frac{c_i}{a(t_i)}$. If the effective annual interest rate is $r$, then $PV(C)=\sum_{i=1}^n\frac{c_i}{(1+r)^{t_i}}$.
+
+\textbf{Time Value} The time value of a cash flow $TV_t(C)=PV(C) \cdot a(t)$. For $0<s<t, TV_t(C)=\frac{a(t)}{a(s)}\cdot TV_s(C)$. If the effective annual interest rate is $r$, then $TV_t(C)=\sum_{i=1}^n\frac{c_i}{(1+r)^{t_i-t}}$ and $TV_t(C)=TV_s(C)\cdot (1+r)^{t-s}$.
+
+\textbf{Principle of Equivalence} Two cash flow streams are equivalent iff they have the same present value.
+
+\textbf{Net Present Value} Considers PV of all negative and positive values, measure of value created today by undertaking investment.
+
+\textbf{Internal Rate of Return} Non-negative root $r$ of equation of value where $PV=0$, a.k.a yield or IRR.
+
+\textbf{Unique IRR} If unique, the IRR is the rate of return on investment. This occurs when $c_0 < 0, c_k \geq 0, c_0+c_1+...+c_n >0$. Otherwise, if the equation of value has degree $n$, then there are at most $n$ distinct solutions.
+
+\textbf{Newton-Raphson} There is no closed form solution for $n\geq 5$. First use IVT to pin down to a small interval where sign changes followed by choosing an initial guess. Then $\alpha_1=\alpha_0-\frac{f(\alpha_0)}{f'(\alpha_0)}$, repeat until satisfied.
+
+\textbf{Using IRR} IRR as a measure of "survivability" can be used to compare investments, just like NPV, higher is better.
+
+\subsection{Annuities}
+
+\textbf{Annuity} Series of payments made at regular intervals, cash flow stream with evenly spread payments.
+
+\textbf{Ordinary Annuity} Payments are made at the end of each period, a.k.a annuity immediate or annuity in arrears. $PV=\sum_{t=1}^n\frac{A}{(1+r)^t}=\frac{A}{r}[1-\frac{1}{(1+r)^n}]$.
+
+\textbf{Annuity Due} Payments are made at the beginning of each period. $PV=\sum_{t=0}^{n-1}\frac{A}{(1+r)^t}=\frac{A(1+r)}{r}[1-\frac{1}{(1+r)^n}]$. $PV(OA)=\frac{1}{1+r}PV(AD)$.
+
+\textbf{Time Value of Annuities} $TV_t=PV \cdot (1+r)^t$.
+
+\textbf{Perpetual Annuity} Pays a fixed sum forever. If Due, $PV=\sum_{t=0}^\infty\frac{A}{(1+r)^t}=\frac{A(1+r)}{r}$. If Ordinary, $PV=\sum_{t=1}^\infty\frac{A}{(1+r)^t}=\frac{A}{r}$.
+
+\textbf{Annuity Formula} Cash flow of ordinary annuity is difference between two perpetuities, $PV=\frac{A}{r}-\frac{A}{r}\cdot\frac{1}{(1+r)^n}=\frac{A}{r}[1-\frac{1}{(1+r)^n}]$
+
+\subsection{Loans}
+
+\textbf{Loan} Repaid by series of installment payments at periodic intervals. Cash flow is $+L, -A, -A,...$.
+
+\textbf{Refinancing} Revise terms of existing loan, based on balance amount. The balance amount is the time value of the remaining unpaid payments.
+
+\textbf{Prospective Method} Consider cash flows for $t>m$, then $L_{Bal}=\frac{A}{1+r}+...+\frac{A}{(1+r)^{n-m}}=\frac{A}{r}[1-\frac{1}{(1+r)^{n-m}}]$.
+
+\textbf{Retrospective Method} Consider cash flows for $t \leq m$, then $L_{Bal}=L(1+r)^m-\frac{A}{r}[1-\frac{1}{(1+r)^m}](1+r)^m$.
+
+\textbf{Number of Payments} Find number of payments, loan will be repaid with $\lfloor n \rfloor$ full payments of $A$ then a last payment of $B < A$.
+
+\section{Bonds}
+\textbf{Bond} Written contract between issuer and investors
+
+\begin{itemize}
+    \item \textbf{Face / Par Value} $F$, Amount based on which periodic interest payments are computed.
+    \item \textbf{Redemption / Maturity Value} $R$, Amount to be repaid at the end of the loan.
+    \item \textbf{Maturity / Redemption Data} Date on which loan will be fully repaid.
+    \item \textbf{Coupon Rate} $c$, Bond's interest payments, as a percentage of par value, made to investors at regular intervals during term of loan.
+    \item \textbf{Other Symbols} $P$: current price of a bond, $m$: number of coupon payments per year, $n$: total number of coupon payments, $\lambda$: nominal yield.
+\end{itemize}
+
+\textbf{Law of One Price} Price of bond equals to PV of cash flow consisting of all coupon payments and redemption value at maturity, calculated at yield $\lambda$.
+
+\textbf{Coupon Bonds} Cash flow is made up of initial $-P$ and coupon payments of $cF/m$ at multiples of $t=1/m$, with redemption or maturity value $cF/m + R$ at time of last payment.
+
+\textbf{Valuing Coupon Bond} $P=\frac{R}{(1+\lambda/m)^n}+\sum_{i=1}^n\frac{cF/m}{(1+\lambda/m)^i}=\frac{R}{(1+\lambda/m)^n}+\frac{F\cdot c/m}{\lambda/m}(1-\frac{1}{(1+\lambda/m)^n})$, made up of PV of redemption value and PV of coupon stream. Typically, $F=R$, then $P=F[\frac{1}{(1+\lambda/m)^n}+\frac{c/m}{\lambda/m}(1-\frac{1}{(1+\lambda/m)^n})]$. Alternatively, $P=F+F(\frac{c-\lambda}{\lambda})[1-\frac{1}{(1+\lambda/m)^n}]$.
+
+\textbf{Bond Purchase} Premium: $P>F, c > \lambda$, Par: $P=F, c=\lambda$, Discount: $P<F, c < \lambda$.
+
+\textbf{Makeham Formula} PV of face value at maturity is $K=\frac{F}{(1+\lambda/m)^n}$. $P=K+\frac{c}{\lambda}(F-K)$. Also, $P_{k+1}=P_k(1+\lambda/m)-cF/m$, made up of accrued interest and coupon payment, after the kth payment.
+
+\textbf{Zero Coupon Bonds} Do not pay coupons, cash flow is maturity value at the end. Then $P=\frac{R}{(1+\lambda)^N}$.
+
+\textbf{Perpeptual Bond} Never matures, $P=\frac{cF}{\lambda}$.
+
+\textbf{Price Yield Relationship} $P$ is a decreasing function of $\lambda$, and the curve is convex (bowl shaped).
+
+\textbf{Macaulay Duration} Weighted average time to maturity of the cash flow from a bond. $D=\frac{\sum_{i=1}^nt_iPV\{(c_i, t_i)\}}{PV(C)}=\sum_{i=1}^nw_it_i$. If $c_i \geq 0$, then $t_1\leq D \leq t_n$. For a zero coupon bond with maturity $T$, $D=T$.
+
+\textbf{Yield Curve} Relationship between yield and maturity
+\begin{itemize}
+    \item Upward Sloping / Normal: Periods of economic expansion with low inflation.
+    \item Downward Sloping / Inverted: Recessionary periods or when inflation is high.
+\end{itemize}
+
+\textbf{Spot Rate} Annual interest rate for money held from today until a future time, $s_t$.
+
+\textbf{Term Structure of Interest Rates} Collection of spot rates.
+
+\textbf{Rate Conventions} Assume a yearly convention, so that $(1+s_t)^t$ is the factor by which a deposit held for $t$ years will grow.
+
+\textbf{Spot Rate Curve} Plot of spot rates against time to maturity. Yield curve can be determined from spot rates.
+
+\textbf{Forward Rate} Interest rate observed at some future time. $f_{0, t}=s_t$, $(1+s_k)^k=(1+s_j)^j(1+f_{j, k})^{k-j}$ for $k>j>0$.
+
+\textbf{Determining Spot Rate} Yield to maturity of a zero coupon bond that matures at $t$. Then $P=\frac{R}{(1+s_n)^n}$, $s_n=(\frac{R}{P})^{1/n}-1$.
+
+\textbf{Bootstrap Method} Suppose we have determined previous spot rates. Then we estimate $s_n$ using the $n$-period bond with cash flow $(-P_n, cF/m,...,cF/m+R)$. Using the pricing formula $P_n=\frac{cF/m}{1+s_1}+...+\frac{cF/m+R}{(1+s_n)^n}$, we can find $s_n$. Use the zero-coupon bond to estimate $s_1$, 2 period coupon paying bond for $s_2$, etc.
+
+\section{Asset Returns}
+
+\textbf{Asset} Investment instrument that can be bought and sold.
+
+\textbf{Return on Investment} $R = \frac{\text{amount received}}{\text{amount invested}}=\frac{P_1}{P_0}$ assuming it is purchased at $P_0$ and sold at $P_1$.
+
+\textbf{Rate of Return} $r=\frac{P_1-P_0}{P_0}$. Then we have $R=1+r, P_1=(1+r)P_0$, acting like a interest rate.
+
+\textbf{Short Sales} Selling an asset that one does not own. Risky as potential loss is unlimited. Return is $R=\frac{-P_1}{-P_0}=\frac{P_1}{P_0}$. Net return $r=\frac{P_1}{P_0}-1$.
+
+\textbf{Returns as Random Variables} Money to be obtained when selling in the future is uncertain.
+
+\textbf{Random Variable} Function that assigns a real number to each outcome in the sample space of a random experiment. It is discrete if its possible values are finite or countably infinite, if not it is continuous.
+
+\textbf{Expected Value} $E(X)=\sum x \cdot p(x)$, $E(aX+bY)=aE(X)+bE(Y)$.
+
+\textbf{Variance} $Var(X)=E[(X-E(X))^2]=E(X^2)-[E(X)^2]=\sigma^2$.
+
+\textbf{Standard Deviation} $SD(X)=\sqrt{Var(X)}=\sigma$, has the same units as $X$.
+
+\textbf{Covariance} Measure of linear dependence of two or more random variables. $\sigma_{X,Y}=Cov(X, Y)=E[(X-E(X))(Y-E(Y))]=E(XY)-E(X)E(Y)$. Note $E(XY) \neq E(X)E(Y)$ in general. $Cov(X,X)=Var(X)$. $Cov(aX, bY)=abCov(X, Y)$. $Cov(aX+bY, Z)=aCov(X, Z)+bCov(Y, Z)$.
+
+\textbf{Correlation Coefficient} $\rho_{X, Y}=Corr(X, Y)=\frac{Cov(X, Y)}{SD(X)SD(Y)}$, with absolute value less than 1. The magnitude measures the degree of linearity while the sign indicates the direction.
+
+\textbf{Independence} $P(X=x, Y=y)=P(X=x)P(Y=y)$. Independence $\Rightarrow Cov=0$.
+
+\textbf{Variance of Sum} $Var(X+Y)=Var(X)+Var(Y)+2Cov(X, Y)$.
+
+\subsection{Portfolio Returns and Mean Variance Analysis}
+
+\textbf{Mean and Variance of Return} $\mu_i=E(r_i), \sigma_i^2=Var(r_i)$. Mean measures return while SD measures risk.
+
+\textbf{Covariance of Returns} Measure of linear dependence between returns of two assets $\sigma_{ij}=Cov(r_i, r_j)$. A standardised measure is the correlation coefficient $\rho_{ij}=\frac{\sigma_{ij}}{\sigma_i \sigma_j}$.
+
+\textbf{Portfolio} Splitting an initial amount $X_0$ to distribute as $X_{0i}$ among $n$ assets. It can be negative if short selling is allowed.
+
+\textbf{Portfolio Weights} $X_{0i}=w_iX_0$. The sum must be equal to 1. It can be negative if short selling is allowed.
+
+\textbf{Portfolio of 2 Assets} For initial wealth $X_0$, the wealth at the end of a period is $X_1=X_0[1+\alpha r_1+(1-\alpha)r_2]$. The rate of return is $\alpha r_1+(1-\alpha)r_2$.
+
+\textbf{Portfolio of $n$ Assets} $X_1=X_0\sum_{i=1}^n w_i (1+r_i)=X_0(1+\sum_{i=1}^n w_ir_i)$. The rate of return is $X_1=X_0(1+r_p)$, then $r_p=\sum_{i=1}^n w_ir_i$. It is a linear combination of the asset returns.
+
+\textbf{Portfolio Mean and Variance} $\mu_p=E(r_p)=\sum_{i=1}^n w_i \mu_i$. $\sigma_p^2=Var(r_p)=\sum_{i=1}^n\sum_{j=1}^n w_iw_j \sigma_{ij}$ where $\sigma_{ij}=Cov(r_i, r_j)$.
+
+\textbf{Mean and Variance for Portfolio with 2 Assets} $\mu_p=\alpha \mu_1+(1-\alpha)\mu_2$. $\sigma_p^2=\alpha^2 \sigma_1^2+(1-\alpha)^2\sigma_2^2+2\alpha(1-\alpha)\rho_{12}\sigma_1\sigma_2$ using variance of sum.
+
+\textbf{Risk Aversion} To reduce risk, seek optimal value of $\alpha$ that minimises $\sigma_p^2$.
+
+\textbf{Global Minimum Variance Portfolio} $\sigma_p^2=(\alpha\sqrt{\sigma_1^2+\sigma_2^2-2\rho_{12}\sigma_1\sigma_2}-\frac{\sigma_2(\sigma_2-\rho_{12}\sigma_1)}{\sqrt{\sigma_1^2+\sigma_2^2-2\rho_{12}\sigma_1\sigma_2}})^2+\sigma_2^2-\frac{\sigma_2^2(\sigma_2-\rho_{12}\sigma_1)^2}{\sigma_1^2+\sigma_2^2-2\rho_{12}\sigma_1\sigma_2}$. It occurs when $\alpha=\alpha^*=\frac{\sigma_2(\sigma_2-\rho_{12}\sigma_1)}{\sigma_1^2+\sigma_2^2-2\rho_{12}\sigma_1\sigma_2}$, with minimum portfolio variance $(\sigma_p^2)^*=\frac{\sigma_1^2\sigma_2^2(1-\rho_{12}^2)}{\sigma_1^2+\sigma_2^2-2\rho_{12}\sigma_1\sigma_2}$. The portfolio mean is then $(\mu_p)^*=\alpha^*\mu_1+(1-\alpha^*)\mu_2$.
+
+\textbf{Feasible Sets} Graph of $\mu_p$ against $\sigma_p$ for all portfolio weights $\alpha$. When $\rho=1$, it is a straight line connecting $(\sigma_1, \mu_1), (\sigma_2, \mu_2)$. When $\rho=-1$, it is V-shaped graph connecting each $(\sigma_i, \mu_i)$ to a point with zero portfolio variance. Otherwise, it is a curve passing through $(\sigma_1, \mu_1), (\sigma_2, \mu_2)$.
+
+\textbf{Efficient Frontier} Subset where $\mu_p\geq \mu_{GMVP}$
+
+\section{Forwards and Futures}
+
+\textbf{Financial Derivative} Financial instrument that has value derived from values of other more basic underlying assets (stocks, indices, commodities, interest rate, currencies).
+
+\textbf{Forward Contract}
+\begin{itemize}
+    \item Obligation to buy or sell an asset at a specific price and time in the future.
+    \item $t$: Time where contract was agreed.
+    \item $T$: Expiration date of forward contract.
+    \item The buyer is long while the seller is short.
+    \item $F(t, T)$: Forward price that applies at delivery.
+    \item Spot Market: Open market for immediately delivery of asset, with spot price $S(t)$.
+    \item Payoff to a position at time $T$ is value of position at maturity. The profit subtracts the investment cost in the position at time $T$.
+    \item For a long (will buy) forward contract, the payoff and profit is $S_T-F(t, T)$, while for a short (will sell) forward contract, it is $F(t, T)-S_T$.
+\end{itemize}
+
+\textbf{Arbitrage} Buying in one place and selling in another to make riskless profit from price differences.
+
+\textbf{No-Arbitrage Principle} There cannot be two portfolio strategies with same initial cost such that one always has a better final payoff than the other.
+
+\textbf{Law of One Price} If two portfolios have the same payoff, they must have the same value / initial price.
+
+\textbf{Forward Price} By no-arbitrage, the forward price is $F(0, T)=S_0e^{rT}, F(t, T)=S_te^{r(T-t)}$.
+
+\subsection{Futures Contract}
+\begin{itemize}
+    \item Attempt to overcome liquidity and counterparty risk.
+    \item Standardised legal contract to buy or sell something at a predetermined price for delivery at a specified time in the future between parties which are not yet know to each other.
+    \item Margin Account: Indiviuals must open them with brokers, who require an initial margin amount as a fraction of contract value as a guarantee that contract holders will not default.
+    \item If value of margin account drops below defined maintenance margin level, margin call is issued to contract holder; if not position will be closed.
+\end{itemize}
+
+\subsection{Hedging}
+
+\textbf{Hedging with Forward Contract} Enter an agreement to remove the risk of price fluctuations in the spot market.
+
+\textbf{Perfect Hedge with Futures}
+\begin{itemize}
+    \item Risk associated with future commitment is completely eliminated by taking an opposite position in the futures market.
+    \item Trader must match delivery date of asset to delivery date of futures.
+    \item Commodity to be hedged must exactly match that of the futures contract.
+    \item Amount of asset obligated must be integral multiple of contract size.
+    \item There must be enough liquidity in the futures market.
+\end{itemize}
+
+\textbf{Minimum variance Hedge}
+\begin{itemize}
+    \item If a perfect hedge for an asset is not available, one can manage risk using futures of another asset.
+    \item Suppose you have $W$ of $A$ which you want to sell at $T$.
+    \item Suppose you only have futures of $B$ which is correlated to $A$.
+    \item You can hedge by shorting $h$ of $B$, where you want to minimise the risk of cashflow at $T$.
+    \item Basis: Spot Price of asset to be hedged - Future Price of contract used.
+    \item $S_A(T)$: Spot price of $A$ at $T$.
+    \item $F_B(0), F_B(T)$: Futures price of $B$ at $t=0, t=T$.
+    \item $h$: Future position taken.
+    \item $y_T$: Cash flow at $T$.
+    \item Cash Flow: Original Obligation + Profit in futures, $y=-WS_T+(F_T-F_0)h$.
+    \item $Var(y)=W^2Var(S_T)-2WCov(S_T, F_T)h+Var(F_T)h^2$.
+    \item To minimise $Var(y)$, set $-2WCov(S_T, F_T)+2Var(F_T)h=0$ (derivative wrt $h$).
+    \item Then $h=W\frac{Cov(S_T, F_T)}{Var(F_T)}=W\frac{\rho_{S,F}\cdot \sigma_S}{\sigma_F}$, $Var(y)=W^2Var(S_T)-\frac{W^2Cov(S_T,F_T)^2}{Var(F_T)}=W^2Var(S_T)[1-\rho_{F,S}^2], \sigma_y=\sqrt{1-\rho_{F,S}^2}\times W \sigma_S$.
+    \item $\beta=\frac{Cov(S_T,F_T)}{Var(F_T)}$ is the optimal hedge ratio.
+    \item $\sqrt{1-\rho_{F,S}^2}$ measures effectiveness of hedging (most effective when 0).
+    \item The SD $W\sigma_S$ of $WS_T$ is the risk with no hedge.
+    \item If sold instead, $h=-\beta W$.
+\end{itemize}
+
+\section{Options}
+\begin{itemize}
+    \item Right but not obligation, to buy or sell an underlying asset under specified terms.
+    \item Call / Put Option: Right to buy /sell specific quantity of asset for a strike price on or before a expiration date from the writer of the option.
+    \item Holder of option pays writer option premium up front, and is in a long position.
+    \item American options can be exercised anytime before the expiration date while European options (assumed) can only be exercised on the expiration date.
+\end{itemize}
+
+\subsection{Option Value}
+\begin{itemize}
+    \item Call Option: For price $S_T$ at expiration date, if $S_T < K$, the value is 0 by not exercising; if $S_T \geq K$,the value is $S_T-K$ by exercising it.
+    \item Put Option: $K-S_T$ instead if it is positive.
+    \item Long Position, Call Option: $\max(0, S_T-K)-TV_{t=T}(C)$
+    \item Long Position, Put Option: $\max(0, K-S_T)-TV_{t=T}(P_0)$
+    \item Short Position, Call Option: $-\max(0, S_T-K)+TV_{t=T}(C_0)$
+    \item Short Position, Put Option: $-\max(0, K-S_T)+TV_{t=T}(P)$
+\end{itemize}
+
+\subsection{Option Price Bounds}
+\begin{itemize}
+    \item Assumptions: No transaction costs; All trading profits are subject to the same tax rate; Borrowing and lending are possible at the same risk-free interest rate; Underlying assets are non-dividend-paying.
+    \item Notation:
+    \begin{itemize}
+        \item $S_0$: Current stock price; $K$: Strike price of option
+        \item $T$: Time to expiration of option; $S_T$: Stock price on expiration date
+        \item $r \geq 0$: Continuously compounded risk-free rate of interest
+        \item $C_0$: Price of European call option; $P_0$: Price of European put option
+    \end{itemize}
+    \item Using the no-arbitrage assumption, we have $C_0 \leq S_0$ for calls and $P \leq Ke^{-rT}$ for puts (discounted strike price).
+    \item For calls, we have $\max(0, S_0-Ke^{-rT}) \leq C$, from $S_0 \leq C + Ke^{-rT}$.
+    \item For puts, we have $\max(0, Ke^{-rT}-S_0) \leq P$, from $Ke^{-rT} \leq P+S_0$.
+    \item Arbitrage Strategies:
+    \begin{itemize}
+        \item $C_0 < S_0 - Ke^{-rT}$: Buy Call, Short Stock, Lend Cash (Invest $S_0-C$).
+        \item $P_0 < Ke^{-rT} - S_0$: Buy Put, Buy Stock, Borrow Cash (Borrow $S_0+P$).
+        \item $C+Ke^{-rT} < P+S_0$ (Parity): Buy Call, Borrow, Short Put, Short Stock. $C+Ke^{-rT} > P+S_0$: Short Call, Invest, Long Put, Long Stock.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Trading Strategies}
+\begin{itemize}
+    \item Principal-protected notes: Created from zero-coupon bond and a European call option. Issuer guarantees that purchaser will receive principal back regardless of performance of asset underlying the option.
+    \item Common strategy involves single option and underlying stock.
+    \item Spread: Take a position in multiple options of the same type.
+    \item Combination: Take a position in both calls and puts on the same stock.
+    \item Butterfly Spread: Consider $K_1<K_2<K_3$. Long a call with $K_1, K_3$. Short calls with price $K_2$. Payoff is positive between $K_1, K_3$, peaking at $K_2$.
+    \item Bull Spread: Long call $K_1$, short call $K_2$, positive payoff when higher than $K_1$.
+    \item Covered Calls: Long position in underlying asset and short position in call option on same asset.
+    \item Protective Puts: Long position in underlying asset and long position in a put option on the same asset.
+    \item Long Straddles: Long positions in a European call and put with same maturity and strike price.
+\end{itemize}
+
+\subsection{Put-Call Parity}
+\begin{itemize}
+    \item Relation between prices of European put and call options with same strike price and time to maturity.
+    \item $C_0, P_0$: Price of European call and put
+    \item $K$: Strike price; $S_0$: Current stock price
+    \item $d$: Discount factor to maturity (expiration date)
+    \item Put-call parity states that $C+dK=P+S_0$, for no-arbitrage.
+\end{itemize}
+
+\subsection{Binomial Model for Option Pricing}
+\begin{itemize}
+    \item $S$: Initial price of stock; $u>d>0$: Up / down factors; $r$: Risk free interest rate
+    \item At the end of one period, price will be $uS$ with probability $p$ and price will be $dS$ with probability $1-p$. With no-arbitrage, we must have $u>R=1+r>d$.
+    \item The value of a call option is either $(uS-K)^+$ or $(dS-K)^+$.
+    \item Let $C_u=\max(uS-K,0), C_d=\max(dS-K,0)$.
+    \item By no-arbitrage, $C_0=\frac{1}{R}[qC_u+(1-q)C_d]$, where $q=\frac{R-d}{u-d}$ is the risk-neutral probability. This is independent of $p$.
+    \item Replicating portfolio: $(x,b)$ of (stock, cash), $x=\frac{C_u-C_d}{u-d}, b = \frac{uC_d-dC_u}{R(u-d)}$.
+\end{itemize}
+
+\end{multicols*}
+
+\end{document}
