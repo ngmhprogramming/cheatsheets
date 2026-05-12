@@ -1,0 +1,644 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[margin=0.5in, top=0.5in, bottom=0.5in]{geometry}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={CS3210 Technical Reference},
+    pdfpagemode=FullScreen,
+}
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily, % Use monospace font
+    keywordstyle=\color{blue}, % Color for keywords
+    stringstyle=\color{red}, % Color for strings
+    commentstyle=\color{green!60!black}, % Color for comments
+    numbers=left, % Add line numbers on the left
+    captionpos=b, % Position of the caption
+    frame=single, % Add a frame around the code
+    breaklines=true, % Automatic line breaking
+    tabsize=4 % Set tab size
+}
+
+\title{CS3210 Technical Reference}
+\author{ngmh}
+\date{22/04/2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Performance Instrumentation}
+
+\subsection{Timing}
+\texttt{/usr/bin/time -v ./a}
+
+\subsection{\texttt{perf}}
+\begin{itemize}
+    \item 
+\texttt{perf stat -e LLC-loads,LLC-load-misses,cycles,instructions -r 3 -- ./a}
+    \item 
+\texttt{perf record -- ./a}
+    \item 
+\texttt{perf report}
+    \item Events include \texttt{L1-dcache-load-misses, L1-dcache-loads, L1-dcache-stores}
+\end{itemize}
+
+\subsection{Slurm}
+\begin{itemize}
+    \item \texttt{srun --partition i7-7700 bash -c "lscpu; hostname"}
+\end{itemize}
+
+\section{OpenMP}
+
+\subsection{Compilation Command}
+\texttt{g++ -fopenmp code.cpp}
+
+\subsection{Work Sharing Constructs}
+\begin{itemize}
+    \item \texttt{omp parallel}: Specify this section of code to be parallelised
+
+    \item \texttt{omp for}: Indicate this for loop to be parallelised, DO NOT NEST!
+    
+    \item \texttt{collapse(n)}: Combines \texttt{n} perfectly nested loops into one large iteration space, improves load balancing when the outer loop has few iterations
+    
+    \item \texttt{schedule(static, chunksize)}: Divide for loop into pieces of size \texttt{chunksize}, and specify \texttt{static} assignment (can also be \texttt{dynamic})
+
+    \item \texttt{omp sections}: Specify the start of a block of sections, where the sections can run in parallel
+
+    \item \texttt{omp section}: Specifies a section block
+
+    \item \texttt{omp single}: This block will only be run by a single thread
+\end{itemize}
+
+\subsection{Synchronisation Constructs}
+\begin{itemize}
+    \item \texttt{omp master}: This block will only be run by the master thread
+
+    \item \texttt{nowait}: Specify that this block does not include an implicit barrier at the end
+
+    \item \texttt{omp barrier}: Provides synchronisation where all threads have to arrive first
+
+    \item \texttt{omp critical}: Specifies a critical section that can only be executed by one thread at a time
+
+    \item \texttt{omp atomic}: Specifies a memory location that must be updated atomically
+\end{itemize}
+
+\subsection{Data Scope Attribute Clauses}
+\begin{itemize}
+    \item \texttt{shared(a, b)}: Mark variables to be shared among threads
+
+    \item \texttt{private(i, j, k)}: Mark variables to be private to a thread
+
+    \item \texttt{reduction(op:list)}: Each thread gets a private copy of the variable, initialized based on the operator (e.g., 0 for \texttt{+}), all private copies are combined into original global variable
+\end{itemize}
+
+\subsection{Runtime Library Routines}
+\begin{itemize}
+    \item \texttt{omp\_get\_thread\_num()}: Get the thread id for the current thread
+
+    \item \texttt{omp\_set\_num\_threads()}: Set the number of threads OpenMP should use
+
+    \item \texttt{omp\_get\_max\_threads()}: Get the maximum number of threads OpenMP can use
+
+    \item \texttt{omp\_get\_num\_threads()}: Get the number of threads that OpenMP is actually using
+\end{itemize}
+
+\subsection{Examples}
+\subsection{Matrix Multiplication}
+\begin{lstlisting}
+void mm(matrix a, matrix b, matrix res) {
+    int i, j, k;
+    #pragma omp parallel for shared(a, b, res) private (i, j, k)
+    for (i = 0; i < size; i++)
+        for (j = 0; j < size; j++)
+            for (k = 0; k < size; k++)
+                res[i][j] += a[i][k] * b[k][j];
+}
+\end{lstlisting}
+
+\subsection{Sections}
+\begin{lstlisting}
+#pragma omp parallel
+{
+    #pragma omp sections
+    {
+        #pragma omp section
+        {
+            work1();
+        }
+        #pragma omp section
+        {
+            work2();
+        }
+    }
+}
+\end{lstlisting}
+
+\subsection{Reduction}
+\begin{lstlisting}
+double dot = 0;
+#pragma omp parallel for reduction(+:dot)
+for (int i = 0; i < n; i++)
+    dot += a[i] * b[i];
+\end{lstlisting}
+
+\section{CUDA}
+
+\subsection{Compilation}
+\texttt{nvcc -arch native -o a a.cu}, can specify Compute Capability e.g. \texttt{-arch sm\_70}
+
+\subsection{Function Specifiers}
+\begin{itemize}
+    \item \texttt{\_\_device\_\_}: Executes on device (GPU), can only be called from device
+    \item \texttt{\_\_global\_\_}: Kernel, executes on device, needs execution configuration in \texttt{<<>>}, callable from both device and host
+    \item \texttt{\_\_host\_\_}: Executes on host (CPU), can only be called from host, default specifier
+\end{itemize}
+
+\subsection{Memory Specifiers}
+\begin{itemize}
+    \item \texttt{None}: Register, accessible by a single thread, might spill to local memory
+    \item \texttt{\_\_shared\_\_}: Shared memory, accessible by all threads in block, statically assigned, fast
+    \item \texttt{\_\_device\_\_}: Global memory, accessible by all threads
+    \item \texttt{\_\_constant\_\_}: Constant memory, accessible by all threads, read-only
+    \item \texttt{\_\_texture\_\_}: Texture memory, accessible by all threads, read-only
+    \item \texttt{\_\_managed\_\_}: Unified memory, accessible by all threads and CPU
+\end{itemize}
+
+\subsection{Memory Allocation}
+\begin{lstlisting}
+cudaMalloc(void **pointer, size_t nbytes);
+cudaMemset(void *pointer, int value, size_t count);
+cudaFree(void* pointer);
+
+cudaMemcpy(void *dst, void *src, size_t nbytes, enum cudaMemcpyKind direction);
+// enum cudaMemcpyKind
+// cudaMemcpyHostToDevice, cudaMemcpyDeviceToHost, cudaMemcpyDeviceToDevice
+\end{lstlisting}
+
+\subsection{Synchronisation}
+\begin{itemize}
+    \item \texttt{\_\_syncthreads()}: Synchronise all threads in a block with a barrier
+    \item \texttt{\_\_syncwarp()}: Force threads within a warp to synchronise
+    \item \texttt{cudaDeviceSynchronize()}: Call on host, wait for GPU to finish all tasks
+    \item \texttt{atomicAdd(void* ptr, val)}: Perform atomic RMW on value at pointer
+\end{itemize}
+
+\subsection{Indexing}
+\begin{itemize}
+    \item \texttt{gridDim.x/y/z}: Number of blocks in the grid
+    \item \texttt{blockDim.x/y/z}: Number of threads in a block 
+    \item \texttt{gridIdx.x/y/z}: Index of current block 
+    \item \texttt{blockIdx.x/y/z}: Index of thread within block
+    \item See this \href{https://www.eecs.umich.edu/courses/eecs498-APP/resources/materials/CUDA-Thread-Indexing-Cheatsheet.pdf}{link} for more details
+\end{itemize}
+
+\subsection{Kernel Execution}
+\texttt{<<Dg, Db, Ns, S>>>}
+\begin{itemize}
+    \item \texttt{Dg}: Grid dimensions (\texttt{dim3})
+    \item \texttt{Db}: Block dimensions (\texttt{dim3})
+    \item \texttt{Ns}: Shared memory size in bytes (\texttt{size\_t}, optional, defaults to 0)
+    \item \texttt{S}: Stream ID (\texttt{cudaStream\_t}, optional, defaults to 0
+    )
+\end{itemize}
+
+\subsection{Examples}
+
+\subsubsection{Matrix Multiplication}
+\begin{lstlisting}
+__global__ void matmul(float *A, float *B, float *C, int size) {
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    if (row < size && col < size) {
+        float sum = 0.0f;
+        for (int k = 0; k < size; k++) {
+            sum += A[row * size + k] * B[k * size + col];
+        }
+        C[row * size + col] = sum;
+    }
+}
+
+int main() {
+    int size = 1024; // Matrix dimension (size x size)
+    size_t bytes = size * size * sizeof(float);
+
+    float *h_A = (float*)malloc(bytes);
+    float *h_B = (float*)malloc(bytes);
+    float *h_C = (float*)malloc(bytes);
+
+    // (Initialize h_A and h_B with data here)
+
+    float *d_A, *d_B, *d_C;
+    cudaMalloc(&d_A, bytes);
+    cudaMalloc(&d_B, bytes);
+    cudaMalloc(&d_C, bytes);
+
+    cudaMemcpy(d_A, h_A, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_B, h_B, bytes, cudaMemcpyHostToDevice);
+
+    // Db: Threads per block (typically 16x16 or 32x32)
+    dim3 Db(16, 16); 
+    // Dg: Number of blocks in the grid (ceiling division)
+    dim3 Dg((size + Db.x - 1) / Db.x, (size + Db.y - 1) / Db.y);
+
+    matmul<<<Dg, Db>>>(d_A, d_B, d_C, size);
+
+    cudaMemcpy(h_C, d_C, bytes, cudaMemcpyDeviceToHost);
+
+    cudaFree(d_A); cudaFree(d_B); cudaFree(d_C);
+    free(h_A); free(h_B); free(h_C);
+}
+\end{lstlisting}
+
+\subsection{Profiling}
+\begin{itemize}
+    \item Nsight Compute: \texttt{[SLURM] ncu --set full --clock-control none ./a}, profiling tool for CUDA kernels
+    \item Nsight Systems: \texttt{[SLURM] nsys profile --cuda-event-trac=false -o report ./a}, visualise timeline of events
+\end{itemize}
+
+\subsection{Streams}
+\begin{itemize}
+    \item Operations from different streams can execute concurrently
+    \item Operations within same stream remain implicitly synchronised
+\end{itemize}
+
+\begin{lstlisting}
+std::vector<cudaStream_t> streams(STREAM_COUNT);
+for (auto& stream : streams) {
+    cudaStreamCreate(&stream);
+}
+
+// Map chunks to streams using modulo
+for (int p = 0; p < total_chunks; p++) {
+    cudaStream_t s = streams[p % STREAM_COUNT];
+
+    // Asynchronous H2D Copy
+    cudaMemcpyAsync(d_in + p*N, h_in + p*N, bytes, cudaMemcpyHostToDevice, s);
+
+    // Kernel Execution on stream
+    transform<<<blocks, threads, 0, s>>>(d_in + p*N, d_out + p*N);
+
+    // Asynchronous D2H Copy
+    cudaMemcpyAsync(h_out + p*N, d_out + p*N, bytes, cudaMemcpyDeviceToHost, s);
+}
+cudaDeviceSynchronize();
+for (auto& s : streams) cudaStreamDestroy(s);
+\end{lstlisting}
+
+\section{OpenMPI}
+
+\subsection{Environment and Point-to-Point Communication}
+\begin{lstlisting}
+int MPI_Init(int* argc, char** argv[])
+int MPI_Finalize(void)
+int MPI_Abort(MPI_Comm comm, int errorCode)
+
+// May be asynchronous, blocking, may be buffered
+int MPI_Send(void* buf, int count, MPI_Datatype dt, int dest, int tag, MPI_Comm c);
+int MPI_Recv(void* buf, int count, MPI_Datatype dt, int src, int tag, MPI_Comm c, MPI_Status *status);
+// Can use MPI_ANY_SOURCE and MPI_ANY_TAG
+// Status is MPI_SOURCE, MPI_TAG, MPI_ERROR
+int MPI_Sendrecv(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm, MPI_Status *status)
+
+// Basic Usage
+MPI_Init(&argc, &argv);
+int rank, size;
+MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+MPI_Send(&msg, 1, MPI_INT, rank+1, 0, MPI_COMM_WORLD);
+MPI_Recv(&msg, 1, MPI_INT, rank-1, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+if(rank == 0) MPI_Send(&data, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+if(rank == 1) MPI_Recv(&data, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+
+MPI_Sendrecv(&send_val, 1, MPI_INT, right, 0, &recv_val, 1, MPI_INT, left, 0, MPI_COMM_WORLD, &status);
+
+MPI_Finalize();
+\end{lstlisting}
+
+\subsection{Communication Modes}
+\begin{lstlisting}
+// May be asynchronous, non-blocking, may be buffered
+int MPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
+int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request);
+int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status)
+int MPI_Wait(MPI_Request *request, MPI_Status *status)
+int MPI_Waitall(int count, MPI_Request array_of_requests[], MPI_Status *array_of_statuses)
+
+// Asynchronous, blocking, buffered (user provided)
+int MPI_Bsend(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
+// Asynchronous, non-blocking, buffered (user provided)
+int MPI_Ibsend(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request)
+
+// Synchronous, blocking, not buffered
+int MPI_Ssend(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
+int MPI_Rsend(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
+
+// Synchronous, non-blocking, typically not buffered
+int MPI_Issend(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request)
+
+// Usage
+MPI_Request reqs[2];
+MPI_Irecv(&data_in, 1, MPI_INT, prev, 0, MPI_COMM_WORLD, &reqs[0]);
+MPI_Isend(&data_out, 1, MPI_INT, next, 0, MPI_COMM_WORLD, &reqs[1]);
+MPI_Waitall(2, reqs, MPI_STATUSES_IGNORE);
+\end{lstlisting}
+
+\subsection{Group Operations}
+\begin{lstlisting}
+int MPI_Comm_group(MPI_Comm comm, MPI_Group *group)
+int MPI_Group_size(MPI_Group group, int *size)
+int MPI_Group_rank(MPI_Group group, int *rank)
+int MPI_Group_union(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup)
+int MPI_Group_intersection(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup)
+int MPI_Group_difference(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup)
+int MPI_Group_incl(MPI_Group group, int n, const int ranks[], MPI_Group *newgroup)
+int MPI_Group_excl(MPI_Group group, int n, const int ranks[], MPI_Group *newgroup)
+int MPI_Group_compare(MPI_Group group1, MPI_Group group2, int *result)
+int MPI_Group_free(MPI_Group *group)    
+\end{lstlisting}
+
+\subsection{Communicators}
+\begin{lstlisting}
+int MPI_Comm_size(MPI_Comm comm, int *size)
+int MPI_Comm_rank(MPI_Comm comm, int *rank)
+int MPI_Comm_create(MPI_Comm comm, MPI_Group group, MPI_Comm *newcomm)
+int MPI_Comm_compare(MPI_Comm comm1, MPI_Comm comm2, int *result)
+int MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm)
+int MPI_Comm_split(MPI_Comm comm, int color, int key, MPI_Comm *newcomm)
+int MPI_Comm_free(MPI_Comm *comm)
+int MPI_Intercomm_create(MPI_Comm local_comm, int local_leader, MPI_Comm peer_comm, int remote_leader, int tag, MPI_Comm *newintercomm)
+
+// Usage
+int row_color = rank / row_size; 
+MPI_Comm row_comm;
+MPI_Comm_split(MPI_COMM_WORLD, row_color, rank, &row_comm);
+\end{lstlisting}
+
+\subsection{Virtual Topologies}
+\begin{lstlisting}
+int MPI_Cart_create(MPI_Comm comm_old, int ndims, const int dims[], const int periods[], int reorder, MPI_Comm *comm_cart)
+int MPI_Cart_get(MPI_Comm comm, int maxdims, int dims[], int periods[], int coords[])
+int MPI_Cartdim_get(MPI_Comm comm, int *ndims)
+int MPI_Cart_coords(MPI_Comm comm, int rank, int maxdims, int coords[])
+int MPI_Cart_rank(MPI_Comm comm, int coords[], int *rank)
+int MPI_Cart_shift(MPI_Comm comm, int direction, int disp, int *rank_source, int *rank_dest)
+
+int MPI_Graph_create(MPI_Comm comm_old, int nnodes, const int index[], const int edges[], int reorder, MPI_Comm *comm_graph)
+int MPI_Graph_get(MPI_Comm comm, int maxindex, int maxedges, int index[], int edges[])
+int MPI_Graphdims_get(MPI_Comm comm, int *nnodes, int *nedges)
+int MPI_Graph_neighbors_count(MPI_Comm comm, int rank, int *nneighbors)
+int MPI_Graph_neighbors(MPI_Comm comm, int rank, int maxneighbors, int neighbors[])    
+
+// Usage
+int dims[2] = {4,4}, periods[2] = {0,0};
+MPI_Comm cart;
+MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, 0, &cart);
+int up, down;
+MPI_Cart_shift(cart, 0, 1, &up, &down); // 0 = row axis, 1 = displacement
+\end{lstlisting}
+
+\subsection{Synchronisation}
+\begin{lstlisting}
+int MPI_Barrier(MPI_Comm)
+int MPI_Ibarrier(MPI_Comm comm, MPI_Request *request)
+\end{lstlisting}
+
+\subsection{Collective Communication}
+\begin{lstlisting}
+int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm)
+int MPI_Allgather(const void *sendbuf, int  sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm)
+int MPI_Scatter(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm)
+int MPI_Scatterv(const void *sendbuf, const int sendcounts[], const int displs[], MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm)
+int MPI_Gather(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm)
+int MPI_Gatherv(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, const int recvcounts[], const int displs[], MPI_Datatype recvtype, int root, MPI_Comm comm)
+int MPI_Reduce(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm)
+int MPI_Allreduce(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm)
+int MPI_Reduce_scatter(const void *sendbuf, void *recvbuf, const int recvcounts[], MPI_Datatype datatype, MPI_Op op, MPI_Comm comm)
+int MPI_Alltoall(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm)
+int MPI_Alltoallv(const void *sendbuf, const int sendcounts[], const int sdispls[], MPI_Datatype sendtype, void *recvbuf, const int recvcounts[], const int rdispls[], MPI_Datatype recvtype, MPI_Comm comm)
+
+// Usage
+MPI_Bcast(&config, 1, MPI_INT, 0, MPI_COMM_WORLD);
+MPI_Reduce(&local_sum, &global_sum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+// rcount is size of chunk each process receives
+MPI_Scatter(big_arr, chunk, MPI_INT, my_chunk, chunk, MPI_INT, 0, MPI_COMM_WORLD);
+\end{lstlisting}
+
+\subsection{Datatypes}
+\begin{lstlisting}
+MPI_CHAR
+MPI_SHORT
+MPI_INT
+MPI_LONG
+MPI_UNSIGNED_CHAR
+MPI_UNSIGNED_SHORT
+MPI_UNSIGNED_LONG
+MPI_UNSIGNED
+MPI_FLOAT
+MPI_DOUBLE
+MPI_LONG_DOUBLE
+MPI_BYTE
+MPI_PACKED
+
+int MPI_Type_contiguous(int count, MPI_Datatype oldtype, MPI_Datatype *newtype)
+int MPI_Type_commit(MPI_Datatype *datatype)
+int MPI_Type_create_struct(int count, int array_of_blocklengths[], const MPI_Aint array_of_displacements[], const MPI_Datatype array_of_types[], MPI_Datatype *newtype)
+
+// Usage
+MPI_Datatype row_type;
+MPI_Type_contiguous(N, MPI_DOUBLE, &row_type);
+MPI_Type_commit(&row_type);
+MPI_Send(matrix[1], 1, row_type, dest, 0, MPI_COMM_WORLD);
+\end{lstlisting}
+
+\subsection{Random Usage Examples}
+\begin{lstlisting}
+
+MPI_Bcast(&data, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+MPI_Cart_create(
+    MPI_COMM_WORLD, // default communicator
+    2,              // 2D grid
+    int[]{4, 4},    // 4 rows, 4 columns
+    int[]{0, 0},    // no wraparounds
+    0,              // no reordering of ranks
+    &cartcomm       // new communicator
+}
+
+MPI_Cart_shift(
+    cartcomm,   // cartesian communicator
+    0,          // up/down axis
+    2,          // shift
+    &nbrs[UP]   // source, rank directly above
+    &nbrs[DOWN] // destination, rank directly below
+}
+#define UP 0, DOWN 1, LEFT 2, RIGHT 3
+
+\end{lstlisting}
+
+\subsection{Command Line}
+\begin{lstlisting}
+mpic++ hello.cpp -o hello
+mpirun -np 4 ./hello
+srun --nodes 1 --ntasks 4 ./hello
+srun --nodes 4 --ntasks 4 ./hello
+srun --nodes 4 --ntasks-per-node 2 ./hello
+srun -p i7-7700 --nodes 1 --ntasks 8 ./hello
+srun -p i7-7700 --nodes 1 --ntasks 32 --overcommit ./hello
+// Block distribution
+srun -N 3 -n 8 --distribution=block --exclusive ./hello
+// Cyclic distribution
+srun -N 3 -n 8 --distribution=cyclic --exclusive ./hello
+// Plane distribution, fixed blocks of size x, cyclically distributed
+srun -N 3 -n 8 --distribution=plane=2 --exclusive ./hello
+\end{lstlisting}
+
+\subsection{AY24/25 S2 Final}
+\begin{lstlisting}
+int main(int argc, char** argv) {
+    int rank, size;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    int num_images;
+    int* images;
+    if (rank == 0) {
+        num_images = get_num_images(...args omitted);
+        images = read_image_data(num_images, ...args omitted);
+    }
+    MPI_Bcast(&num_images, 1, MPI_INT, 0, comm);
+    int N = (num_images / size);
+    int* images_self = malloc(sizeof(int) * 320 * 320 * N);
+    MPI_Scatter(images, num_images * 320 * 320, MPI_INT, images_self, N * 320 * 320, MPI_INT, 0, MPI_COMM_WORLD);
+    int* images_processed = process(images_self, N);
+    MPI_Gather(images_processed, N * 320 * 320, MPI_INT, images, num_images * 320 * 320, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Finalize();
+    return 0;
+}
+\end{lstlisting}
+
+\subsection{AY24/25 S1 Final}
+\begin{lstlisting}
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define T 100 // Number of time steps
+#define alpha 0.01 // Diffusion rate
+
+void update_temperature(double* temp, double* temp_new, int rows, int Ny) {
+    int i, j;
+    // Point A
+    start_i = 1
+    start_j = 1
+    end_i = rows - 1
+    end_j = Ny - 1
+    for (i = start_i; i < end_i; i++) {
+        for (j = start_j; j < end_j; j++) {
+            temp_new[i * Ny + j] = temp[i * Ny + j] + alpha * (
+                temp[(i + 1) * Ny + j] + temp[(i - 1) * Ny + j] +
+                temp[i * Ny + (j + 1)] + temp[i * Ny + (j - 1)] -
+                4 * temp[i * Ny + j]
+            );
+        }
+    }
+}
+
+int main(int argc, char** argv) {
+    int rank, size;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    if (argc < 3) {
+        if (rank == 0) {
+            fprintf(stderr, "Usage: %s Nx Ny\n", argv[0]);
+        }
+        MPI_Finalize();
+        exit(EXIT_FAILURE);
+    }
+
+    // Read Nx, Ny from command line
+    int Nx = atoi(argv[1]);
+    int Ny = atoi(argv[2]);
+
+    // set chunk size and other variables
+    // Point B
+    int rows_per_rank = Nx / size;
+    int rows = rows_per_rank + 2;
+    
+    // Allocate temperature arrays
+    double* temp = (double*)calloc(rows * Ny, sizeof(double));
+    double* temp_new = (double*)calloc(rows * Ny, sizeof(double));
+
+    // Set initial temperature (heat source in the center rank)
+    if (rank == size / 2) {
+        temp[(rows_per_rank / 2) * Ny + Ny / 2] = 100.0;
+    }
+
+    // Point C
+    // Nothing
+    
+    // Main simulation loop
+    for (int t = 0; t < T; t++) {
+        // Boundary exchange with neighboring ranks
+        // Point D
+        // Ignore boundaries...
+        int up = rank - 1;
+        int down = rank + 1;
+        // Deadlock solution
+        // If even rank, send then receive
+        // If odd rank, receive then send
+        MPI_Send(&temp[1 * Ny], Ny, MPI_DOUBLE, up, 0, MPI_COMM_WORLD);
+        MPI_Recv(&temp[(rows - 1) * Ny], Ny, MPI_DOUBLE, down, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        MPI_Send(&temp[(rows - 2) * Ny], Ny, MPI_DOUBLE, down, 1, MPI_COMM_WORLD);
+        MPI_Recv(&temp[0 * Ny], Ny, MPI_DOUBLE, up, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        // Update temperature within the rank's subgrid
+        update_temperature(temp, temp_new, rows, Ny);
+
+        // Swap pointers for the next iteration
+        double* temp_swap = temp;
+        temp = temp_new;
+        temp_new = temp_swap;
+    }
+
+    // Get results to root rank
+    double* final_grid = NULL;
+    if (rank == 0) {
+        final_grid = (double*)malloc(Nx * Ny * sizeof(double));
+    }
+
+    // Point E
+    MPI_Gather(&temp[Ny], rows_per_rank * Ny, MPI_DOUBLE, final_grid, rows_per_rank * Ny, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    // Print final grid (only by root rank)
+    if (rank == 0) {
+        for (int i = 0; i < Nx; i++) {
+            for (int j = 0; j < Ny; j++) {
+                printf("%f ", final_grid[i * Ny + j]);
+            }
+            printf("\n");
+        }
+        free(final_grid);
+    }
+
+    // Clean up
+    free(temp);
+    free(temp_new);
+    MPI_Finalize();
+    return 0;
+}
+\end{lstlisting}
+
+\end{document}

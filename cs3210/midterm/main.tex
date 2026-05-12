@@ -1,0 +1,367 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\usepackage{background}
+\setlist{nosep}
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=0.4,
+angle=0,
+contents={
+  % \includegraphics[width=\paperwidth,height=\paperheight]{eldon.png}
+  }
+}
+
+\pdfinfo{
+  /Title (CS3210.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{CS3210}}
+            \\ \normalsize{AY25/26 Sem 2}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{Introduction}
+\begin{itemize}
+    \item In recent times, processors have gained more logical cores
+    \item von Neumann Model: Each core is an independent processing unit which can execute a linear stream of instructions
+    \item Parallelism is limited by dependencies and communication
+    \item Having $n$ cores might not equate to an $n$ times speedup
+    \item Parallelism: Tasks actually execute simultaneously
+    \item Decomposition: Splitting problem into smaller tasks
+    \item Scheduling and Mapping: Defining when a task should run and on which PU
+    \item Performance: Execution Time (Latency) v/s Throughput
+    \item Parallel Execution Time consists of computation time and parallelisation overheads
+    \item Examples of overhead include distribution of work, synchronisation, information exchange, memory issues, idle time
+\end{itemize}
+
+\section{Processes, Threads, Synchronisation}
+\begin{itemize}
+    \item Steps: Decomposition, Scheduling (tasks to processes or threads), and Mapping (processes or threads to physical processors)
+    \item Process: Instance of a program in execution; consists of executable, global data, stack and heap, registers
+    \item IPC: Shared memory, Message Passing e.g. Pipes and Signal
+    \item Processes are costly to create and communicate within
+    \item Threads are lightweight extensions of processes; consisting of PC, SP, and registers while sharing the same address space
+    \item Threads are faster to generate
+    \item Threads can be either User level (managed by library, invisible to OS) or Kernel threads (managed by OS)
+    \item Can be many-to-one, one-to-one, or many-to-many
+    \item Synchronisation: Coordinating access to shared resources
+    \item Mechanisms include locks, mutexes, semaphores, monitors, condition variables, etc.
+    \item Race Condition: Multiple execution paths execute at the same time and finish in a different order than expected
+    \item Critical race conditions cause invalid execution and software bugs
+    \item Critical Section protects parts of the program by allowing in only one thread at a time
+    \item Mutexes protect access to shared resources through acquire and release operations
+    \item Data Race: Two concurrent threads access a shared resource without any protection and at least one thread modifies the shared resource
+    \item Semaphores provide mutual exclusion through atomic counters
+    \item Deadlock: Every process is waiting for an event that can be caused only by another process in the set
+    \item Coffman Conditions: Mutual exclusion, Hold and wait, No pre-emption, Circular wait
+    \item Can ignore, prevent, avoid, or detect and recover
+    \item Starvation: Process is prevented from making progress because some other process has the resource it requires; side effect of scheduling algorithm
+    \item Livelock: States of processes in livelock constantly change but none make progress
+    \item Lock Implementation: Test and Set atomic instruction
+\end{itemize}
+
+\section{Parallel Computing Architectures}
+\begin{itemize}
+    \item Bit Level Parallelism: Increase data processed per second via increasing word size (unit of transfer) since PU is optimised for operations on word sized values
+    \item Superword Level Parallelism: Same word size, but larger registers, process more data with one instruction
+    \item Tradeoffs have resulted in word size staying the same
+    \item Instruction Level Parallelism: Core executes instructions in parallel
+    \item Pipelining (Time): Split instruction execution into multiple stages, so that multiple instructions can occupy different stages in the same clock cycle (if they do not have dependencies)
+    \item Hazards might result in stalling, which can be mitigated with advanced techniques like branch prediction, out of order execution, or prefetching
+    \item Superscalar (Space): Have more slots within each pipeline stage, so that multiple instructions can be run at the same time although it only supports one overall execution flow
+    \item Scheduling is challenging, typically dynamic
+    \item Structural hazards cause problems, but more instructions per cycle possible and fewer cycles per instruction
+    \item Thread Level Parallelism: Multiple physical contexts in a physical core, threads share resources
+    \item SMT: Simultaneous multithreading, processor support for multithreading
+    \item Processor Level Parallelism (Multiprocessing): Have more physical cores and thus execution flows
+\end{itemize}
+
+\subsection{Flynn's Taxonomy}
+\begin{itemize}
+    \item Instruction Stream: Single execution flow
+    \item Data Stream: Data being manipulated by instruction stream
+    \item SISD: Single instruction stream, each instruction operates on a single unit of data, most uniprocessors fall into here
+    \item SIMD: Each instruction can now work on multiple data, supported by most modern processors through multiple ALUs
+    \item MISD: Multiple instruction streams, but all working on the same data, very rare
+    \item MIMID: Each PU has its own instruction and data, most popular model for modern multiprocessors
+    \item Stream Processors like GPUs have a set of threads executing same code (SIMD) and multiple sets of threads executing in parallel (MIMD)
+\end{itemize}
+
+\subsection{Memory Organisation}
+\begin{itemize}
+    \item Typically made up of core, one or more levels of caches, and memory module
+    \item Memory Latency: Amount of time for memory request from a processor to be serviced by memory system
+    \item Memory Bandwidth: Maximum rate at which memory system can provide data to a processor
+    \item Processor stalls when it cannot run next instruction while waiting for memory
+    \item Bandwidth is the critical resource and parallel programs should fetch data from memory less often by exploiting temporal locality and sharing data across threads
+    \item Distributed Memory Systems: Each node is an independent unit, memory in a node is private and data is sent explicitly between nodes
+    \item Shared Memory System: Parallel programs access memory through shared memory provider, and might not be aware of actual hardware memory architecture
+    \item Cache Coherence: Multiple copies of same data exist on different caches, changes need to be propagated
+    \item Factors to differentiate shared memory systems: Processor to Memory Delay, Presence of local cache with cache coherence protocol
+    \item Uniform Memory Access (UMA): Latency of accessing main memory is the same for every PU, suitable for a small number of PUs which are fighting for limited bandwidth
+    \item Non-Uniform Memory Access (NUMA): Physically distributed memory of all PUs are combined to form a global shared memory address space; accessing local memory is faster than remote memory so it becomes non-uniform
+    \item Cache Only Memory Architecture (COMA): Each memory block works as cache memory; data migrates dynamically according to cache coherence schemes
+    \item No need to partition code or data, or move data among processors
+    \item Special synchronisation constructs are required; not scalable due to contention
+\end{itemize}
+
+\section{Parallel Programming Models}
+\begin{itemize}
+    \item Total Work consists of work done for actual tasks and overhead of dependencies
+    \item Data Parallelism: Partition data used in solving the problem, each PU carries out similar operations on its part of the data e.g. SIMD
+    \item Loop parallelism: Run loop iterations in parallel if possible
+    \item Task Parallelism: Partition tasks used to solve the problem among PUs
+    \item Task Dependence Graph: Visualises decomposition strategies as DAG
+    \item Critical Path Length is maximum slowest completion time
+    \item Degree of Concurrency is Total Work / Critical Path Length
+\end{itemize}
+
+\subsection{Models of Coordination}
+\begin{itemize}
+    \item Shared Address Space: Tasks communicate by reading and writing using shared variables, ensuring mutex through locks
+    \item Requires hardware support to implement efficiently due to contention, matches shared memory systems
+    \item Very little structure so it is simple, but hard to scale
+    \item Message Passing: Tasks operate within their own private address space and communicate with each other by sending and receiving messages e.g. MPI
+    \item Hardware does not implement system-wide loads and stores, matching distributed memory systems
+    \item Highly structured communication, allowing scalability but complex to program and network communication has delay
+\end{itemize}
+
+\subsection{Program Parallelisation}
+\begin{itemize}
+    \item Granularity of Computation: Coarse or Fine Grained
+    \item Foster's Design Methodology (PCAM)
+    \item 1. Partitioning: Splitting problem into smaller tasks
+    \item Data Centric / Domain Decomposition: Divide data into smaller pieces, associate computations with data (data parallelism)
+    \item Computation Centric / Functional Decomposition: Divide computation into pieces, determine how to associate data with computations (task parallelism)
+    \item Rules of Thumb: 10x more primitive tasks than cores, minimise redundant computations and data storage, have primitive tasks of roughly the same size, number of tasks increasing function or problem size
+    \item 2. Communication: Provide data required by tasks
+    \item Local Communication: Task needs data from small number of other tasks
+    \item Global Communication: Significant number of tasks contribute data to perform a computation
+    \item Rules of Thumb: Keep communication operations balanced among tasks, have each task communicating with a small group of neighbours, overlap computation with communication
+    \item 3. Agglomeration: Decrease communication and development costs while maintaining flexibility
+    \item Combine tasks into larger tasks to improve performance and maintain scalability
+    \item Too many tasks leads to high communication overhead
+    \item Rules of Thumb: Increase locality of parallel algorithm, ensure tradeoff between agglomeration and code modification costs is reasonable
+    \item 4. Mapping: Mapping tasks to processors to minimise execution time
+    \item Conflict between maximising processor utilisation and minimising inter-processor communication
+    \item Optimal mapping is NP-hard, use some sort of heuristic
+    \item Evaluate static and dynamic task allocation options, cores should be saturated and task allocator should not be performance bottleneck
+    \item Hard to analyse dependencies
+    \item Execution time is hard to predict
+\end{itemize}
+
+\subsection{Parallel Programming Patterns}
+\begin{itemize}
+    \item Fork-Join: Task creates child tasks which run independently in parallel
+    \item Parbegin-Parend: When execution reaches this construct, a set of threads is created
+    \item Statements after this construct are only executed after all these threads are done
+    \item All forks are done at the same time, all joins are done at the same time
+    \item SIMD: Single instructions executed synchronously by different threads on differnet data
+    \item SPMD: Same program executed on different cores on different data, no implicit synchronisation
+    \item Master-Worker: Single master program controls execution of program, worker task waits for instructions from master task
+    \item Task (Work) Pools: Threads retrieve and store tasks and execute those tasks
+    \item Access to task pool must be synchronised to avoid race conditions; execution is completed when all threads are done and task pool is empty
+    \item Useful for adaptive and irregular applications, but introduces synchronisation overhead
+    \item Producer-Consumer: Producer threads produce data which are used as input by consumer threads, synchronisation is needed
+    \item Pipelining: Data in application is processed as stream; elements flow through pipeline stages which perform different processing steps
+\end{itemize}
+
+\section{Performance of Parallel Systems}
+\begin{itemize}
+    \item User Goals: Reduced response time / latency
+    \item Computer Managers: High throughput / work done per unit time
+    \item Execution Time $T_p(n)$: Wall-clock time, consisting of computation, exchange of data, synchronisation, waiting time, etc.
+    \item Speedup: $S_p(n)=T_*(n)/T_p(n)$ Ratio of best sequential execution time to parallel execution time
+    \item Possible to have $S_p(n) > p$
+    \item Cost: $C_p(n)=p \times T_p(n)$ Estimation of total amount of work done by all PUs
+    \item Cost-Optimal: Executes same total number of operations as the fastest sequential program
+    \item Efficiency: $E_p(n)=S_p(n)/p=T_*(n)/C_p(n)$, measure of how good a speedup is to theoretically maximum speedup
+    \item Amdahl's Law: Speedup of parallel execution is limited by sequential fraction of code $f$ that cannot be parallelised which forms a bottleneck, $S_p(n)=\frac{1}{f+(1-f)/p}\leq \frac{1}{f}$, estimate $f=\frac{p/S_p(n)-1}{p-1}$
+    \item Manufacturers discouraged from making large parallel computers if most problems have large sequential fractions
+    \item Gustafson's Law: Sequential fraction is not constant wrt problem size, this fraction shrinks as problems grow larger
+    \item $S_p(n)=f'+(1-f')p$, where $f'$ is the sequential fraction corresponding to the problem of size $n$, derived from sequential $T_{par}=(1-f') \times T_p(n) \times p$ etc.
+    \item Amdahl's speedup is relative to serial-processor execution time, while Gusafson's is derived from parallel-processor execution time.
+\end{itemize}
+
+\subsection{Modelling Program Performance}
+\begin{itemize}
+    \item Response Time (wall-clock): User CPU time, System CPU time, Waiting time
+    \item $Time_{user}(A)=N_{instr}(A)\times CPI(A)\times Time_{avg\_cycle}$
+    \item Depends on total number of instructions, average CPI, and average time per CPU cycle
+    \item To consider memory, can make term $N_{cycle}(A)+N_{mm\_cycle}(A)$
+    \item $N_{mm\_cycle}(A)=N_{read\_cycles}(A)+N_{write\_cycles}$, $N_{read\_cycles}(A)=N_{read\_ops}(A) \times R_{read\_miss\_rate}(A) \times N_{miss\_cycles}$, this can be expanded to multilevel caches
+    \item Altogether, $Time_{user}(A)=([N_{instr}(A)\times CPI(A)]+[N_{rw\_ops}(A)\times R_{miss\_rate}(A)\times N_{miss\_cycles}]) \times Time_{avg\_cycle}$
+    \item Throughput can be measure with Million Instructions Per Second, $MIPS(A)=N_{instr}(A)/(Time_{user}(A)\times 10^6)$
+    \item Another variation only measures floating point operations, MFLOPS
+    \item Arithmetic Intensity: Amount of computation / Amount of communication
+    \item Roofline Model: Performance against Arithmetic Intensity, increases as bound by bandwidth then levels out when bounded by peak performance
+    \item Contention: Resources can perform operations at a given throughput, but many requests might be made to the same resource within a small window of time
+    \item Can exploit temporal or spatial locality to reduce this
+    \item Possible Bottlenecks and How to diagnose:
+    \begin{itemize}
+        \item Instruction-rate limited: Add more math and see effect on execution time
+        \item Memory bottleneck: Remove math but load same data
+        \item Locality of data access: Arbitrarily change all array access to the same place
+        \item Synchronisation overhead: Remove all atomic operations and locks
+        \item Profile e.g. with perf then optimise
+    \end{itemize}
+\end{itemize}
+
+\section{Memory Consistency}
+\subsection{Cache Coherence}
+\begin{itemize}
+    \item Behaviour of reads and writes to a specific memory location
+    \item Program Order: A single core should see its memory reads and writes in program order (if no other cores write)
+    \item Write Propagation: Writes from a core should eventually become visible to other cores
+    \item Transaction Serialisation: All cores should agree on the order of writes to a memory location
+    \item Track invalid or valid states
+    \item If invalid, reading forces other caches to write back first
+    \item If valid, writing to it invalidates all other caches
+    \item Cache Coherence Protocols are enforced by hardware cache controllers
+    \item Snooping Based: Each cache maintains state of own cache blocks, cache controllers broadcast onto and monitor shared bus for updates
+    \item All PUs can observe every bus transaction, bus puts events into a single order, individual PUs maintain program order
+    \item Granularity of coherence is per cache block
+    \item Directory Based: Central directory maintains state, no broadcasts
+    \item CC causes overhead in shared memory systems, appearing as increased memory latency and lowering hit rate
+    \item Cache Ping-Pong: 2 PUs keep accessing the same cache line, causing it to be repeatedly invalidated
+    \item False Sharing: 2 PUs write to different memory addresses which share a cache line, can be avoided with padding
+\end{itemize}
+
+\subsection{Memory Consistency Models}
+\begin{itemize}
+    \item Coherence: All PUs must agree on order of reads and writes to same memory location
+    \item Memory Consistency: Constrains the order in which memory operations performed by one thread become visible to other threads for different memory locations
+    \item Consistency models allow instructions within a program or core to be reordered to achieve better performance
+    \item Memory Ordering Requirements: WR, RR, RW, WW
+    \item Sequentially Consistent: Preserves all four, ever PU issues operations in program order
+    \item Relaxed Consistency: Relax order only if there are no data dependencies between operations (accessing same memory location), no modern CPU provides it by default
+    \item WR relaxed consistency: Allow a read to be reordered wrt to the previous write of same processing unit, hiding latency of slow writes, provided that data dependencies are preserved and caches are coherent
+    \item Total Store Ordering (TSO): A PU can perform a later read before its previous write is seen by all other PUs, reads by other PUs cannot return the new value of the write until it is observable by all PUs (write atomicity)
+    \item Processor Consistency (PC): May return the value of any write, even from another PU, before the write is observed by all PUs, write atomicity is not preserved, although it is eventually propagated
+    \item WW relaxed consistency: Writes can bypass earlier writes to different location in write buffer (non FIFO write buffer)
+    \item Partial Store Ordering (PSO): Relaxed WR, WW, maintains write atomicity
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=1\linewidth]{siriam.jpg}
+\end{center}
+
+\end{multicols*}
+
+\end{document}
