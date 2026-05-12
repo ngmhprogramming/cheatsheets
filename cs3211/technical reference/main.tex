@@ -1,0 +1,3553 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[margin=0.75in]{geometry}
+
+% code styling
+\usepackage{xcolor}
+\usepackage{listings}
+
+\lstdefinelanguage{Golang}{
+  morekeywords={
+    break,default,func,interface,select,case,defer,go,map,struct,
+    chan,else,goto,package,switch,const,fallthrough,if,range,type,
+    continue,for,import,return,var,bool,string,int,int8,int16,int32,
+    int64,uint,uint8,uint16,uint32,uint64,uintptr,byte,rune,
+    float32,float64,complex64,complex128,nil,true,false,iota
+  },
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]',
+  morestring=[s]{`}{`}
+}
+
+\lstdefinelanguage{Rust}{
+  morekeywords={
+    abstract,alignof,as,become,break,const,continue,crate,do,
+    else,enum,extern,false,fn,for,if,impl,in,let,loop,match,mod,move,
+    mut,pub,ref,return,self,Self,static,struct,super,trait,true,type,
+    typeof,unsafe,unsized,use,where,while,yield,str,String,Vec,Option,Result
+  },
+  otherkeywords={&, !, ', ->, =>},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  moredelim=[s][\color{orange!70!black}]{\ '}{\ } % Highlight lifetimes like 'a
+}
+
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\large,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{red!70!black},
+    commentstyle=\color{green!50!black}\itshape,
+    numberstyle=\normalsize\color{gray},
+    numbers=left,
+    stepnumber=1,
+    numbersep=8pt,
+    frame=single,
+    rulecolor=\color{black!30},
+    breaklines=true,
+    tabsize=4,
+    showstringspaces=false,
+    backgroundcolor=\color{gray!5},
+    % C++ Specific Keywords
+    emph={std, ptrdiff_t, size_t, uint64_t, int64_t, atomic, mutex, condition_variable, barrier, counting_semaphore},
+    emphstyle=\color{teal}\bfseries
+}
+
+\title{CS3211 Technical Reference}
+\author{ngmh}
+\date{04/05/2026}
+
+\begin{document}
+\large
+\maketitle
+
+\section{C++ Threads}
+\begin{lstlisting}[language=C++]
+// function
+void hello() {
+    std::cout << "Hello";
+}
+
+// function object
+class task {
+public:
+    void operator()() const {
+        hello();
+    }
+}
+
+int main() {
+    std::thread t(hello);
+    t.join();
+
+    task f;
+    std::thread my_thread(f);
+}
+
+\end{lstlisting}
+
+\subsection{Most Vexing Parse}
+The following code defines a function that:
+\begin{itemize}
+    \item Takes in a pointer to a function with no parameters and returns a task
+    \item Returns a thread object
+\end{itemize}
+\begin{lstlisting}[language=C++]
+std::thread my_thread(task());
+\end{lstlisting}
+
+Instead, to create a thread, it should be:
+\begin{lstlisting}[language=C++]
+std::thread my_thread((task()));
+std::thread my_thread{task()};
+std::thread my_thread([]{ hello(); });
+\end{lstlisting}
+
+\subsection{Waiting and Detaching}
+Always join even when an exception occurs! If you forget to join a joinable thread, standard says \verb|std::terminate| is called.
+\begin{lstlisting}[language=C++]
+t.join();
+t.joinable(); // true
+
+t.detach();
+t.joinable(); // false
+\end{lstlisting}
+
+\subsection{Passing Arguments to Threads}
+Pass in references if necessary.
+\begin{lstlisting}[language=C++]
+void f(int i);
+std::thread t(f, 3);
+
+void update(widget w, data& data);
+std::thread t(update, w, std::ref(data));
+// necessary! constructor copies / moves objects
+\end{lstlisting}
+
+\subsection{Thread Ownership}
+\begin{lstlisting}[language=C++]
+// out of function
+std::thread f() {
+    void foo();
+    return std::thread{foo};
+}
+
+// into function
+void f(std::thread t)
+void g() {
+    void func();
+    f(std::thread{func});
+    // or
+    std::thread t{func};
+    f(std::move(t));
+}
+
+\end{lstlisting}
+
+\section{C++ Synchronisation}
+
+\subsection{RAII}
+\begin{itemize}
+    \item Resource Acquisition Is Initialisation
+    \item Binds life cycle of resource that must be acquired before use to the lifetime of an object
+    \item Resource is released when lifetime of controlling object ends in reverse order of acquisition
+\end{itemize}
+
+\subsection{Using Mutexes}
+\begin{lstlisting}[language=C++]
+std::mutex mut;
+void f() {
+    std::lock_guard<std::mutex> guard{mut};
+    // critical section
+}
+\end{lstlisting}
+
+\subsection{Types of Locks}
+\begin{lstlisting}[language=C++]
+std::mutex m1, m2;
+
+void f() {
+    // lock_guard is the simplest
+    // can transfer ownership of lock
+    std::lock(m1, m2);
+    std::lock_guard<std::mutex> lock1(m1, std::adopt_lock);
+    std::lock_guard<std::mutex> lock2(m2, std::adopt_lock);
+
+    // unique lock ownership can be transferred
+    // can manually lock and unlock with unique lock
+    std::unique_lock<std::mutex> u_lock{m1, std::defer_lock};
+    u_lock.lock();
+    u_lock.unlock();
+    // or
+    std::lock(u_lock);
+    
+    // scoped lock can take in multiple mutexes, ensures no deadlock
+    std::scoped_lock<std::mutex, std::mutex> guard{m1, m2};
+}
+\end{lstlisting}
+
+\subsection{Condition Variables}
+\begin{lstlisting}[language=C++]
+std::mutex mut;
+std::queue<int> q;
+std::condition_variable data_cond;
+
+void producer() {
+    {
+        std::lock_guard<std::mutex> lk{mut};
+        q.push(1);
+    }
+    data_cond.notify_one();
+}
+
+void consumer() {
+    while (true) {
+        // condition_variable needs unique_lock
+        // condition_variable_any does not
+        std::unique_lock<std::mutex> lk{mut};
+        data_cond.wait(lk, []{ return !q.empty(); });
+        // data_cond.wait_for(...)
+        // data_cond.wait_until(...)
+        q.pop();
+    }
+}
+\end{lstlisting}
+
+\section{C++ Memory Orders}
+
+\subsection{\texttt{std::memory\_order} Enumeration}
+\begin{lstlisting}[language=C++]
+// Default
+std::memory_order_seq_cst
+// Store Operations
+std::memory_order_seq_cst
+std::memory_order_release
+std::memory_order_relaxed
+// Load Operations
+std::memory_order_seq_cst
+std::memory_order_acquire
+std::memory_order_consume
+std::memory_order_relaxed
+// RMW Operations
+std::memory_order_seq_cst
+std::memory_order_acq_rel
+std::memory_order_acquire
+std::memory_order_release
+std::memory_order_consume
+std::memory_order_relaxed
+\end{lstlisting}
+
+\subsection{Memory Orderings}
+\begin{lstlisting}[language=C++]
+// Sequentially Consistent Ordering
+std::memory_order_seq_cst
+
+// Relaxed Ordering
+std::memory_order_relaxed
+
+// Acquire-Release Ordering
+std::memory_order_acquire
+std::memory_order_release
+std::memory_order_acq_rel
+std::memory_order_consume
+\end{lstlisting}
+
+\section{Concurrent Data Structures}
+
+\subsection{S1: Thread Safe Stack with one global mutex}
+\begin{itemize}
+    \item Safe for multiple threads to call member functions concurrently
+    \item Exception safe
+    \item Work is serialised; only one thread can ever do work, limiting performance
+    \item No means of waiting for item to be added
+\end{itemize}
+\begin{lstlisting}[language=C++]
+struct empty_stack: std::exception {
+    const char* what() const throw();
+};
+template<typename T>
+class threadsafe_stack {
+private:
+    std::stack<T> data;
+    mutable std::mutex m;
+public:
+    threadsafe_stack(){}
+    threadsafe_stack(const threadsafe_stack& other) {
+        std::lock_guard<std::mutex> lock(other.m);
+        data = other.data;
+    }
+    threadsafe_stack& operator=(const threadsafe_stack&) = delete;
+    void push(T new_value) {
+        std::lock_guard<std::mutex> lock(m);
+        data.push(std::move(new_value));
+    }
+    std::shared_ptr<T> pop() {
+        std::lock_guard<std::mutex> lock(m);
+        if (data.empty()) throw empty_stack();
+        std::shared_ptr<T> const res(
+            std::make_shared<T>(std::move(data.top()))
+        );
+        data.pop();
+        return res;
+    }
+    void pop(T& value) {
+        std::lock_guard<std::mutex> lock(m);
+        if (data.empty()) throw empty_stack();
+        value = std::move(data.top());
+        data.pop();
+    }
+    bool empty() const {
+        std::lock_guard<std::mutex> lock(m);
+        return data.empty();
+    }
+};
+\end{lstlisting}
+
+\subsection{Q1: Thread Safe Queue with notification}
+\begin{itemize}
+    \item Analysis from stack also applies
+    \item \verb|wait_and_pop()| provides a solution to waiting for an entry
+    \item If a thread throws an exception after it is woken up, no other threads will be woken
+    \item Can replace with a global notification, or notify one when an exception is thrown, or move shared pointer initialisation to push and store shared pointer instances instead
+\end{itemize}
+
+\begin{lstlisting}[language=C++]
+template<typename T>
+class threadsafe_queue {
+private:
+    mutable std::mutex mut;
+    std::queue<T> data_queue;
+    std::condition_variable data_cond;
+public:
+    threadsafe_queue() {}
+    void push(T new_value) {
+        std::lock_guard<std::mutex> lk(mut);
+        data_queue.push(std::move(new_value));
+        data_cond.notify_one();
+    }
+    void wait_and_pop(T& value) {
+        std::unique_lock<std::mutex> lk(mut);
+        data_cond.wait(lk, [this]{ return !data_queue.empty(); });
+        value = std::move(data_queue.front());
+        data_queue.pop();
+    }
+    std::shared_ptr<T> wait_and_pop() {
+        std::unique_lock<std::mutex> lk(mut);
+        data_cond.wait(lk, [this]{ return !data_queue.empty(); });
+        std::shared_ptr<T> res(
+            std::make_shared<T>(std::move(data_queue.front()))
+        );
+        data_queue.pop();
+        return res;
+    }
+    bool try_pop(T& value) {
+        std::lock_guard<std::mutex> lk(mut);
+        if (data_queue.empty()) return false;
+        value = std::move(data_queue.front());
+        data_queue.pop();
+        return true;
+    }
+    std::shared_ptr<T> try_pop() {
+        std::lock_guard<std::mutex> lk(mut);
+        if (data_queue.empty()) return std::shared_ptr<T>();
+        std::shared_ptr<T> res(
+            std::make_shared<T>(std::move(data_queue.front()))
+        );
+        data_queue.pop();
+        return res;
+    }
+    bool empty() const {
+        std::lock_guard<std::mutex> lk(mut);
+        return data_queue.empty();
+    }
+};
+\end{lstlisting}
+
+\subsection{Q2: Push shared pointers in the queue}
+\begin{itemize}
+    \item Exception safe
+    \item Allocaiton of new instance can be done outside of the lock for better performance
+    \item Concurrency is still limited by global mutex
+\end{itemize}
+
+\begin{lstlisting}[language=C++]
+template<typename T>
+class threadsafe_queue {
+private:
+    mutable std::mutex mut;
+    std::queue<std::shared_ptr<T>> data_queue;
+    std::condition_variable data_cond;
+public:
+    threadsafe_queue() {}
+    void wait_and_pop(T& value) {
+        std::unique_lock<std::mutex> lk(mut);
+        data_cond.wait(lk, [this]{ return !data_queue.empty(); });
+        value = std::move(*data_queue.front());
+        data_queue.pop();
+    }
+    bool try_pop(T& value) {
+        std::lock_guard<std::mutex> lk(mut);
+        if (data_queue.empty()) return false;
+        value = std::move(*data_queue.front());
+        data_queue.pop();
+        return true;
+    }
+    std::shared_ptr<T> wait_and_pop() {
+        std::unique_lock<std::mutex> lk(mut);
+        data_cond.wait(lk, [this]{ return !data_queue.empty(); });
+        std::shared_ptr<T> res = data_queue.front();
+        data_queue.pop();
+        return res;
+    }
+    std::shared_ptr<T> try_pop() {
+        std::lock_guard<std::mutex> lk(mut);
+        if (data_queue.empty()) return std::shared_ptr<T>();
+        std::shared_ptr<T> res = data_queue.front();
+        data_queue.pop();
+        return res;
+    }
+    void push(T new_value) {
+        std::shared_ptr<T> data(
+            std::make_shared<T>(std::move(new_value))
+        );
+        std::lock_guard<std::mutex> lk(mut);
+        data_queue.push(data);
+        data_cond.notify_one();
+    }
+    bool empty() const {
+        std::lock_guard<std::mutex> lk(mut);
+        return data_queue.empty();
+    }
+};
+\end{lstlisting}
+
+\subsection{Q3: Single threaded queue}
+\begin{itemize}
+    \item Uses unique pointers to manage nodes so that they get deleted by RAII
+    \item Pushing can modify both the front and back
+    \item Pushing and popping access the next pointer of a node which requires serialisation
+\end{itemize}
+
+\begin{lstlisting}[language=C++]
+template<typename T>
+class queue {
+private:
+    struct node {
+        T data;
+        std::unique_ptr<node> next;
+        node(T data_):
+            data(std::move(data_))
+        {}
+    };
+    std::unique_ptr<node> front;
+    node* back;
+public:
+    queue(): back(nullptr) {}
+    queue(const queue& other)=delete;
+    queue& operator=(const queue& other)=delete;
+    std::shared_ptr<T> try_pop() {
+        if (!front) {
+            return std::shared_ptr<T>();
+        }
+        std::shared_ptr<T> const res(
+            std::make_shared<T>(std::move(front->data))
+        );
+        std::unique_ptr<node> const old_front = std::move(front);
+        front = std::move(old_front->next);
+        if (!front) back = nullptr;
+        return res;
+    }
+    void push(T new_value) {
+        std::unique_ptr<node> p(new node(std::move(new_value)));
+        node* const new_back = p.get();
+        if (back) back->next = std::move(p);
+        else front = std::move(p);
+        back = new_back;
+    }
+};
+\end{lstlisting}
+
+\subsection{Q4: Single threaded queue, Enabling concurrency by separating data}
+\begin{itemize}
+    \item Pre-allocate dummy node with no data, so that there is always at least one node in the queue separating the front and back nodes
+    \item Extra level of indirection needed to store data by pointers
+\end{itemize}
+
+\begin{lstlisting}[language=C++]
+template<typename T>
+class queue {
+private:
+    struct node {
+        std::shared_ptr<T> data;
+        std::unique_ptr<node> next;
+    };
+    std::unique_ptr<node> front;
+    node* back;
+public:
+    queue(): front(new node), back(front.get()) {}
+    queue(const queue& other)=delete;
+    queue& operator=(const queue& other)=delete;
+    std::shared_ptr<T> try_pop() {
+        if (front.get() == back) {
+            return std::shared_ptr<T>();
+        }
+        std::shared_ptr<T> const res(front->data);
+        std::unique_ptr<node> old_front = std::move(front);
+        front = std::move(old_front->next);
+        return res;
+    }
+    void push(T new_value) {
+        std::shared_ptr<T> new_data(
+            std::make_shared<T>(std::move(new_value))
+        );
+        std::unique_ptr<node> p(new node);
+        back->data = new_data;
+        node* const new_back = p.get();
+        back->next = std::move(p);
+        back = new_back;
+    }
+};
+\end{lstlisting}
+
+\subsection{Q5: Fine-grained Thread-safe Queue}
+Invariants Held:
+\begin{itemize}
+    \item \verb|back->next == nullptr|
+    \item \verb|back->data == nullptr|
+    \item \verb|front == back| implies an empty list
+    \item A single element list has \verb|front->next == back|
+    \item For each node \verb|x| where \verb|x != back|, \verb|x->data| points to an instance of \verb|T| and \verb|x->next| points to the next node in the list; \verb|x->next == back| implies \verb|x| is the last node in the list
+    \item Following the \verb|next| nodes from \verb|front| will eventually yield \verb|back|
+\end{itemize}
+
+\begin{lstlisting}[language=C++]
+template<typename T>
+class threadsafe_queue {
+private:
+    struct node {
+        std::shared_ptr<T> data;
+        std::unique_ptr<node> next;
+    };
+    std::mutex front_mutex;
+    std::unique_ptr<node> front;
+    std::mutex back_mutex;
+    node* back;
+    node* get_back() {
+        std::lock_guard<std::mutex> back_lock(back_mutex);
+        return back;
+    }
+    std::unique_ptr<node> pop_front() {
+        std::lock_guard<std::mutex> front_lock(front_mutex);
+        if (front.get() == get_back()) {
+            return nullptr;
+        }
+        std::unique_ptr<node> old_front = std::move(front);
+        front = std::move(old_front->next);
+        return old_front;
+    }
+public:
+    threadsafe_queue(): front(new node), back(front.get()) {}
+    threadsafe_queue(const queue& other)=delete;
+    threadsafe_queue& operator=(const queue& other)=delete;
+    std::shared_ptr<T> try_pop() {
+        std::unique_ptr<node> old_front = pop_front();
+        return old_front ? old_front->data : std::shared_ptr<T>();
+    }
+    void push(T new_value) {
+        std::shared_ptr<T> new_data(
+            std::make_shared<T>(std::move(new_value))
+        );
+        std::unique_ptr<node> p(new node);
+        node* const new_back = p.get();
+        std::lock_guard<std::mutex> back_lock(back_mutex);
+        back->data = new_data;
+        back->next = std::move(p);
+        back = new_back;
+    }
+};
+\end{lstlisting}
+
+\subsection{Q6: Even more Fine-grained Lock-based Queue}
+\begin{itemize}
+    \item Per-node mutexes provide synchronises with relationship between push and pop threads
+    \item Additional scope introduced when trying to pop avoids UAF
+\end{itemize}
+
+\begin{lstlisting}[language=C++]
+class FineQueue {
+    struct Node {
+        std::mutex mut;
+        Node *next = nullptr;
+        Data data{};
+    };
+    std::mutex mut_back;
+    Node *back;
+    std::mutex mut_front;
+    Node *front;
+public:
+    FineQueue() : mut_back{},
+                  back{new Node{}},
+                  mut_front{},
+                  front{back} {}
+    ~FineQueue() {
+        while (front != nullptr) {
+            Node *next = front->next;
+            delete front;
+            front = next;
+        }
+    }
+    void push(Data data) {
+        Node *new_node = new Node{};
+        std::scoped_lock lock{mut_back};
+        std::scoped_lock node_lock{back->mut};
+        back->data = data;
+        back->next = new_node;
+        back = new_node;
+    }
+    std::optional<Data> try_pop() {
+        Node *old_node;
+        {
+            std::scoped_lock lock{mut_front};
+            old_node = front;
+            std::scoped_lock node_lock{old_node->mut};
+            if (old_node->next == nullptr) {
+                return std::nullopt;
+            }
+            front = front->next;
+        }
+        Data data = old_node->data;
+        delete old_node;
+        return data;
+    }
+};
+\end{lstlisting}
+
+\section{Testing and Debugging}
+
+\subsection{Using Valgrind}
+\begin{lstlisting}
+valgrind --tool=memcheck <prog>
+\end{lstlisting}
+
+\subsection{Using ASan}
+\begin{lstlisting}
+clang++ -O1 -fsanitize=address a.cc && ./a.out
+\end{lstlisting}
+
+\subsection{How ASan works}
+\begin{lstlisting}
+// X is good byte, O is bad byte, mapped to shadow value
+XXXXXXXX  0
+XXXXXXXO  7
+XXXXXXOO  6
+XXXXXOOO  5
+XXXXOOOO  4
+XXXOOOOO  3
+XXOOOOOO  2
+XOOOOOOO  1
+OOOOOOOO -1
+
+*a=...;
+char *shadow = addr >> 3; // find corresponding byte
+if (*shadow // all safe has value zero, fails this check
+&& *shadow <= ((a&7)+N-1)) { // find offset within block and last accessed byte
+    ReportError(a);
+}
+*a=...;
+\end{lstlisting}
+
+\subsection{Using TSan}
+\begin{lstlisting}
+g++ a.cpp -fsanitize=thread -fPIE -pie
+TSAN_OPTIONS="history-size=7 force_seq_cst_atomics=1" ./myprogram
+\end{lstlisting}
+
+\subsection{How TSan works}
+\begin{lstlisting}
+Shadow = 4 * (Addr & kMask); // shadow address hash function
+
+TID: 16 bits (TID, thread ID)
+Epoc: 42 bits (Epoch, scalar clock)
+Pos: 5 bits (Position in 8-byte word)
+IsW: 1 bit (IsWrite)
+\end{lstlisting}
+
+\section{Midterms Tutorial Stuff}
+
+\subsection{C++ Concurrent Queue with Semaphore}
+
+\begin{lstlisting}[language=C++]
+struct Job {
+  int id;
+  int count;
+};
+
+class JobQueue {
+  std::queue<Job> jobs;
+  std::mutex mut;
+  std::counting_semaphore<> count;
+
+public:
+  JobQueue() : jobs{}, mut{}, count{0} {}
+
+  void enqueue(Job job) {
+    std::unique_lock lock{mut};
+    jobs.push(job);
+    count.release(); // increment semaphore counter
+  }
+
+  std::optional<Job> try_dequeue() {
+    if (count.try_acquire()) {
+      // enter critical section and remove a job
+      std::unique_lock lock{mut};
+      Job job = jobs.front();
+      jobs.pop();
+      return job;
+    } else {
+      // queue is empty
+      return std::nullopt;
+    }
+  }
+
+  Job dequeue() {
+    count.acquire(); // decrement semaphore counter
+    std::unique_lock lock{mut};
+    Job job = jobs.front();
+    jobs.pop();
+    return job;
+  }
+};
+\end{lstlisting}
+
+\subsection{C++ Concurrent Queue with Monitor}
+
+\begin{lstlisting}[language=C++]
+struct Job {
+    int id;
+    int count;
+}
+class JobQueue {
+    std::queue<Job> jobs;
+    std::mutex mut;
+    std::condition_variable cond;
+public:
+    JobQueue() : jobs{}, mut{}, cond{} {}
+    void enqueue(Job job) {
+        {
+            std::unique_lock lock{mut};
+            jobs.push(job);
+        }
+        cond.notify_one();
+    }
+    std::optional<Job> try_dequeue() {
+        std::unique_lock lock{mut};
+        if (jobs.empty()) {
+            return std::nullopt;
+        } else {
+            Job job = jobs.front(); jobs.pop();
+            return job;
+        }
+    }
+    Job dequeue() {
+        std::unique_lock lock{mut};
+        cond.wait(lock, [this]() { return !jobs.empty(); });
+        // same as
+        // while (jobs.empty()) {
+        //     cond.wait(lock);
+        // }
+        Job job = jobs.front();
+        jobs.pop();
+        return job;
+    }
+};
+\end{lstlisting}
+
+\subsection{Atomic Puzzle Tips}
+\begin{itemize}
+    \item Find possible modification orders; they must obey write-write coherence.
+    \item Decide the possible outcomes of reads; they must obey read-write, write-read, write-write coherence.
+    \item Deduce the sw relationships between threads; the load must successfully read the store (or value in release sequence) and the two operations must be suitably tagged.
+    \item Deduce the hb relationships.
+    \item For non-atomic variables, any two operations involving at least one write must be synchronised; otherwise, there is a data race.
+\end{itemize}
+
+\subsection{Smart Pointers}
+\begin{itemize}
+    \item Unique pointer implements RAII with unique ownership. 
+    \item \verb|std::shared_ptr| stores \verb|ref_count| (thread safe) and the underlying object (not thread safe), protecting shared resources.
+    \item Weak pointer acts as a viewer and helps to prevent circular dependencies since it does not contribute to ownership.
+    \item The underlying object is deleted when \verb|shared_count| hits 0.
+    \item The control block is deleted when \verb|weak_count| hits 0.
+    \item If \verb|shared_count| is above 0, it counts towards \verb|weak_count| as well.
+\end{itemize}
+
+\begin{lstlisting}[language=C++]
+std::unique_ptr<int> foo = std::make_unique<int>(0);
+foo.get(); // *foo
+
+std::shared_ptr<int> x = std::make_shared<int>(100);
+{
+    auto a = x;
+    auto b = x;
+    cout << x.use_count();
+}
+
+// Shared Pointer Usage
+
+// Stack (Local Variables)
+shared_ptr { ctrl_blk* }
+weak_ptr   { ctrl_blk* }
+
+// Heap (The Control Block)
+ctrl_blk {
+    std::atomic<size_t> shared_count; // Controls object life
+    std::atomic<size_t> weak_count;   // Controls control block life
+    T* ptr_to_obj;                    // The actual data
+}
+\end{lstlisting}
+
+\subsection{C++ Shared Pointer}
+\begin{lstlisting}[language=C++]
+template <typename T>
+struct SharedPtr {
+private:
+    std::atomic<size_t>* m_count;
+    T* m_ptr;
+public:
+    SharedPtr(T* ptr) : m_count(new std::atomic<size_t>(1)), m_ptr(ptr) { }
+    SharedPtr(const SharedPtr& other) : m_count(other.m_count),                                   m_ptr(other.m_ptr) {
+        m_count->fetch_add(1, std::memory_order::relaxed);
+    }
+    ~SharedPtr() {
+        size_t old_count = m_count->fetch_sub(1, std::memory_order::acq_rel);
+        if(old_count == 1) {
+            delete m_ptr;
+            delete m_count;
+        }
+    }
+    T* get() { return m_ptr; }
+    const T* get() const { return m_ptr; }
+};
+\end{lstlisting}
+
+\subsection{Compare and Swap}
+\begin{lstlisting}[language=C++]
+int v = x.load();
+while (true) {
+    // could spuriously fail
+    if (x.compare_and_exchange_weak(v, v+1)) {
+        return v;
+    }
+}
+// or
+x.compare_and_exchange_strong(v, v+1);
+// similar to
+x.fetch_add(1);
+\end{lstlisting}
+
+\subsection{C++ Lock Free Stack}
+
+\begin{lstlisting}[language=C++]
+void push(Job job) {
+    Node* newTop = new Node{job, nullptr};
+    Node* oldTop = top.load();
+    while (true) {
+        newTop->next.store(oldTop);
+        if (top.compare_exchange_weak(oldTop, newTop)) {
+            break;
+        }
+    }
+}
+std::optional<Job> try_pop() {
+    Node* oldTop = top.load();
+    while (true) {
+        if (oldTop == nullptr) return std::nullopt;
+        Node* newTop = oldTop->next.load();
+        if (top.compare_exchange_weak(oldTop, newTop)) {
+            Job job = oldTop->job;
+            delete oldTop;
+            return job;
+        }
+    }
+}
+\end{lstlisting}
+
+\subsection{C++ Lock Free Queue + Recycling Centre}
+\begin{itemize}
+    \item Unbounded lock free queue with \verb|push| and non-blocking \verb|try_pop|
+    \item Avoids ABA problem using generation counter
+    \item Avoids UAF by reusing nodes instead of deallocating them
+    \item However, does not provide serialisation
+\end{itemize}
+
+\begin{lstlisting}[language=C++]
+struct Job
+{
+    int id;
+    int data;
+};
+class JobQueue {
+    using stdmo = std::memory_order;
+
+    // a node is a dummy node if its next pointer is set to QUEUE_END
+    // use the next ptr to establish the synchronizes-with relationship
+    // next is in charge of releasing job
+    struct Node {
+        std::atomic<Node*> next = QUEUE_END;
+        Job job;
+    };
+
+    // sentinel values
+    static inline Node* const QUEUE_END = nullptr;
+    static inline Node* const STACK_END = QUEUE_END + 1;
+
+    struct alignas(16) GenNodePtr {
+        Node* node;
+        uintptr_t gen;
+    };
+
+    static_assert(std::atomic<GenNodePtr>::is_always_lock_free);
+
+    alignas(64) std::atomic<Node*> m_queue_back;              // producer end
+    alignas(64) std::atomic<GenNodePtr> m_queue_front;        // consumer end
+    alignas(64) std::atomic<GenNodePtr> m_recycled_stack_top; // recycled node stack
+
+public:
+    // queue starts with a dummy node
+    JobQueue()
+        : m_queue_back(new Node())
+        , m_queue_front(GenNodePtr { m_queue_back.load(stdmo::relaxed), 1 })
+        , m_recycled_stack_top(GenNodePtr { STACK_END, 1 }) {}
+
+    ~JobQueue() {
+        // assumes no other threads are accessing the job queue
+        Node* cur_node = m_queue_front.load(stdmo::relaxed).node;
+        while(cur_node != QUEUE_END) {
+            Node* next = cur_node->next;
+            delete cur_node;
+            cur_node = next;
+        }
+
+        // clean up the recycled nodes
+        cur_node = m_recycled_stack_top.load(stdmo::relaxed).node;
+        while(cur_node != STACK_END) {
+            Node* next = cur_node->next;
+            delete cur_node;
+            cur_node = next;
+        }
+    }
+
+    // either get a node from the recycling stack if we have some
+    // or allocate a new one if we dont
+    Node* get_recycled_node_or_allocate_new() {
+        GenNodePtr old_stack_top = m_recycled_stack_top.load(stdmo::relaxed);
+        while(true) {
+            if(old_stack_top.node == STACK_END) {
+                return new Node();
+            }
+
+            // use acquire, synchronise with the release-store of
+            // node->next in add_node_to_recycling_stack
+            Node* cur_stack_next = old_stack_top.node->next.load(stdmo::acquire);
+
+            GenNodePtr new_stack_top { cur_stack_next, old_stack_top.gen + 1 };
+
+            if(m_recycled_stack_top.compare_exchange_weak(
+                   old_stack_top,
+                   new_stack_top,
+                   stdmo::relaxed)) {
+                return old_stack_top.node;
+            }
+        }
+    }
+
+    // put node in recycling centre
+    void add_node_to_recycling_stack(Node* node) {
+        GenNodePtr old_stack_top = m_recycled_stack_top.load(stdmo::relaxed);
+        while(true) {
+            // use release, synchronise with the acquire-load of
+            // node->next in get_recycled_node_or_allocate_new
+            node->next.store(old_stack_top.node, stdmo::release);
+
+            GenNodePtr new_stack_top { node, old_stack_top.gen + 1 };
+
+            if(m_recycled_stack_top.compare_exchange_weak(
+                   old_stack_top,
+                   new_stack_top,
+                   stdmo::relaxed)) {
+                break;
+            }
+        }
+    }
+public:
+    void push(Job job) {
+        Node* new_dummy = get_recycled_node_or_allocate_new();
+        new_dummy->next.store(QUEUE_END, stdmo::relaxed);
+
+        Node* work_node = m_queue_back.exchange(new_dummy, stdmo::acq_rel);
+        work_node->job = job;
+        work_node->next.store(new_dummy, stdmo::release);
+    }
+
+    std::optional<Job> try_pop() {
+        // splice node from the front of queue, but only if its not dummy
+        // successfully splicing a node establishes global order of pops
+
+        GenNodePtr old_front = m_queue_front.load(stdmo::acquire);
+        while(true) {
+            // get node out from the GenNodePtr
+            Node* old_front_next = old_front.node->next.load(stdmo::acquire);
+            if(old_front_next == QUEUE_END) {
+                return std::nullopt;
+            }
+
+            // note that the generation is strictly increasing
+            GenNodePtr new_front { old_front_next, old_front.gen + 1 };
+
+            if(m_queue_front.compare_exchange_weak(old_front,
+                   new_front, stdmo::acq_rel)) {
+                // node now belongs to us
+                break;
+            }
+        }
+
+        Job job = old_front.node->job;
+        add_node_to_recycling_stack(old_front.node);
+        return job;
+    }
+};
+\end{lstlisting}
+
+\section{Go Basics}
+
+\subsection{Fundamentals}
+\begin{lstlisting}[language=Golang]
+world := "World"
+var exclamation string = "!" // name before type
+defer func(){}() // RAII style, FILO
+
+if res, err := something(); err != nil {
+
+}
+
+s := make([]int, 0, 5) // size 0, cap 5
+s = append(s, 0) // append 0 to slice
+
+m1 := make(map[string]int)
+m2 := make[string]int{"A": 65}
+val, ok := m1[key1]
+// iteration order is random
+
+// set trick
+s := map[string]struct{}{}
+_, exist := s["A"]
+
+for i := 0; i < 5; i++ {}
+for {
+    if ok := check(); !ok { break }
+}
+for check() {}
+for i, elem := range[]int{1, 2, 3} {} // use _ if unwanted
+for k, v := range map[int]int{} {}
+for elem := range elemCh {}
+
+switch num {
+case 1: smth()
+case 2: fallthrough
+default: default()
+}
+
+type Duck interface { Walk() }
+type SomeBird struct { wing Wing }
+func (b *SomeBird) Walk() {} // tied to an instance, by reference
+// SomeBird fulfils Duck even if not explictly linked
+\end{lstlisting}
+
+\subsection{Goroutines}
+\begin{lstlisting}[language=Golang]
+func hello() {
+    fmt.Println("hello")
+}
+func main() {
+    go hello()
+    go func() { fmt.Println("bye") }() // anonymous function
+}
+\end{lstlisting}
+
+\subsection{Synchronising Goroutines}
+Use \texttt{WaitGroup}.
+\begin{lstlisting}[language=Golang]
+func main() {
+    var wg sync.WaitGroup
+    for _, x := range []string{"a", "b", "c"} {
+        wg.Add(1)
+        // closure over x
+        go func() {
+            defer wg.Done() // RAII style
+            fmt.Println(x)
+        }
+        // copy x
+        go func(x string) {
+            defer wg.Done()
+            fmt.Println(x)
+        }
+    }
+    wg.Wait()
+}
+\end{lstlisting}
+
+\subsection{Channels}
+\begin{lstlisting}[language=Golang]
+// bidirectional channels
+var x chan interface{}
+x = make(chan interface{})
+
+// unidirectional channels
+var rx <-chan interface{}
+var tx chan<- interface{}
+x := make(chan interface{})
+rx = x
+tx = x
+
+// buffered channel
+c := make(chan interface{}, 4)
+
+// using channels
+s := make(chan string)
+go func() {
+    s <- "hi"
+}()
+t, ok := <-s
+// ok indicates whether read was a write or default value
+// reading from closed channel is always allowed
+\end{lstlisting}
+
+\subsection{Synchronisation with Channels}
+\begin{lstlisting}[language=Golang]
+// ranging over channel
+c := make(chan int)
+go func() {
+    defer close(c)
+    for i := 1; i <= 5; i++ {
+        c <- i
+    }
+}()
+for x := range c {
+    fmt.Println(x)
+}
+
+c := make(chan interface{})
+var wg sync.WaitGroup
+for i := 0; i < 5; i++ {
+    wg.Add(1)
+    go func(i int) {
+        defer wg.Done()
+        <-c
+    }
+}
+close(c)
+wg.Wait()
+\end{lstlisting}
+
+\subsection{\texttt{select}}
+\begin{lstlisting}[language=Golang]
+// pseudorandom uniform selection
+// no fall through
+c1 := make(chan interface{}); close(c1)
+c2 := make(chan interface{}); close(c2)
+var x1, x2 int
+for i := 1000; i >= 0; i-- {
+    select {
+        case <- c1: x1++
+        case <- c2: x2++
+        default:
+    }
+}
+
+// timeout channel implementation
+select {
+    case <-c:
+    case <- time.After(1 * time.Second):
+        fmt.Println("Timed out")
+}
+
+// for-select
+loop:
+for {
+    select {
+        case <- done: break loop
+        default:
+    }
+    // do work
+}
+\end{lstlisting}
+
+\subsection{Synchronisation Constructs}
+\begin{lstlisting}[language=Golang]
+// RWMutex
+var mu sync.RWMutex
+mu.RLock() // multiple readers can hold
+defer mu.RUnlock()
+
+// similar to Mutex
+mu.Lock() // only one writer can hold
+defer mu.Unlock()
+
+// Once
+var once sync.Once
+// excutes only once
+once.Do(func() {
+    // something
+})
+
+// Cond
+mu := &sync.Mutex{}
+cond := sync.NewCond(mu)
+ready := false
+// waiter
+go func() {
+    mu.Lock()
+    for !ready {
+        cond.Wait()
+    }
+    fmt.Println("Ready!")
+    mu.Unlock()
+}()
+// In the signaller
+mu.Lock()
+ready = true
+cond.Signal() // wake one
+cond.Broadcast() // wake all
+mu.Unlock()
+
+// Pool
+var bufferPool = sync.Pool{
+    New: func() interface{} {
+        return make([]byte, 1024)
+    },
+}
+func process() {
+    buf := bufferPool.Get().([]byte)
+    defer bufferPool.Put(buf)
+    // use buffer
+}
+\end{lstlisting}
+
+\section{Go Patterns}
+
+\subsection{Lexical Confinement}
+\begin{lstlisting}[language=Golang]
+// only expose reading end of channel to others
+owner := func() <-chan int {
+    res := make(chan int, 5)
+    go func() {
+        defer close(res)
+        for i := 0; i <= 5; i++ {
+            res <- i
+        }
+    }()
+    return res
+}   
+consumer := func(res <-chan int) {
+    for res := range res {
+        fmt.Println(res)
+    }
+}
+res := owner()
+consumer(res)
+
+printData := func(data []byte) {
+    // ...
+}
+// expose only slices of arrays
+go printData(data[:3])
+go printData(data[3:])
+\end{lstlisting}
+
+\subsection{For-Select Loop}
+\begin{lstlisting}[language=Golang]
+for {
+    select {
+        case num := <-q:
+            sum += num
+        case <-done:
+            sumCh <- sum
+            return
+    }
+}
+\end{lstlisting}
+
+\subsection{Preventing Leaking}
+\begin{lstlisting}[language=Golang]
+// returns status channel
+doWork := func(
+    done <-chan interface{},
+    strings <- chan string,
+) <-chan interface{} {
+    terminated := make(chan interface{})
+    go func() {
+        defer close(terminated)
+        for {
+            select {
+                case s := <-strings: fmt.Println(s)
+                case <-done: return
+            }
+        }
+    }
+}
+
+// done channel
+done := make(chan interface{})
+terminated := doWork(done, nil)
+go func() {
+    time.Sleep(1 * time.Second)
+    close(done)
+}
+<-terminated
+\end{lstlisting}
+
+\subsection{Error Handling}
+\begin{lstlisting}[language=Golang]
+type Result struct {
+    Error error
+    Response *http.Response
+}
+checkStatus := func(done <-chan interface{}, urls ...string) <-chan Result {
+    results := make(chan Result)
+    go func() {
+        defer close(results)
+        for _, url := range urls {
+            var result Result
+            resp, err := http.Get(url)
+            result = Result{Error: err, Response: resp}
+            select {
+                case <-done: return
+                case results <- result:
+            }
+        }
+        return results
+    }
+}
+done := make(chan interface{})
+defer close(done)
+urls := []string{"", ""}
+for res := range checkStatus(done, urls...) {
+    if res.Error != nil {
+        continue
+    }
+}
+\end{lstlisting}
+
+\subsection{Pipeline}
+\begin{lstlisting}[language=Golang]
+generator := func(done <-chan interface{}, integers ...int) <-chan int {
+    intStream := make(chan int)
+    go func() {
+        defer close(intStream)
+        for _, i := range integers {
+            select {
+                case <-done: return
+                case intStream <- i:
+            }
+        }
+    }()
+    return intStream
+}
+multiply := func(
+    done <-chan interface{},
+    intStream <-chan int,
+    multiplier int,
+) <-chan int {
+    multipliedStream := make(chan int)
+    go func() {
+        defer close(multipliedStream)
+        for i := range intStream {
+            select {
+                case <-done: return
+                case multipliedStream <- i * multiplier:
+                // add is the same but with + here
+            }
+        }
+    }()
+    return multipliedStream
+}
+
+done := make(chan interface{})
+defer close(done)
+intStream := generator(done, 1, 2, 3, 4)
+// * 2 + 1 * 2
+pipeline := multiply(done, add(done, multiply(done, intStream, 2), 1), 2)
+for v := range pipeline {
+    fmt.Println(v)
+}
+\end{lstlisting}
+
+\subsection{Fan-out, Fan-in}
+\begin{lstlisting}[language=Golang]
+fanIn := func(
+    done <-chan interface{},
+    channels ...<-chan interface{}
+) <-chan interface {
+    var wg sync.WaitGroup
+    multiplexedStream := make(chan interface{})
+    multiplex := func(c <-chan interface{}) {
+        defer wg.Done()
+        for i := range c {
+            select {
+                case <-done: return
+                case multiplexedStream <- i:
+            }
+        }
+    }
+    wg.Add(len(channels))
+    for _, c := range channels {
+        go multiplex(c)
+    }
+    go func() {
+        wg.Wait()
+        close(multiplexedStream)
+    }()
+    return multiplexedStream
+}
+
+done := make(chan interface{})
+defer close(done)
+start := time.Now()
+rand := func() interface{} { return rand.Intn(676767) }
+randIntStream := toInt(done, repeatFn(done, rand))
+numFinders := runtime.NumCPU() // number of OS threads
+finders := make([]<-chan interface{}, numFinders)
+for i := 0; i < numFinders; i++ {
+    finders[i] = primeFinder(done, randIntStream)
+}
+// limit output
+for prime := range take(done, fanIn(done, finders...), 10) {
+    fmt.Println(prime)
+}
+\end{lstlisting}
+
+\subsection{Load Balancer}
+\begin{lstlisting}[language=Golang]
+// requests sent to balancer
+type Request struct {
+    fn func() int // operation to perform
+    c chan int // channel for result
+}
+
+// requester
+func requester(work chan<- Request) {
+    c := make(chan int)
+    for {
+        work <- Request{ workFn, c }
+        result := <-c
+        process(result)
+    }
+}
+
+// worker
+type Worker struct {
+    requests chan Request // buffered work channel
+    pending int // count of tasks
+    index int // index in heap
+}
+
+func (w *Worker) work(done chan *Worker) {
+    for {
+        req := <-w.requests
+        req.c <- req.fn()
+        done <- w
+    }
+}
+
+// balancer
+type Pool []*Worker
+type Balancer struct {
+    pool Pool
+    done chan *Worker
+}
+
+func (b *Balancer) balance(work chan Request) {
+    for {
+        select {
+            case req := <-work: b.dispatch(req)
+            case w := <-b.done: b.completed(w)
+        }
+    }
+}
+
+// worker pool
+func (p Pool) Less(i, j int) bool {
+    return p[i].pending < p[j].pending
+}
+
+// dispatcher
+func (b *Balancer) dispatch(req Request) {
+    w := heap.Pop(&b.pool).(*Worker)
+    w.requests <- req
+    w.pending++
+    heap.Push(&b.pool, w)
+}
+
+// completed
+func (b *Balancer) completed(w *Worker) {
+    w.pending--
+    heap.Remove(&b.pool, w.index)
+    heap.Push(&b.pool, w)
+}
+\end{lstlisting}
+
+\section{Classical Synchronisation Problems}
+
+\subsection{Producer Consumer}
+\begin{lstlisting}
+// producer
+Produce Item;
+wait(notFull);
+wait(mutex);
+buffer[in] = item;
+in = (in+1) % K;
+count++;
+signal(mutex);
+signal(notEmpty);
+
+// consumer
+wait(notEmpty);
+wait(mutex);
+item = buffer[out];
+out = (out+1) % K;
+count--;
+signal(mutex);
+signal(notFull);
+Consume Item;
+\end{lstlisting}
+
+\subsection{Readers Writers}
+\begin{lstlisting}
+// lightswitch
+counter = 0
+mutex = Semaphore(1)
+roomEmpty = Semaphore(1)
+lock(semaphore):
+    mutex.wait()
+    counter += 1
+    if counter == 1:
+        semaphore.wait()
+    mutex.signal()
+unlock(semaphore):
+    mutex.wait()
+    counter -= 1
+    if counter == 0:
+        semaphore.signal()
+    mutex.signal()
+
+// writer
+turnstile.wait()
+roomEmpty.wait()
+// CS
+turnstile.signal()
+roomEmpty.signal()
+
+// reader
+turnstile.wait()
+turnstile.signal()
+readLightswitch.lock(roomEmpty)
+// CS
+readLightswitch.unlock(roomEmpty)
+\end{lstlisting}
+
+\subsection{\texttt{std::barrier}}
+\begin{lstlisting}[language=C++]
+std::barrier sync_point(std::ssize(x), complete);
+auto work = [&](std::string y) {
+    // work
+    sync_point.arrive_and_wait();
+    // work
+    sync_point.arrive_and_wait();
+}
+std::vector<std::thread> threads;
+for (auto const& y : x) threads.emplace_back(work, y);
+for (auto& thread : threads) thread.join();
+\end{lstlisting}
+
+\subsection{Barrier Implementation}
+
+\subsection{C++}
+\begin{lstlisting}[language=C++]
+struct Barrier {
+    std::ptrdiff_t expected;
+    std::ptrdiff_t count;
+    std::mutex mut;
+    std::counting_semaphore<> turnstile;
+    std::counting_semaphore<> turnstile2;
+    Barrier(std::ptrdiff_t expected)
+        : expected{expected}, count{0}, mut{}, turnstile{0}, turnstile2{0} {}
+    void arrive_and_wait() {
+        {
+            std::scoped_lock lock{mut};
+            count++;
+            if (count == expected) {
+                turnstile2.acquire(); // close waiter turnstile
+                turnstile.release(expected); // open turnstile into CS
+            }
+        }
+        turnstile.acquire();
+        {
+            std::scoped_lock lock{mut};
+            count--;
+            if (count == 0) {
+                turnstile.acquire(); // close turnstile to reset barrier
+                turnstile2.release(expected); // open waiter turnstile
+            }
+        }
+        turnstile2.acquire();
+    }
+};
+\end{lstlisting}
+
+\subsection{Golang}
+\begin{lstlisting}[language=Golang]
+type Barrier struct {
+    wg sync.WaitGroup
+    wg2 sync.WaitGroup
+}
+
+func (b *Barrier) Init(expected int) {
+    b.wg.Add(expected)
+    b.wg2.Add(expected)
+}
+
+func (b *Barrier) Wait() {
+    b.wg.Done()
+    b.wg.Wait()
+    // all threads have called wait
+    // reset barrier
+    b.wg.Add(1)
+    b.wg2.Done()
+    // wait for barrier to fully reset
+    b.wg2.Wait()
+    // barrier reset
+    b.wg2.Add(1)
+}
+\end{lstlisting}
+
+\subsection{Dining Philosophers}
+
+\subsubsection{C++}
+\begin{lstlisting}[language=C++]
+// solution 1: basic solution
+template<size_t NumP>
+struct DiningTable {
+    using ChpStick = std::mutex;
+    ChpStick chpSticks[NumP];
+    ChpStick& get_left_chpStick(size_t pid) { return chpSticks[pid]; }
+    ChpStick& get_right_chpStick(size_t pid) { return chpSticks[(pid+1) % NumP]; }
+    void eat(size_t pid, void (*eat_callback)(size_t pid)) {
+        std::scoped_lock lock{get_left_chpStick(pid), get_right_chpStick(pid)};
+        eat_callback(pid);
+    }
+};
+
+// solution 2: limited eaters
+template<size_t NumP>
+struct DiningTable {
+    using ChpStick = std::mutex;
+    ChpStick chpSticks[NumP];
+    std::counting_semaphore<> footman_sem{NumP-1};
+    ChpStick& get_left_chpStick(size_t pid) { return chpSticks[pid]; }
+    ChpStick& get_right_chpStick(size_t pid) { return chpSticks[(pid+1) % NumP]; }
+    void eat(size_t pid, void (*eat_callback)(size_t pid)) {
+        footman_sem.acquire();
+        std::scoped_lock left_lock{get_left_chpStick(pid)};
+        std::scoped_lock right_lock{get_right_chpStick(pid)};
+        eat_callback(pid);
+        footman_sem.release();
+    }
+};
+
+// solution 3: fair semaphore
+template<size_t NumP>
+struct DiningTable {
+    using ChpStick = FairMutex;
+    ChpStick chpSticks[NumP];
+    FairSemaphore footman_sem{NumP-1};
+    ChpStick& get_left_chpStick(size_t pid) { return chpSticks[pid]; }
+    ChpStick& get_right_chpStick(size_t pid) { return chpSticks[(pid+1) % NumP]; }
+    void eat(size_t pid, void (*eat_callback)(size_t pid)) {
+        footman_sem.acquire();
+        std::scoped_lock left_lock{get_left_chpStick(pid)};
+        std::scoped_lock right_lock{get_right_chpStick(pid)};
+        eat_callback(pid);
+        footman_sem.release();
+    }
+};
+
+\end{lstlisting}
+
+\subsubsection{Golang}
+\begin{lstlisting}[language=Golang]
+type ChpStick struct {}
+type DiningTable struct {
+    numPhilosophers int
+    chpStickChs []chan ChpStick
+}
+
+func (t *DiningTable) Init(numPhilosophers int) {
+    t.numPhilosophers = numPhilosophers
+    t.chpStickChs = make([]chan ChpStick, 0, numPhilosophers)
+    for i := 0; i < numPhilosophers; i++ {
+        chpStick := make(chan ChpStick, 1)
+        chpStick <- ChpStick{}
+        t.chpStickChs = append(t.chpStickChs, chpStick)
+    }
+}
+
+// solution 1: odd-even ring communication
+func (t *DiningTable) Eat(pid int, eat_callback func(pid int)) {
+    evenChpStickCh := t.evenChpStickCh(pid)
+    oddChpStickCh := t.oddChpStickCh(pid)
+    <-evenChpStickCh
+    <-oddChpStickCh
+    eat_callback(pid)
+    evenChpStickCh <- ChpStick{}
+    oddChpStickCh <- ChpStick{}
+}
+
+func (t *DiningTable) leftChpStickCh(pid int) chan ChpStick {
+    return t.chpStickChs[pid]
+}
+
+func (t *DiningTable) rightChpStickCh(pid int) chan ChpStick {
+    return t.chpStickChs[(pid+1) % t.numPhilosophers]
+}
+
+func (t *DiningTable) evenChpStick(pid int) chan ChpStick {
+    if pid % 2 == 0 {
+        return t.leftChpStickCh(pid)
+    } else {
+        return t.rightChpStickCh(pid)
+    }
+}
+
+func (t *DiningTable) oddChpStick(pid int) chan ChpStick {
+    if pid % 2 == 1 {
+        return t.leftChpStickCh(pid)
+    } else {
+        return t.rightChpStickCh(pid)
+    }
+}
+
+// solution 2: swap order of chopsticks to avoid deadlock
+func (t * DiningTable) Eat(pid int, eat_callback func(pid int)) {
+    evenChpStickCh := t.evenChpStickCh(pid)
+    oddChpStickCh := t.oddChpStickCh(pid)
+    
+breakLock:
+    for {
+        <-evenChpStickCh
+        select {
+            case <-oddChpStickCh:
+                break breakLock
+            default:
+                // swap
+        }
+        evenChStickCh <- ChpStick{}
+        <-oddChpStickCh
+        select {
+            case <-evenChpStickCh:
+                break breakLock
+            default:
+                /// swap
+        }
+    }
+    eat_callback(pid)
+    evenChpStickCh <- ChpStick{}
+    oddChpStickCh <- ChpStick{}
+}
+
+// solution 3: limited eater using footman
+type DiningTable struct {
+    numPhilosophers int
+    chpStickChs []chan ChpStick
+    footman chan struct{}
+}
+
+func (t *DiningTable) Init(numPhilosophers int) {
+    t.numPhilosophers = numPhilosophers
+    t.chpStickChs = make([]chan ChpStick, 0, numPhilosophers)
+    for i := 0; i < numPhilosophers; i++ {
+        chpStick := make(chan ChpStick, 1)
+        chpStick <- ChpStick{}
+        t.chpStickChs = append(t.chpStickChs, chpStick)
+    }
+    t.footman = make(chan struct{}, numPhilosophers - 1)
+    for i := 0; i < numPhilosophers - 1; i++ {
+        t.footman <- struct{}{}
+    }
+}
+
+func (t *DiningTable) Eat(pid int, eat_callback(func(pid int)) {
+    leftChpStickCh := t.leftChpStickCh(pid)
+    rightChpStickCh := t.rightChpStickCh(pid)
+    <-t.footman
+    select {
+        case <-leftChpStickCh: <-rightChpStickCh
+        case <-rightChpStickCh: <-leftChpStickCh
+    }
+    eat_callback(pid)
+    leftChpStickCh <- ChpStick{}
+    rightChpStickCh <- ChpStick{}
+    t.footman <- struct{}{}
+}
+\end{lstlisting}
+
+\subsubsection{Pseudocode}
+\begin{lstlisting}
+// Tanenbaum solution
+int state[N];
+Semaphore mutex = 1;
+Semaphore s[N];
+
+void philosopher(int i) {
+    while (TRUE) {
+        Think();
+        takeChpSticks(i);
+        Eat();
+        putChpSticks(i);
+    }
+}
+
+void takeChpSticks(i) {
+    wait(mutex);
+    state[i] = HUNGRY;
+    safeToEat(i);
+    signal(mutex);
+    wait(s[i]);
+}
+
+void safeToEat(i) {
+    if ((state[i] == HUNGRY) &&
+        (state[LEFT] != EATING) &&
+        (state[RIGHT] != EATING)) {
+        state[i] = EATING;
+        signal(s[i]);
+    }
+}
+
+void putChpSticks(i) {
+    wait(mutex);
+    state[i] = THINKING;
+    safeToEat(LEFT);
+    safeToEat(RIGHT);
+    signal(mutex);
+}
+
+// limited eater
+// with N-1, guaranteed to have at least one success
+void philosopher(int i) {
+    while (TRUE) {
+        Think();
+        wait(seats);
+        wait(chpStick[LEFT]);
+        wait(chpStick[RIGHT]);
+        Eat();
+        signal(chpStick[LEFT]);
+        signal(chpStick[RIGHT]);
+        signal(seats);
+    }
+}
+\end{lstlisting}
+
+\subsection{Barbershop}
+\subsection{Pseudocode}
+\begin{lstlisting}
+// pseudocode
+customers = 0
+mutex = Semaphore(1)
+customer = Semaphore(0)
+barber = Semaphore(0)
+customerDone = Semaphore(0)
+barberDone = Semaphore(0)
+// customer
+wait(mutex);
+if (customers == n) {
+    signal(mutex);
+    exit();
+}
+customers += 1;
+signal(mutex);
+signal(customer);
+wait(barber);
+getHairCut();
+signal(customeDone);
+wait(barberDone);
+wait(mutex);
+customers -= 1;
+signal(mutex);
+// barber
+while (TRUE) {
+    wait(customer);
+    signal(barber);
+    cutHair();
+    wait(customerDone);
+    signal(barberDone);
+}
+\end{lstlisting}
+
+\subsection{C++}
+\begin{lstlisting}[language=C++]
+template <size_t MaxCustomers>
+struct Barbershop {
+    size_t customers;
+    std::mutex mut;
+    std::counting_semaphore<> customer_sem;
+    std::counting_semaphore<> barber_sem;
+    std::counting_semaphore<> done_customer_sem;
+    std::counting_semaphore<> done_barber_sem;
+    void barber(void (*cutHair)()) {
+        while (true) {
+            customer_sem.acquire();
+            barber_sem.release();
+            cutHair();
+            done_customer_sem.acquire();
+            done_barber_sem.release();
+        }
+    }
+    void customer(void (*balk)(), void (*getHairCut)()) {
+        {
+            std::scoped_lock lock{mut};
+            if (customers == MaxCustomers + 1) {
+                balk();
+                return;
+            }
+            customers++;
+        }
+        customer_sem.release();
+        barber_sem.acquire();
+        getHairCut();
+        done_customer_sem.release();
+        done_barber_sem.acquire();
+        {
+            std::scoped_lock lock{mut};
+            customers--;
+        }
+    }
+};
+\end{lstlisting}
+
+\subsection{Golang}
+\begin{lstlisting}[language=Golang]
+// might not be FIFO
+type Barbershop struct {
+    chairs chan int
+    barberAvailable chan struct{}
+}
+
+func (bs *Barbershop) Init(numChairs int) {
+    bs.chairs = make(chan int, numChairs)
+    bs.barberAvailable = make(chan struct{})
+}
+
+func (bs *Barbershop) Barber(cutHair func()) {
+    for {
+        bs.barberAvailable <- struct{}{}
+        <-bs.chairs
+        cutHair()
+    }
+}
+
+func (bs *Barbershop) Customer(balk func(), getHairCut func()) {
+    select {
+        case bs.chairs <- 1:
+            <-bs.barberAvailable
+            getHairCut()
+        default:
+            balk()
+    }
+}
+\end{lstlisting}
+
+\section{Rust}
+
+\subsection{Rust Basics}
+\begin{lstlisting}[language=Rust]
+fn add_one(i: i32) -> i32 { i+1 }
+
+let x = 1; // immutable
+let mut y = 1; // mutable
+let z: i32 = 1;
+
+// closures
+|i| i + 2
+|i: i32| -> i32 { i + 2 }
+
+&str // char array like
+String // string type buffer
+
+// struct and enum literals
+OrderDetails {
+    price: 1,
+    count: 1,
+    id: 1
+}
+
+match order {
+    Order::Buy(details) => smth(),
+    Order::Sell(details) => smth(),
+    Order::Cancel { id } => smth()
+}
+
+let v = 1;
+match v {
+    1 => ...,
+    _ => ...
+}
+
+pub enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+// optionals
+pub enum Option<T> {
+    None,
+    Some(T),
+}
+
+let order_id = Some(3);
+let Some(value) = order_id else {
+    // panic
+};
+
+order_id.unwrap();
+
+// ? operator unwraps 'Ok' or returns 'Err'
+let content = std::fs::read_to_string("config.txt")?; 
+let content = match std::fs::read_to_string("config.txt") { Ok(v) => v, Err(e) => return Err(e.into()) };
+
+// vectors
+let mut odd = Vec::new();
+odd.push(1);
+let numbers = (1..=100).collect::<Vec<u32>>();
+let even: Vec<&u32> = numbers.iter().filter(|&i| i % 2 == 0).collect();
+for n in &odd { } // borrow in loop
+\end{lstlisting}
+
+\subsection{Ownership and Borrowing}
+\begin{lstlisting}[language=Rust]
+// transferring ownership
+fn main() {
+    let mut book = Vec::new();
+    book.push(...);
+    book.push(...);
+    publish(book);
+    // ownership transferred, shallow copy of fields to other stack
+    // original book cannot be used
+    // publish(book); // compilation error, used of moved value
+}
+fn publish(book: Vec<String>) {
+    // ...
+} // book gets dropped here
+
+// immutable borrow, shared reference
+fn main() {
+    let mut book = Vec::new();
+    book.push(...);
+    book.push(...);
+    publish(&book);
+    // reference borrowed
+    publish(&book); // ok now
+    // book is mutable here
+}
+fn publish(book: &Vec<String>) {
+    // book is immutable here and in main
+}
+
+// mutable borrow
+fn main() {
+    let mut book = Vec::new();
+    book.push(...);
+    book.push(...);
+    publish(&mut book);
+    publish(&mut book);
+}
+// book doesn't need mut since itself doesn't need to be mutable
+// the underlying reference is already mutable
+fn publish(book: &mut Vec<String>) {
+    // book is not usable in main at all
+    book.push(...)
+}
+
+// return ownership
+fn publish(book: Vec<String>) {
+    book
+}
+\end{lstlisting}
+
+\subsection{Threads}
+
+\begin{lstlisting}[language=Rust]
+let loc = thread::spawn(|| { // anonymous function syntax
+    "world"
+});
+println!("Hello, {}!", loc.join().unwrap());
+
+// move transfers ownership
+// without move, rust will try to infer (not recommended)
+let mut dst = Vec::new();
+thread::spawn(move || {
+    dst.push(3);
+});
+dst.push(3); // error, ownership was transferred
+\end{lstlisting}
+
+\subsection{Lifetimes}
+\begin{lstlisting}[language=Rust]
+// static lifetime, data does not borrow anything that could go out of scope
+let s: &'static str = "hello";
+
+// annotations
+// x, y are valid for the lifetime of scope a
+// returned reference will live at least as long as the shortest lifetime of x, y
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+// 2 different scopes
+// z has different lifetime compared to x, y
+fn longest_print_z<'a, 'b>(x: &'a str, y: &'a str, z: 'b str) -> &'a str {
+    println!("{}", z);
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+// reference counted type
+// error, cannot be sent across threads
+let v = Rc:: new(vec![1, 2, 3]);
+let v2 = v.clone();
+thread::spawn(move || {
+    println!("{}", v.len());
+});
+another_fn(v2.clone);
+
+// traits (interfaces)
+trait Clone {
+    fn clone(&self) -> Self;
+}
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Vec<T> {
+        let mut v = Vec::new();
+        for elem in self {
+            v.push(elem.clone());
+        }
+        return v;
+    }
+}
+
+// atomic reference counted
+// only allows shared references
+let v = Arc:: new(vec![1, 2, 3]);
+let v2 = v.clone();
+// move shared reference into thread
+thread::spawn(move || {
+    // v cannot be modified
+    println!("{}", v.len());
+});
+another_fn(&v2);
+\end{lstlisting}
+
+\subsection{Rust Synchronisation}
+\begin{lstlisting}[language=Rust]
+// mutex
+fn sync inc(counter: &Mutex<i32>) {
+    let mut data MutexGuard<i32> = counter.lock();
+    *data += 1;
+}
+
+// atomics
+let number = AtomicUsize::new(10);
+let prev = number.fetch_add(1, SeqCst);
+assert_eq!(prev, 10);
+let prev = number.swap(2, SeqCst);
+assert_eq!(prev, 11);
+assert_eq!(number.load(SeqCst), 2);
+
+// MPSC FIFO queue
+let (tx, rx) = mpsc::channel();
+let tx2 = tx.clone();
+thread::spawn(move || tx.send(5));
+thread::spawn(move || tx2.send(4));
+// order of printing is not specified
+println!("{:?}", rx.recv));
+println!("{:?}", rx.recv));
+\end{lstlisting}
+
+\subsection{Crossbeam}
+\begin{lstlisting}[language=Rust]
+// scoped threads
+fn main() {
+    let v = vec![1, 2, 3];
+    std::thread::scope(|scope| {
+        scope.spawn(|inner_scope| {
+            // do stuff with v
+        });
+    }).unwrap();
+    // v is back here
+}
+
+// producer consumer
+fn main() {
+    let (send_end, receive_end) = bounded(CHANNEL_CAPACITY);
+    let mut threads = vec![];
+    for _i in 0 .. NUM_THREADS {
+        let send_end = send_end.clone();
+        threads.push(
+            thread::spawn(move || {
+                for _k in 0 .. ITEMS_PER_THREAD {
+                    let produced_value = produce_item();
+                    send_end.send(produced_value).unwrap();
+                }
+            })
+        )
+    }
+    for _j in 0 .. NUM_THREADS {
+        let receive_end = receive_end.clone();
+        threads.push(
+            thread::spawn(move || {
+                for _k in 0 .. ITEMS_PER_THREAD {
+                    let to_consume = receive_end.recv().unwrap();
+                    consume_item(to_consume);
+                }
+            })
+        )
+    }
+    for t in threads {
+        let _ = t.join();
+    }
+}
+
+// exponential backoff
+use crossbeam_utils::Backoff;
+use std::sync_atomic::AtomicUsize;
+use std::sync::atomic::Ordering::SeqCst;
+fn fetch_mul(a: &AtomicUsize, b: usize) -> usize {
+    let backoff = Backoff::new();
+    loop {
+        let val = a.load(SeqCst);
+        if a.compare_and_swap(val, val.wrapping_mul(b), SeqCst) == val {
+            return val;
+        }
+        backoff.spin();
+    }
+}
+
+// rough implementation of spin wait
+fn spin_wait(ready: &AtomicBool) {
+    let backoff = Backoff::new();
+    while !ready.load(SeqCst) {
+        backoff.snooze();
+    }
+}
+\end{lstlisting}
+
+\subsection{Rayon}
+\begin{lstlisting}[language=Rust]
+// sequential maximum
+fn main() {
+    let vec = init_vector();
+    let max = MIN;
+    vec.iter().for_each(|n| {
+        if *n > max {
+            max = *n;
+        }
+    });
+}
+// with Rayon
+fn main() {
+    let vec = init_vector()
+    let max = AtomicI64::new(MIN);
+    vec.par_iter().for_each(|n| {
+        loop {
+            let old = max.load(Ordering::SeqCst);
+            if *n <= old {
+                break;
+            }
+            let returned = max.compare_and_swap(old, *n, Ordering::SeqCst);
+            if returned == old {
+                break;
+            }
+        }
+    });
+}
+\end{lstlisting}
+
+\subsection{Futures}
+\begin{lstlisting}[language=Rust]
+// simplified trait
+trait Future {
+    type Output;
+    fn poll(&mut self, cx: &mut Context) -> Poll<Self::Output>;
+}
+enum Poll<T> {
+    Ready(T),
+    Pending,
+}
+
+// composition
+let future = placeOnStove(meat)
+    .then(|meat| cookOneSide(meat))
+    .then(|meat| flip(meat))
+    .then(|meat| cookOneSide(meat));
+
+// clunky composition
+fn addToInbox(email_id: u64, recipient_id: u64) -> impl Future<Output=Result<(), Error>> {
+    loadMessage(email_id)
+        .and_then(|message| get_recipient(message, recipient_id))
+        .map(|(message, recipient)| recipient.verifyHasSpace(&message))
+        .and_then(|(message, recipient)| recipient.addToInbox(message))
+}
+
+// async, returns a future
+// await waits for a future and retrieves a value
+async fn addToInbox(email_id: u64, recipient_id: u64) -> Result<(), Error> {
+    let message = loadMessage(email_id).await?;
+    let recipient = get_recipient(recipient_id).await?;
+    recipient.verifyHasSpace(&message)?;
+    recipient.addToInbox(message).await
+}
+
+// state management
+enum AddToInboxState {
+    NotYetStarted { email_id: u64, recipient_id: u64},
+    WaitingLoadMessage { recipient_id: u64, state: LoadMessageFuture },
+    WaitingGetRecipient { message: Message, state: GetRecipientFuture },
+    WaitingAddToInbox { state: AddToInboxFuture },
+    Completed { result: Result<(), Error> },
+}
+
+fn poll(*) {
+    match self.state {
+        NotYetStarted(email_id, recipient_id) => {
+            let next_future = load_message(email_id);
+            // switch to WaitingLoadMessage state
+        },
+        WaitingLoadMessage(email_id, recipient_id, state) => {
+            match state.poll() {
+                Ready(message) => {
+                    let next_future = get_recipient(recipient_id);
+                    // switch to WaitingGetRecipient state
+                },
+                Pending => return Pending,
+            }
+        },
+        WaitingGetRecipient(message, recipient_id, state) => {
+            match state.poll() {
+                Ready(recipient) => {
+                    recipient.verifyHasSpace(&message)?;
+                    let next_future = recipient.addToInbox(message);
+                    // switch to WaitingAddToInbox state
+                },
+                Pending => return Pending,
+            }
+        },
+        // ...
+    }
+}
+\end{lstlisting}
+
+\section{TLA+}
+\subsection{Basics}
+\begin{lstlisting}
+// AND: /\
+// OR:  \/
+// NOT: ~a
+
+// predicate: expression returning boolean
+operator(a, b, c) == (a /\ b) \/ (a /\ ~c)
+
+// actions: tests
+// tick means after
+Next ==
+    state = "hello"
+    /\ state' = "goodbye"
+
+// counting
+Init ==
+    x = 1
+Next ==
+    (x = 1 /\ x' = 2)
+    \/ (x = 2 /\ x' = 3)
+// alternatively, we can explicitly name the steps known as operators
+// deadlocks at state 3
+// staying at a state is not valid
+Init == x = 1
+Step1 == x = 1 /\ x' = 2
+Step2 == x = 2 /\ x' = 3
+Done == x = 3 /\ UNCHANGED x
+// add new valid transitions
+Next == Step1 \/ Step2 \/ Done \/ UNCHANGED x
+
+// properties
+[] (x > 0) // x always > 0
+<> (x = 2) // eventually x = 2
+<>[] (x = 3) // eventually x always = 3
+(x = 2) ~> (x = 3) // x = 2 leads to x = 3
+// stuttering causes these to fail
+
+Spec = Init /\ [](Next \/ UNCHANGED x) // refactor specification
+Spec = Init /\ [][Next]_x // syntax for next or stutter
+Spec = Init /\ [][Next]_x /\ WF_x(Next) // fairness, if next step is available, eventually try it, ignoring stutter
+
+// set theory
+e \in S // inclusion
+{1, 2, 3} // define set
+{e \in S : p} // define set using predicate
+\A e \in S : p // for all elements check predicate
+\E x \in S : p // there exists element satisfying predicate
+\end{lstlisting}
+
+\subsection{Producer Consumer}
+\begin{lstlisting}
+// producer states and actions
+CheckWritable ==
+    producerState = "ready"
+    /\ queueSize < MaxQueueSize
+    /\ producerState' = "canWrite"
+    /\ UNCHANGED queueSize
+
+Write == 
+    producerState = "canWrite"
+    /\ producerState' = "ready"
+    /\ queueSize' = queueSize + 1
+
+ProducerAction == CheckWritable \/ Write
+
+// consumer states and actions
+CheckReadable ==
+    consumerState = "ready"
+    /\ queueSize > 0
+    /\ consumerState' = "canRead"
+    /\ UNCHANGED queueSize
+
+Read == 
+    consumerState = "canRead"
+    /\ consumerState' = "ready"
+    /\ queueSize' = queueSize - 1
+
+ConsumerAction == CheckReadable \/ Read
+
+// complete script
+VARIABLES
+    queueSize,
+    producerState,
+    consumerState
+
+MaxQueueSize == 2
+
+Init ==
+    queueSize = 0
+    /\ producerState = "ready"
+    /\ consumerState = "ready"
+
+Next == 
+    ProducerAction
+    \/ ConsumerAction
+    \/ (UNCHANGED producerState
+        /\ UNCHANGED consumerState
+        /\ UNCHANGED queueSize)
+
+// properties
+AlwaysWithinBounds ==
+    [] (queueSize >= 0
+        /\ queueSize <= MaxQueueSize)
+
+// multiple producers and consumers
+// actually fails checks, since check and write a separate actions
+CONSTANT producers, consumers
+producers = {"p1", "p2"}
+consumers = {"c1", "c2"}
+VARIABLES queueSize, producerState, consumerState // maps / dictionaries
+MaxQueueSize == 2
+Init == 
+    queueSize = 0
+    /\ producerState = [p \in producers |-> "ready"]
+    /\ consumerState = [c \in consumers |-> "ready"]
+
+CheckWritable(p) == 
+    producerState[p] = "ready"
+    /\ queueSize < MaxQueueSize
+    /\ producerState' =
+        [producerState EXCEPT ![p] = "canWrite"]
+    /\ UNCHANGED queueSize
+    /\ UNCHANGED consumerState
+
+Write(p) ==
+    producerState[p] = "canWrite"
+    /\ queueSize' = queueSize + 1
+    /\ producerState' =
+        [producerState EXCEPT ![p] = "ready"]
+    /\ UNCHANGED consumerState
+
+ProducerAction ==
+    \E p \in producers : CheckWritable(p) \/ Write(p)
+
+CheckReadable(c) == 
+    consumerState[c] = "ready"
+    /\ queueSize > 0
+    /\ consumerState' =
+        [consumerState EXCEPT ![c] = "canRead"]
+    /\ UNCHANGED queueSize
+    /\ UNCHANGED producerState
+
+Read(c) ==
+    consumerState[c] = "canRead"
+    /\ queueSize' = queueSize - 1
+    /\ consumerState' =
+        [consumerState EXCEPT ![c] = "ready"]
+    /\ UNCHANGED producerState
+
+ConsumerAction ==
+    \E c \in consumers : CheckReadable(c) \/ Read(c)
+\end{lstlisting}
+
+\section{Finals Tutorial Stuff}
+
+\subsection{Go Concurrent Counter}
+\begin{lstlisting}[language=Golang]
+// worker
+count := <-ch
+count++
+wg.Done()
+ch <- count
+
+// master
+wg.Wait()
+fmt.Println(<-ch)
+\end{lstlisting}
+
+\subsection{Go Multi Producer Multi Consumer Queue}
+\begin{lstlisting}[language=Golang]
+func producer(done chan struct{}, q chan int) {
+    for {
+        select {
+        case q <- 1:
+        case <-done:
+            return
+        }
+    }
+}
+
+func consumer(done chan struct{}, q chan int, sumCh chan<- int) {
+    sum := 0
+    for {
+        select {
+        case <-done:
+            sumCh <- sum
+            close(sumCh)
+            return
+        case num := <-q:
+            sum += num
+        }
+    }
+}
+
+
+var (
+    NumProducer = 5
+    NumConsumer = 5
+)
+
+func main() {
+    start, done := make(chan struct{}), make(chan struct{})
+    q := make(chan int)
+
+    // 1 channer per consumer
+    sumChs := make([]chan int, 0, NumConsumer)
+    for i := 0; i < NumConsumer; i++ {
+        sumCh := make(chan int, 1)
+        sumChs = append(sumChs, sumCh)
+    }
+
+    for i := 0; i < NumProducer; i++ {
+        go func() {
+            <-start
+            producer(done, q)
+        }()
+    }
+    for j := 0; j < NumConsumer; j++ {
+        j := j // capture j in the scope, for older Go versions
+        go func() {
+            <-start
+            consumer(done, q, sumChs[j])
+        }()
+    }
+
+    close(start) // start goroutines
+    time.Sleep(time.Second) // run for 1 second
+    close(done) // stop goroutines
+
+    // collect all sums
+    sum := 0
+    for _, ch := range sumChs { // NOTE: range over slice, not combined channel
+        sum += <-ch
+    }
+    fmt.Println("Sum: ", sum)
+}
+\end{lstlisting}
+
+\subsection{Go Contexts}
+\begin{lstlisting}[language=Golang]
+// using a context
+func producer(ctx context.Context, q queue) {
+    for {
+        select {
+        case q<- 1:
+        case <-ctx.Done(): return
+        }
+    }
+}
+// creating contexts
+ctx, _ := context.WithTimeout(context.Background(), 4 * time.Second)
+// context tree, if parent is canelled, child is also cancelled
+ctx2, _ := context.withTimeout(ctx, 2 * time.Second)
+// manually cancel a context
+ctx3, cancel := context.WithCancel(ctx)
+go func() { cancel() }()
+\end{lstlisting}
+
+\subsection{Go Fan-In Fan-Out}
+\begin{lstlisting}[language=Golang]
+type worker struct {
+	inputCh  chan Event
+	outputCh chan Event
+}
+
+func newWorker() *worker {
+	return &worker{
+		inputCh:  make(chan Event),
+		outputCh: make(chan Event),
+	}
+}
+
+// workers with promises
+func (w *worker) start(
+	ctx context.Context,
+	fn EventFunc, workerQueue chan *worker, wg *sync.WaitGroup,
+) {
+    wg.Add(1)
+	go func() {
+        defer wg.Done()
+        for {
+            select {
+            case <-ctx.Done():
+                return
+            case workerQueue <- w:
+                e := <-w.inputCh
+                w.outputCh <- fn(e)
+            }
+        }
+	}()
+}
+
+// ordered multiplexer
+func orderedMux(
+	ctx context.Context, cancel context.CancelFunc,
+	inputCh chan Event, workerQueue chan *worker, workerOutputCh chan chan Event,
+) {
+	go func() {
+        for {
+            select {
+            case <-ctx.Done():
+                return
+            case e := <-inputCh:
+                w := <-workerQueue
+                w.inputCh <- e
+                workerOutputCh <- w.outputCh
+            }
+        }
+	}()
+}
+
+// in main
+readerDone := make(chan struct{})
+go func() {
+    for outputCh := range workerOutputCh { // <-- reading a stream of promises
+        output, more := <-outputCh // <-- read from the promise once only
+        if !more {
+            break // <-- a worker breaks its promise; workers exiting
+        }
+        fmt.Printf("Event id: %d\n", output.id)
+    }
+    close(readerDone)
+}()
+
+// serialiser
+finalOutputCh := make(chan Event, 1)
+	go func() {
+        buffer := make(map[int64]Event)
+        var nextEvent int64 = 1
+        for output := range processedCh {
+            buffer[output.id] = output
+            for {
+                if event, exists := buffer[nextEvent]; exists {
+                    finalOutputCh <- event
+                    nextEvent += 1
+                } else {
+                    break
+                }
+            }
+        }
+        close(finalOutputCh)
+    }()
+\end{lstlisting}
+
+\subsection{Go Pipelining}
+\begin{lstlisting}[language=Golang]
+func toPipelineStage(
+    ctx context.Context,
+    reqCh <-chan Request, instances int,
+    fn func(*Request) *Request,
+) chan Request {
+    outCh := make(chan Request)
+    for i := 0; i < instances; i++ {
+        go func() {
+            for req := range reqCh {
+                select {
+                case outCh <- *fn(&req):
+                case <-ctx.Done():
+                    return
+                }
+            }
+        }()
+    }
+    return outCh
+}
+
+// in main
+c := make(chan Request, 100)
+c = toPipelineStage(ctx, c, 2, step1)
+c = toPipelineStage(ctx, c, 5, step2)
+c = toPipelineStage(ctx, c, 10, step3)
+c = toPipelineStage(ctx, c, 5, step4)
+\end{lstlisting}
+
+\subsection{C++ H2O using Barrier}
+\begin{lstlisting}[language=C++]
+std::counting_semaphore<> oxygenSem{1};
+std::counting_semaphore<> hydrogenSem{2};
+std::barrier<> barrier{3};
+
+void oxygen(void (*bond)()) {
+    oxygenSem.acquire();
+    barrier.arrive_and_wait();
+    bond();
+    oxygenSem.release();
+}
+
+void hydrogen(void (*bond)()) {
+    hydrogenSem.acquire();
+    barrier.arrive_and_wait();
+    bond();
+    hydrogenSem.release();
+}
+\end{lstlisting}
+
+\subsection{Go H2O using Daemon}
+\begin{lstlisting}[language=Golang]
+type WaterFactoryWithDaemon struct {
+    // Channels for atoms to send their arrival requests
+    precomH chan chan struct{}
+    precomO chan chan struct{}
+}
+
+func NewFactoryWithDaemon() WaterFactoryWithDaemon {
+    wfd := WaterFactoryWithDaemon{
+        precomH: make(chan chan struct{}),
+        precomO: make(chan chan struct{}),
+    }
+
+    // Daemon goroutine
+    go func() {
+        for {
+            // Step 1: (Precommit)
+            // Receive arrival requests from 2 hydrogen and 1 oxygen atoms
+            h1 := <-wfd.precomH
+            h2 := <-wfd.precomH
+            o := <-wfd.precomO
+            // Step 2: (Commit)
+            // Tell the 3 atoms to start bonding
+            h1 <- struct{}{}
+            h2 <- struct{}{}
+            o <- struct{}{}
+            // Step 3: (Postcommit)
+            // Wait until the 3 atoms have finished before looping
+            // We re-use the same communication channel as (Commit)
+            <-h1
+            <-h2
+            <-o
+        }
+    }()
+
+    return wfd
+}
+
+func (wfd *WaterFactoryWithDaemon) hydrogen(bond func()) {
+    commit := make(chan struct{}) // Step 1: Create private communication channel
+    wfd.precomH <- commit         // Step 2: (Precommit)
+    <-commit                      // Step 3: (Commit)
+    bond()                        // Step 4: Bond
+    commit <- struct{}{}          // Step 5: (Postcommit)
+}
+
+func (wfd *WaterFactoryWithDaemon) oxygen(bond func()) {
+    commit := make(chan struct{}) // Step 1: Create private communication channel
+    wfd.precomO <- commit         // Step 2: (Precommit)
+    <-commit                      // Step 3: (Commit)
+    bond()                        // Step 4: Bond
+    commit <- struct{}{}          // Step 5: (Postcommit)
+}
+\end{lstlisting}
+
+\subsection{Go H2O using Oxygen Leaders}
+\begin{lstlisting}[language=Golang]
+type WaterFactoryWithLeader struct {
+    oxygenMutex chan struct{}
+    precomH     chan chan struct{}
+}
+
+func NewFactoryWithLeader() WaterFactoryWithLeader {
+    wf := WaterFactoryWithLeader{
+        oxygenMutex: make(chan struct{}, 1),
+        precomH:     make(chan chan struct{}),
+    }
+    wf.oxygenMutex <- struct{}{}
+    return wf
+}
+
+func (wf *WaterFactoryWithLeader) hydrogen(bond func()) {
+    commit := make(chan struct{}) // Step 1: Create private communication channel
+    wf.precomH <- commit          // Step 2: (Precommit)
+    <-commit                      // Step 3: (Commit)
+    bond()                        // Step 4: Bond
+    commit <- struct{}{}          // Step 5: (Postcommit)
+}
+
+func (wf *WaterFactoryWithLeader) oxygen(bond func()) {
+    // Step 1: Become leader
+    <-wf.oxygenMutex // For fun, we can use a channel as a mutex
+    // Step 2: (Precommit)
+    // Receive arrival requests from 2 hydrogen atoms
+    h1 := <-wf.precomH
+    h2 := <-wf.precomH
+    // Step 3: (Commit)
+    // Tell the 2 hydrogen atoms to start bonding
+    h1 <- struct{}{}
+    h2 <- struct{}{}
+    // Step 4: Bond
+    bond()
+    // Step 5: (Postcommit)
+    // Wait until the 2 hydrogen atoms to finish
+    // We re-use the same communication channel as (Commit)
+    <-h1
+    <-h2
+    // Step 6: Step down from being leader
+    wf.oxygenMutex <- struct{}{}
+}
+
+// H2O2 problem
+// other oxygen is follower who does not get oxygen mutex
+case h2o2f.precomO <- commit: // Follower
+    <-commit             // Step 3: (Commit)
+    bond()               // Step 4: Bond
+    commit <- struct{}{} // Step 5: (Postcommit)
+\end{lstlisting}
+
+\subsection{C++ FIFO Semaphore using Ticket Queue}
+\begin{lstlisting}[language=C++]
+struct FIFOSemaphore {
+  std::mutex mut;
+  std::condition_variable cond;
+  std::atomic<std::ptrdiff_t> next_ticket;
+  std::ptrdiff_t now_serving;
+
+  FIFOSemaphore(std::ptrdiff_t initial_count)
+      : mut{}, cond{}, next_ticket{1}, now_serving{initial_count} {}
+
+  void acquire() {
+    std::ptrdiff_t my_ticket =
+        next_ticket.fetch_add(1, std::memory_order_relaxed);
+    std::unique_lock lock{mut};
+    cond.wait(lock, [=, this]() { return now_serving >= my_ticket; });
+  }
+
+  void release() {
+    {
+      std::scoped_lock lock{mut};
+      now_serving++;
+    }
+    cond.notify_all();
+  }
+};
+\end{lstlisting}
+
+\subsection{C++ FIFO Semaphore using Queue of Semaphores}
+\begin{lstlisting}[language=C++]
+struct FIFOSemaphore {
+  struct Waiter {
+    std::binary_semaphore sem{0};
+  };
+
+  std::mutex mut;
+  std::queue<std::shared_ptr<Waiter>> waiters;
+  std::ptrdiff_t count;
+
+  FIFOSemaphore(std::ptrdiff_t initial_count)
+      : mut{}, waiters{}, count{initial_count} {}
+
+  void acquire() {
+    auto waiter = std::make_shared<Waiter>();
+    {
+      std::scoped_lock lock{mut};
+      if (count > 0) {
+        count--;  // Positive count,
+        return;   // simply decrement without blocking
+      }
+      waiters.push(waiter);  // Zero count, add to waiters
+    }
+    waiter->sem.acquire();  // and block on the semaphore
+  }
+
+  void release() {
+    std::shared_ptr<Waiter> waiter;
+    {
+      std::scoped_lock lock{mut};
+      if (waiters.empty()) {
+        count++;  // No waiters, simply increment count
+        return;
+      }
+
+      waiter = waiters.front();  // Pop a waiter
+      waiters.pop();
+    }
+    waiter->sem.release();  // and signal it
+  }
+};
+\end{lstlisting}
+
+\subsection{Go FIFO Semaphore using Buffered Channel}
+\begin{lstlisting}[language=Golang]
+type Semaphore struct {
+	sem chan struct{}
+}
+
+func NewSemaphore(capacity int, initial_count int) *Semaphore {
+	sem := Semaphore{
+		sem: make(chan struct{}, capacity),
+	}
+	for i := 0; i < initial_count; i++ {
+		sem.Release()
+	}
+	return &sem
+}
+
+func (s *Semaphore) Acquire() {
+	// Receive from the channel to decrement the number of items
+	// Blocks if there are no items (count is 0)
+	<-s.sem
+	// Blocked goroutines will be unblocked in FIFO order as of Go 1.24
+}
+
+func (s *Semaphore) Release() {
+	// Send to the channel to increment the number of items
+	s.sem <- struct{}{}
+}
+\end{lstlisting}
+
+\subsection{Go FIFO Semaphore using Daemon}
+\begin{lstlisting}[language=Golang]
+type Semaphore struct {
+	acquireCh chan chan struct{}
+	releaseCh chan struct{}
+}
+
+func NewSemaphore(initial_count int) *Semaphore {
+	sem := new(Semaphore)
+	sem.acquireCh = make(chan chan struct{}, 100)
+	sem.releaseCh = make(chan struct{}, 100)
+
+	go func() {
+		count := initial_count
+		// The FIFO queue that stores the channels used to unblock waiters
+		waiters := NewChanQueue()
+
+		for {
+			select {
+			case <-sem.releaseCh: // Increment or unblock a waiter
+				if waiters.Len() > 0 {
+					ch := waiters.Pop()
+					ch <- struct{}{} // Unblocks the oldest waiter
+				} else {
+					count++
+				}
+
+			case ch := <-sem.acquireCh: // Decrement or add a waiter
+				if count > 0 {
+					count--
+					ch <- struct{}{} // Don't keep waiter blocked
+				} else {
+					waiters.PushBack(ch) // Add waiter to back of queue
+				}
+			}
+		}
+	}()
+
+	return sem
+}
+
+func (s *Semaphore) Acquire() {
+	ch := make(chan struct{})
+	// Send daemon a channel that can be used to unblock us
+	s.acquireCh <- ch
+	// Block until daemon decides to unblock us
+	<-ch
+}
+
+func (s *Semaphore) Release() {
+	s.releaseCh <- struct{}{}
+}
+\end{lstlisting}
+
+\subsection{Rust Concurrent Counter}
+\begin{lstlisting}[language=Rust]
+// mutex solution
+use std::thread;
+use std::sync::Mutex;
+
+fn main() {
+  let counter = Mutex::new(0);
+
+  thread::scope(|s| {
+    s.spawn(|| { 
+        // THE FOLLOWING IS NOT IDIOMATIC RUST 
+        // (what *counter.lock().unwrap() += 1 actually does)
+        use std::ops::DerefMut;
+
+        let lock_result = counter.lock();
+        let mut lock_guard = lock_result.unwrap();
+        let counter_ref: &mut i32 = lock_guard.deref_mut();
+        *counter_ref += 1;
+        // END UNIDIOMATIC RUST
+    });
+    s.spawn(|| { *counter.lock().unwrap() += 1; });
+  });
+
+  println!("{}", *counter.lock().unwrap());
+}
+
+// using Arc
+use std::thread;
+use std::sync::{Mutex, Arc};
+
+fn main() {
+  let counter = Arc::new(Mutex::new(0));
+
+  let t0 = {
+    let counter = counter.clone();
+    thread::spawn(move || {
+      // THE FOLLOWING IS NOT IDIOMATIC RUST
+      use std::ops::{Deref, DerefMut};
+
+      let mutex: &Mutex<i32> = counter.deref();
+      let lock_result = mutex.lock();
+      let mut lock_guard = lock_result.unwrap();
+      let counter_ref: &mut i32 = lock_guard.deref_mut();
+      *counter_ref += 1;
+      // END UNIDIOMATIC RUST
+    })
+  };
+  let t1 = {
+    let counter = counter.clone();
+    thread::spawn(move || {
+      *counter.lock().unwrap() += 1;
+    })
+  };
+
+  t0.join().unwrap();
+  t1.join().unwrap();
+
+  println!("{}", *counter.lock().unwrap());
+}
+
+// atomics
+use std::sync::atomic::{AtomicI32, Ordering};
+use std::thread;
+
+use std::sync::{Mutex, Arc};
+
+fn main() {
+    let counter = AtomicI32::new(0);
+
+    thread::scope(|s| {
+        s.spawn(|| {
+            counter.fetch_add(1, Ordering::Relaxed);
+        });
+        s.spawn(|| {
+            counter.fetch_add(1, Ordering::Relaxed);
+        });
+    });
+
+    println!("{}", counter.load(Ordering::Relaxed));
+}
+\end{lstlisting}
+
+\subsection{Rust Line Echo Server}
+\begin{lstlisting}[language=Rust]
+use std::net::SocketAddr;
+
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tokio::net::{TcpListener, TcpStream};
+
+async fn handle_client(stream: TcpStream) -> std::io::Result<()> {
+    let mut reader = BufReader::new(stream);
+    let mut buf: Vec<u8> = Vec::new();
+    loop {
+        let size = reader.read_until(b'\n', &mut buf).await?;
+        if size == 0 || buf[size - 1] != b'\n' {
+            break;
+        }
+        reader.get_mut().write_all(&buf[..size]).await?;
+        buf.clear();
+    }
+    Ok(())
+}
+
+#[tokio::main]
+async fn main() -> std::io::Result<()> {
+    let port = std::env::args()
+        .nth(1)
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(50000u16);
+    let listener = TcpListener::bind(SocketAddr::from(([127, 0, 0, 1], port))).await?;
+    loop {
+        let (socket, _) = listener.accept().await?;
+        tokio::spawn(async move {
+            eprintln!("Accepted connection");
+            std::mem::drop(handle_client(socket).await);
+            eprintln!("Connection ended");
+        });
+    }
+}
+\end{lstlisting}
+
+\subsection{Rust H2O}
+\begin{lstlisting}[language=Rust]
+#![allow(dead_code)]
+
+use futures::future::join_all;
+use std::sync::Arc;
+use tokio::sync::{Barrier, Semaphore};
+
+fn bond(s: &str) {
+    println!("bond {s}!");
+}
+
+#[tokio::main]
+async fn main() {
+    let n = 100;
+    let f = Arc::new(WaterFactory::new());
+
+    let hs = (0..n * 2).map(|i| {
+        let f = f.clone();
+        tokio::spawn(async move {
+            f.hydrogen(|| bond(&format!("h{i}"))).await;
+        })
+    });
+    let os = (0..n).map(|i| {
+        let f = f.clone();
+        tokio::spawn(async move {
+            f.oxygen(|| bond(&format!("o{i}"))).await;
+        })
+    });
+
+    join_all(Iterator::chain(hs, os)).await;
+}
+
+struct WaterFactory {
+    o_sem: Semaphore,
+    h_sem: Semaphore,
+    barrier: Barrier,
+}
+
+impl WaterFactory {
+    fn new() -> Self {
+        Self {
+            o_sem: Semaphore::new(1),
+            h_sem: Semaphore::new(2),
+            barrier: Barrier::new(3),
+        }
+    }
+
+    async fn oxygen(&self, bond: impl FnOnce()) {
+        let _permit = self.o_sem.acquire().await.unwrap();
+        self.barrier.wait().await;
+        bond();
+    }
+
+    async fn hydrogen(&self, bond: impl FnOnce()) {
+        let _permit = self.h_sem.acquire().await.unwrap();
+        self.barrier.wait().await;
+        bond();
+    }
+}
+\end{lstlisting}
+
+\section{PYP Questions}
+
+\subsection{22/23 \texttt{io\_uring} in C++}
+\begin{lstlisting}[language=C++]
+struct Request {
+    int client_fd;
+    data_t data;
+    res_t result;
+    };
+
+class ConcurrentRing {
+private:
+    LockFreeQueue<Request> queue;
+    std::counting_semaphore write{SIZE};
+    std::counting_semaphore read{0};
+public:
+    void submit_request(Request req) {
+        write.acquire();
+        queue.push(req);
+        read.release();
+    }
+    Request retrieve_request() {
+        read.acquire();
+        std::optional<Request> req;
+        while (true) {
+            req = queue.try_pop();
+            if (req) break;
+        }
+        write.release();
+        return req.value();
+    }
+};
+
+int main() {
+    // Set up TCP socket
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    // Bind socket to port
+    listen(server_fd, 5);
+    ConcurrentRing SQ, CQ;
+    for (int i = 0; i < W; i++) {
+        std::thread([&]() {
+            while (true) {
+                Request req = SQ.retrieve_req();
+                req.process();
+                CQ.submit_request(req);
+            }
+        });
+        std::thread([&]() {
+            while (true) {
+                Request req = CQ.retrieve_req();
+                send(req.client_fd, req);
+            }
+        });
+    }
+    while (true) {
+        // Accept new client connection
+        int client_fd = accept(server_fd, nullptr, nullptr);
+        std::thread([&]() {
+            data_t data = read(client_fd);
+            while (data) {
+                Request req{client_fd, data};
+                SQ.submit_request(req);
+                data = read(client_fd);
+            }
+        });
+    }
+}
+\end{lstlisting}
+
+\subsection{22/23 \texttt{io\_uring} in Go}
+\begin{lstlisting}[language=Golang]
+func main() {
+    SQ = make(chan Request, SIZE)
+    CQ = make(chan Request, SIZE)
+    for i := 0; i < W; i++ {
+        go func() {
+            for {
+                select {
+                case req := <-SQ:
+                    req.process()
+                CQ <- req
+                    default:
+                }
+            }
+        }()
+    }
+    for i := 0; i < W; i++ {
+        go func() {
+            for {
+                select {
+                case req := <-CQ:
+                    req.queue <- req
+                default:
+                }
+            }
+        }()
+    }
+    listener, err := net.Listen("tcp", ":8080")
+    if err != nil {
+        // handle error
+    }
+    for {
+        conn, err := listener.Accept()
+        if err != nil {
+            // handle error
+        }
+        queue := make(chan Request)
+        go func() {
+            for {
+                req := conn.read()
+                req.queue = queue
+                SQ <- req
+            }
+        }()
+        go func() {
+            for {
+                select {
+                case req := <-queue:
+                    conn.send(req);
+                default:
+                }
+            }
+        }()
+    }
+}
+\end{lstlisting}
+
+\subsection{22/23 \texttt{io\_uring} in Rust}
+\begin{lstlisting}[language=Rust]
+async fn main() -> Result<(), Box<dyn Error>> {
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+    let listener = TcpListener::bind(&addr).await?;
+    let (sq_tx, mut sq_rx) = mpsc::channel::<IoOperation>(100);
+    let (cq_tx, mut cq_rx) = mpsc::channel::<IoOperation>(100);
+    loop {
+        let (stream, _) = listener.accept().await?;
+        tokio::spawn(async move {
+            loop {
+                let mut buf = Vec::new();
+                stream.read(&mut buf).await;
+                sq_tx.send(IoOperation::Read(stream, buf)).await;
+            }
+        });
+    }
+    tokio::spawn(async move {
+        while let Some(op) = sq_rx.recv().await {
+            tokio::spawn(async move {
+                let res = process(op.data).await;
+                cq_tx.send(IoOperation::Write(op.stream, res)).await;
+            });
+        }
+    });
+    tokio::spawn(async move {
+        while let Some(op) = cq_rx.recv().await {
+            op.stream.write_all(op.data).await;
+        }
+    });
+    Ok(())
+}
+\end{lstlisting}
+
+\subsection{24/25 Ticket Master}
+\begin{lstlisting}[language=C++]
+struct Seat {
+    mutex mtx; // For per-seat locking
+    atomic<bool> sold = false;
+    int reservedBy = -1;
+    steady_clock::time_point expiryTime = steady_clock::time_point::min();
+};
+class TicketSystem {
+    vector<Seat> seats;
+    thread expirationThread;
+    atomic<bool> running = true;
+
+    public:
+    TicketSystem(int numSeats) : seats(numSeats) {
+        expirationThread = thread(&TicketSystem::monitorExpirations, this);
+    }
+    ~TicketSystem() {
+        running = false;
+        if (expirationThread.joinable()) {
+            expirationThread.join();
+        }
+    }
+    bool processPayment(int userID, int seatID) {
+        confirmPayment(userID);
+        return true;
+    }
+    bool reserveSeat(int userID, int seatID, int holdSeconds = 5) {
+        // (reservedBy + expiry for someone else holding seat)
+        if (seatID < 0 || seatID >= seats.size()) return false;
+        Seat& seat = seats[seatID];
+        unique_lock<mutex> lock(seat.mtx);
+        auto now = steady_clock::now();
+        if (seat.sold || (seat.expiryTime > now && seat.reservedBy != userID)) {
+            return false; // Already sold or held by someone
+        }
+        seat.reservedBy = userID;
+        seat.expiryTime = now + seconds(holdSeconds);
+        return true;
+    }
+    bool confirmSeat(int seatID, int userID) {
+        if (seatID < 0 || seatID >= seats.size()) return false;
+        Seat& seat = seats[seatID];
+        unique_lock<mutex> lock(seat.mtx);
+        auto now = steady_clock::now();
+        if (seat.reservedBy == userID && seat.expiryTime > now) {
+            seat.sold = true;
+            seat.expiryTime = steady_clock::time_point::min();
+            return true;
+        } else {
+            refundUser(userID);
+            return false;
+        }
+    }
+    void monitorExpirations() {
+        while (true) {
+            this_thread::sleep_for(seconds(1));
+            auto now = steady_clock::now();
+            for (auto& seat : seats) {
+                unique_lock<mutex> lock(seat.mtx);
+                if (!seat.sold && seat.expiryTime < now) {
+                    seat.reservedBy = -1;
+                    seat.expiryTime = steady_clock::time_point::min();
+                }
+            }
+        }
+    }
+};
+
+// atomics
+struct Seat {
+    atomic<bool> available;
+    atomic<int> heldBy;
+    Seat() : available(true), heldBy(0) {}
+};
+class TicketSystem {
+    vector<Seat> seats;
+    // ...
+    bool reserveSeat(int userID, int seatID, int holdSeconds = 5) {
+        steady_clock::time_point newExpiry =
+        steady_clock::now() + seconds(holdSeconds);
+        if (seatID < 0 || seatID >= seats.size()) return false;
+        // Attempt to atomically reserve the seat
+        bool expected = true;
+        if (seats[seatID].available.compare_exchange_strong(expected, false)) {
+            // Successfully changed availability to false
+            seats[seatID].heldBy.store(userID);
+            return true;
+        } else {
+            // Seat was not available
+            return false;
+        }
+    }
+};
+\end{lstlisting}
+
+\subsection{24/25 Load Balancer}
+\begin{lstlisting}[language=Golang]
+type Request struct {
+    userID int
+    seatID int
+    responseCh chan bool
+}
+type Server struct {
+    id int
+    seatMin int
+    seatMax int
+    reqCh chan Request
+    ts *TicketServer
+}
+type LoadBalancer struct {
+    servers []*Server
+}
+
+func NewServer(id, seatMin, seatMax int) *Server {
+    s := &Server{
+        id: id,
+        seatMin: seatMin,
+        seatMax: seatMax,
+        reqCh: make(chan Request),
+        ts: NewTicketServer(seatMax),
+        // assume Server handles seatMin to seatMax
+    }
+    go func() {
+        for req := range s.reqCh {
+            success := s.ts.HandleClient(req.userID,req.seatID)
+            req.responseCh <- success
+        }
+    }()
+    return s
+}
+
+func NewLoadBalancer(numServers int, maxSeatID int) *LoadBalancer {
+    lb := &LoadBalancer{}
+    seatsPerServer := (maxSeatID + numServers - 1) / numServers
+    for i := 0; i < numServers; i++ {
+        seatMin := i * seatsPerServer
+        seatMax := seatMin + seatsPerServer - 1
+        if seatMax > maxSeatID {
+            seatMax = maxSeatID
+        }
+        lb.servers = append(lb.servers, NewServer(i, seatMin, seatMax))
+    }
+    return lb
+}
+
+func (lb *LoadBalancer) Dispatch(userID int, seatID int, responseCh chan bool) {
+    for _, s := range lb.servers {
+        if seatID >= s.seatMin && seatID <= s.seatMax {
+            s.reqCh <- Request{
+                userID: userID,
+                seatID: seatID,
+                responseCh: responseCh,
+            }
+            return
+        }
+    }
+}
+
+func main() {
+    N := 3
+    maxSeatID := 9
+    lb := NewLoadBalancer(N, maxSeatID)
+    results := make([]chan bool, 20)
+    for i := 1; i <= 20; i++ {
+        seatID := rand.Intn(10)
+        results[i-1] = make(chan bool)
+        lb.Dispatch(i, seatID, results[i-1])
+    }
+    for i := 1; i <= 20; i++ {
+        confirmed := <-results[i-1]
+        fmt.Printf("User %d seat confirmation: %v\n", i, confirmed)
+    }
+    time.Sleep(5 * time.Second)
+}
+\end{lstlisting}
+
+\end{document}
