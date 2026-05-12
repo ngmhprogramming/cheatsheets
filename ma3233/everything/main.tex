@@ -1,0 +1,668 @@
+\documentclass[10pt, landscape]{article}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{ifthen}
+\usepackage[a4paper,margin=5mm,landscape]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb}
+\usepackage{color,graphicx,overpic}
+\usepackage{hyperref}
+\usepackage{newtxtext} 
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{vwcol}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+\usepackage[T1]{fontenc} %%% <--- NOTE THIS
+% for relations
+\usepackage{cancel}
+\usepackage{ mathrsfs }
+\usepackage{listings}
+\usepackage{background}
+\setlist{nosep}
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=0.4,
+angle=0,
+contents={
+  % \includegraphics[width=\paperwidth,height=\paperheight]{eldon.png}
+  }
+}
+
+\pdfinfo{
+  /Title (MA3233.pdf)
+  /Creator (TeX)
+  /Producer (pdfTeX 1.40.0)
+  /Author (Seamus)
+  /Subject (Example)
+  /Keywords (pdflatex, latex,pdftex,tex)}
+
+\lstset{language=Java,keywordstyle={\bfseries \color{black}}}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+\newenvironment{tightcenter}{%
+  \setlength\topsep{0pt}
+  \setlength\parskip{0pt}
+  \begin{center}
+}{%
+  \end{center}
+}
+
+% redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\section}{\@startsection{section}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}%
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand\rmdefault{\sfdefault}
+% makes nested numbering (e.g. 1.1.1, 1.1.2, etc)
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand\labelitemii{•}
+%  for logical not operator
+\renewcommand{\lnot}{\mathord{\sim}}
+\renewcommand{\bf}[1]{\textbf{#1}}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\makeatother
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\everymath\expandafter{\the\everymath \color{myblue}}
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\let\iff\leftrightarrow
+\let\Iff\Leftrightarrow
+\let\then\rightarrow
+\let\Then\Rightarrow
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+%% this changes all items (enumerate and itemize)
+\setlength{\leftmargini}{0.5cm}
+\setlength{\leftmarginii}{0.5cm}
+\setlist[itemize,1]{leftmargin=2mm,labelindent=1mm,labelsep=1mm}
+\setlist[itemize,2]{leftmargin=4mm,labelindent=1mm,labelsep=1mm}
+
+%My Environments
+\newtheorem{example}[section]{Example}
+% -----------------------------------------------------------------------
+
+\begin{document}
+\raggedright
+\footnotesize
+\begin{multicols*}{3}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+    \fbox{%
+        \parbox{0.8\linewidth}{\centering \textcolor{black}{
+            {\Large\textbf{MA3233}}
+            \\ \normalsize{AY25/26 Sem 2}}
+            \\ {\footnotesize \textcolor{myblue}{by ngmh}} 
+        }%
+    }
+\end{center}
+
+\section{Graphs Recap}
+\textbf{Average to High Minimum Degree} Every non-empty graph $G$ has a subgraph $H \subset G$ such that $\delta(H) \geq \frac{1}{2}\overline{d}(G)$.
+
+\section{Linear Programming}
+\textbf{Linear Program} Maximise/Minimise $c^Tx$, subject to linear constraints such as $Ax \leq b, Ax=b$, $x \geq 0$ where $x$ is a vector.
+
+\textbf{Feasible Solution} A vector $x$ which satisfies all constraints. The set of feasible solutions is the feasible region, which is a convex polygon.
+
+\textbf{Optimal Solution} If we want to maximise $c^Tx$, then $x^*$ is optimal if $c^Tx^* \geq c^Tx$ for all feasible $x$. If the feasible region is non-empty, either an optimal solution exists or the objective is unbounded above.
+
+\textbf{Convexity} A set $C \subseteq \mathbb{R}^n$ is convex if $\forall x, y, \in C, \lambda \in [0,1]$, $\lambda x + (1-\lambda)y \in C$. The line connecting $x$ and $y$ stays strictly within $C$. The intersection of convex sets is convex.
+
+\textbf{Half-Space} $a_1x_1+...+a_nx_n \leq b$ defines a half-space $H:=\{x \in \mathbb{R}^n: a^Tx \leq b\}$ and is convex. The feasible region is an intersection of half-spaces corresponding to each constraint.
+
+\textbf{Objective Hyperplanes} $c^Tx$ gives a family of parallel hyperplanes $c^Tx=\alpha$.
+
+\textbf{Extreme Point} $x \in P$ where it cannot be written as $\lambda y + (1-\lambda)z$ (does not lie on a line segment). An optimal solution to the maximisation problem can be found at an extreme point of $P$.
+
+\textbf{Unboundedness and Infeasibility} An LP may be infeasible: no feasible $x$ exists; unbounded: objective tends to infinity; or have at least one optimal solution.
+
+\textbf{LP Forms} Inequality Form: $Ax \leq b, x \geq 0$; Standard (Equality) Form: $Ax=b, x \geq 0$.
+
+\textbf{Slack Variables} Convert inequalities to equalities; for $Ax \leq b, x \geq 0$, convert to $Ax+s=b, x \geq 0, s \geq 0$. Augment $A'$ with $I$, and $x'$ with $s$ to get $A'x'=b,x'\geq 0$.
+
+\textbf{Squeeze} Equality to inequality; $Ax=b$ becomes $Ax \leq b, -Ax \leq -b$.
+
+\textbf{Farkas Lemma} Applies to both equality and inequality versions; Exactly one of the following holds:
+\begin{itemize}
+    \item $\exists x \geq 0, Ax =b$ or $Ax \leq b$
+    \item $\exists y, y^TA \geq 0, y^Tb < 0$ (certificate for infeasibility)
+\end{itemize}
+
+% todo: remove this bit on geometric farkas
+
+\textbf{Cones} $cone(a_1,...,a_n)=\{\sum_{j=1}^nx_ja_j: x_j \geq 0\}$. This contains all nonnegative linear combinations which are closed under scaling by a positive factor. Feasible points lie within this cone. If $b \notin C$, then we have $\exists y, y^Tx \geq 0, \forall x \in C, y^Tb < 0$. The half cone and $b$ lie on opposite sides of the line $y^Tx=0$, and the system is infeasible.
+
+\textbf{Optimality Criterion} For a bounded LP, an optimal solution occurs at an extreme point of the feasible region. Then $x^*$ optimal $\Rightarrow$ $c^Tx^* \geq c^Tx$ for all corners $x$.
+
+\subsection{Duality}
+
+\textbf{Orthogonality} For $u,v \in \mathbb{R}^n, u^Tv=0 \Rightarrow u \perp v$.
+
+\textbf{Annihilators} For a subspace $U \subseteq \mathbb{R}^n$, its annihilator is $U^\perp=\{y \in \mathbb{R}^n:y^Tu=0,\  \forall u \in U\}$.
+
+\textbf{Primal LP} $\max c^Tx, Ax \leq b, x \geq 0$.
+
+\textbf{Dual LP} $\min b^Ty, A^Ty \geq c, y \geq 0$. Derived using $c^Tx \leq y^TAx \leq y^Tb$.
+
+\textbf{Primal to Dual LP} Flip objective and constraints, then transpose weight matrix $A$.
+
+\textbf{Weak Duality} If $x$ is primal-feasible and $y$ is dual-feasible, $c^Tx \leq b^Ty$, $\max(primal)$ $\leq$ $\min(dual)$.
+
+\textbf{Strong Duality} Let $P^*, D^*$ be the optimal primal and dual values if they exist. Weak duality says $P^* \leq D^*$ while strong duality says $P^*=D^*$.
+
+\textbf{Integer Programming} Additional constraint that entries in $x$ are integers.
+
+\textbf{LP Relaxation} For IP, solve the relaxed problem for nonnegative real numbers. This upper bounds the optimal integer value for max.
+
+\textbf{Convex Programming} Replaces linearity with convexity. LP is a special CP problem.
+
+\section{Independence, Matchings and Covers}
+
+\textbf{Matching} Subset of edges where no two edges share a common endpoint. A perfect matching covers all vertices. A maximal matching cannot be enlarged by adding an edge. A maximum matching has maximum possible size. Not all maximal matchings are maximum. The matching number $\nu(G)$ is the maximum size of a matching in $G$.
+
+\textbf{Vertex Cover} Set of vertices that contains at least one endpoint of every edge. The vertex cover number $\tau(G)$ is the minimum size of a vertex cover of $G$.
+
+\textbf{Proposition} $\tau(G) \geq \nu(G)$. For bipartite graphs, equality holds.
+
+\textbf{Clique} Subset of vertices that induces a complete subgraph. The clique number $\omega(G)$ is the size of the largest clique in $G$.
+
+\textbf{Independent Set} Set of vertices $S$ where no two vertices in $S$ are adjacent. The independence number $\alpha(G)$ is the maximum size of an independent set in $G$.
+
+\textbf{Cliques and Independence} $\alpha(G)=\omega(\overline{G}), \omega(G)=\alpha(\overline{G})$.
+
+\textbf{Kneser Graph} $KG(n, k)$ is the graph where vertices are $k$-subsets of $[n]$ and two vertices are adjacent if their sets are disjoint. $\alpha(KG(n,k))={n-1 \choose k-1}$.
+
+\textbf{Independence and Vertex Cover} For $n$ vertices, $\alpha(G)+\tau(G)=n$.
+
+\textbf{Line Graph} Vertices are edges of $G$, while two vertices of $L(G)$ are adjacent if the corresponding edges in $G$ share an endpoint. Then $\nu(G)=\alpha(L(G))$.
+
+\textbf{Maximum Matching LP} Maximise $\sum_{e \in E} x_e$, where $\sum_{v \in e}x_e \leq 1$, $x_e \in \{0,1\}$. This selects disjoint edges, using $x_e$ for each edge.
+
+\textbf{Minimum Vertex Cover LP} Minimise $\sum_{v \in V}y_v$, where $y_u+y_v \geq 1$, $y_v \in \{0, 1\}$. This ensures each edge is covered, using $y_v$ for each vertex.
+
+\textbf{Dual LPs} Let $B$ be the vertex-edge incidence matrix. Then the primal LP is the fractional matching problem while the dual LP is the fractional vertex cover problem. Weak duality implies $\sum x_e \leq \sum y_v$, which gives us $\nu(G) \leq \tau(G)$.
+
+\subsection{Bipartite Matching}
+
+\textbf{Bipartite Graphs} Graph where $V=A \sqcup B$ (disjoint union). Equivalently, $G$ has no odd cycle or $\chi(G) \leq 2$.
+
+\textbf{Perfect Matching} A matching is perfect to $A$ if every vertex of $A$ is matched. $|A| \leq |B|$ is necessary.
+
+\textbf{Hall's Marriage Theorem} A bipartite graph contains a matching perfect to $A$ iff the marriage condition holds; $\forall S \subseteq A, |N(S)| \geq |S|$. Fails on infinite graphs.
+
+\textbf{Regular Bipartite Graphs} Every $d$-regular bipartite graph has a perfect matching using Hall's theorem with $d|X| \leq d|N(x)|$.
+
+\textbf{Edge Decomposition} The edges of a $d$-regular bipartite graph can be decomposed into $d$ perfect matchings; repeatedly remove a perfect matching to get a $d-1$-regular graph.
+
+\textbf{Triesch's Conjecture} If $\forall S\subset A,|N_G(S)| \geq |N_H(S)|$, then $m(G) \geq m(H)$ where $m$ is the number of perfect matchings.
+
+\textbf{Hall's using Farkas'} Introduce $x_e \geq 0$ for each edge and consider $\sum x_e=1,\ \forall a \in A$, $\sum x_e \leq 1 \ \forall b \in B$. Infeasibility occurs when for real $y_a$ and nonnegative $z_b$, $y_a+z_b \geq 0\ \forall ab \in E$ and $\sum y_a + \sum z_b <0$, giving $|N(S)|<|S|$.
+
+\textbf{Kőnig's Theorem} For any bipartite graph, $\nu(G)=\tau(G)$.
+
+\subsection{General Matching}
+\textbf{Alternating Path (wrt M)} Path such that $v_1$ is unmatched, and the edges alternate between not in $M$ and in $M$. An augmenting path also ends at an unmatched vertex. Inverting an augmenting path increases the matching size.
+
+\textbf{Berge's Theorem} A matching $M$ is maximum iff there exists no augmenting path with respect to $M$.
+
+\textbf{Odd Component} There are $o(H)$ components with an odd number of vertices.
+
+\textbf{Tutte's Theorem} A graph has a perfect matching iff $\forall U \subseteq V, o(G[V\backslash U]) \leq |U|$.
+
+\textbf{Tutte-Berge Formula} $\nu(G)=\frac{1}{2}\min_{U \subseteq V}(|U|-o(G[V \backslash U])+n)$; alternatively, $2\nu(G)=n-\max_{U \subseteq V}(o(G[V \backslash U])-|U|)$.
+
+\textbf{Deficiency} $(U)=o(G[V \backslash U])-|U|$. If positive, then at least $(U)$ vertices must remain unmatched since we cannot fully match odd components.
+
+\textbf{Matching ILP} Introduce a binary variable $x_e$ for each edge. Then the constraints are $\sum_{v \in e}x_e \leq 1$ and we want to maximise $\sum_{e \in E} x_e$.
+
+\textbf{Berge's and LP} An augmenting path is a feasible direction increasing the objective value. Berge's states local optimality (no augmenting path) implies global optimality.
+
+\textbf{Tutte's and LP} Tutte's inequalities characterise when a solution exists for a perfect matching.
+
+\textbf{Tutte-Berge as Duality} The primal problem is the maximum matching size, while the dual problem is maximising the deficiency. Tutte-Berge expresses the strong duality of these problems.
+
+\textbf{Matching Polytope} $P(G)=conv\{\chi(M) : \text{$M$ is a matching of $G$}\} \subseteq \mathbb{R}^E$, where $\chi(M)$ is the incidence vector of $M$ (for edges) and $conv$ is the convex hull. Each vertex is a matching and linear optimisation over it is the maximum matching problem. For a bipartite graph, all vertices are integral.
+
+\textbf{Big Picture (Combinatorics v.s LP)}
+\begin{itemize}
+    \item Matching $\Leftrightarrow$ Integer Feasible Solutions
+    \item Augmenting Path $\Leftrightarrow$ Improving Direction
+    \item Berge's Theorem $\Leftrightarrow$ Optimality Condition
+    \item Tutte's Condition $\Leftrightarrow$ Feasibility Inequalities
+    \item Tutte-Berge $\Leftrightarrow$ Strong Duality
+    \item Matching Polytope $\Leftrightarrow$ Convex Hull of Matchings
+\end{itemize}
+
+\section{Connectivity}
+\textbf{Separating Set / Vertex Cut} A set $S \subset V(G)$ such that $G-S$ has more than one connected component.
+
+\textbf{Cut Vertex} Separating set consisting of a single vertex.
+
+\textbf{Vertex Connectivity} $\kappa(G)$, minimum size of $S \subset V(G)$ such that $G-S$ is disconnected or has only one vertex.
+
+\textbf{k-Connected} $\kappa(G) \geq k$. Removing $k-1$ vertices leaves the graph connected.
+
+\textbf{2-Connected Graphs} Every 2-connected graph has a cycle.
+
+\textbf{Connectivity and Minimum Degree} $\kappa(G) \leq \delta(G)$.
+
+\textbf{Mader's Theorem} Every graph of average degree at least $4k$ contains a k-connected subgraph.
+
+\textbf{Edge Connectivity} A graph is $\ell$-edge-connected if for every subset of edges with $|F| < \ell$, $G-F$ remains connected. $\kappa'(G)$ is the maximum such $\ell$.
+
+\textbf{Edge Cuts and Bridges} Every minimal disconnecting set is an edge cut. Any edge whose removal disconnects $G$ is a cut edge or bridge. $\kappa'(G)=1$ iff $G$ has a bridge.
+
+\textbf{Cut Relations} $\kappa(G) \leq \kappa'(G) \leq \delta(G)$.
+
+\textbf{Chartrand-Harary Theorem} For all $0 < a \leq b \leq c$, there exists $G$ such that $\kappa(G)=a, \kappa'(G)=b, \delta(G)=c$.
+
+\textbf{Whitney's Theorem} A graph is 2-connected iff for every pair of vertices there exists two internally-disjoint $u-v$ paths; they belong to a cycle.
+
+\textbf{A-B Path} Path such that $V(P) \cap A = \{ x_0 \}$, $V(P) \cap B = \{x_k\}$.
+
+\textbf{Separating Sets} A set separates $A$ and $B$ if every $A-B$ path contains a vertex or edge from $X$.
+
+\textbf{Cut Vertex} Vertex separating two other vertices in the same component.
+
+\textbf{Cut Edge} Edge separating its two endpoints.
+
+\textbf{Menger's Theorem} The minimum number of vertices separating $A$ from $B$ is equal to the maximum number of vertex-disjoint $A$-$B$ paths.
+
+\textbf{Stronger Lemma} Let $k$ be the minimum number of vertices separating $A$ and $B$. If $\mathcal{P}$ is a set of fewer than $k$ vertex-disjoint $A$-$B$ paths, then there exists a larger set $\mathcal{Q}$ of vertex-disjoint $A$-$B$ paths whose set of end vertices properly contains the set of ends of $\mathcal{P}$.
+
+\textbf{Corollaries of Menger's Theorem} If $a$ and $b$ are not adjacent, then the minimum number of vertices separating them equals the maximum number of independent (internally vertex-disjoint) $a$-$b$ paths. The minimum number of edges separating $a$ and $b$ equals the maximum number of edge-disjoint $a$-$b$ paths.
+
+\textbf{Global Menger's Theorem} A graph is $k$-vertex-connected iff every pair of vertices is joined by $k$ internally-disjoint paths. A graph is $k$-edge-connected iff every pair of vertices is joined by $k$ edge-disjoint paths.
+
+\textbf{Packing Problem} Find as many internally vertex-disjoint $a$-$b$ paths as possible. Let $\mathcal{P}$ be the set of all $a$-$b$ paths. Introduce $x_p$ which is binary for each path.
+
+\textbf{Packing Primal LP} Maximise $\sum_{P \in \mathcal{P}}x_P$, subject to $\sum_{v \in P}x_P \leq 1$ for all $v \in V(G) \backslash\{a,b\}$, $x_P \geq 0$. This asks for a fractional packing of paths.
+
+\textbf{Covering Dual LP} Introduce $y_v \geq 0$ for each $v \in V(G) \backslash \{a,b\}$. Minimise $\sum_{v \in V(G) \backslash \{a, b\}}y_v$ subject to $\sum_{v \in V(P)} y_v \geq 1$ for all paths. $y_v$ is the weight assigned to vertex $v$, every $a$-$b$ path must be hit by weight at least 1.
+
+\textbf{Separating Sets} If $X \subset V(G) \backslash \{a,b\}$ separates $a$ and $b$, define $y_v=1$ if $v \in X$. Then every $a$-$b$ path meets $X$ so the dual constraints are satisfied. Integral dual solutions correspond to separating vertex sets, so the dual objective is the size the separator. The dual LP is a covering problem.
+
+\textbf{Menger's as Duality} If both LPs are feasible, then Menger's is a strong duality theorem.
+
+\section{Flows}
+
+\textbf{Flow Network} Directed graph with a source (all out-edges) and sink (all in-edges), as well as a non-negative capacity on each edge.
+
+\textbf{Flow} A map $f:E(D) \rightarrow \mathbb{R}_{\geq0}$ satisfying capacity constraints ($0 \leq f_{u \rightarrow v} \leq c_{u \rightarrow v}$) for every edge, as well as flow conservation ($\sum_{u: v\rightarrow u}f_{v\rightarrow u}=\sum_{w: w\rightarrow v}f_{w\rightarrow v}$) for every non source or sink vertex.
+
+\textbf{Size of Flow} $|f|=\sum_{v: s\rightarrow v}f_{s\rightarrow v}=\sum_{v: v\rightarrow t}f_{v\rightarrow t}$.
+
+\textbf{Max-Flow LP} Find a flow with maximum possible size. Maximise $\sum_{(s,v)\in E}f_{sv}-\sum_{(v,s)\in E}f_{vs}$ (value of flow), under the constraints that $\sum_{(u, v)\in E}f_{uv}-\sum_{(v, w) \in E}f_{vw} \leq 0, \forall v \in V \backslash \{s, t\}$, $-\sum_{(u, v)\in E}f_{uv}+\sum_{(v, w) \in E}f_{vw} \leq 0, \forall v \in V \backslash \{s, t\}$, $0 \leq f_{uv} \leq c_{uv}, \forall uv \in E$ (flow conservation).
+
+\textbf{Cut} Partition such that $s$ and $t$ fall into different components.
+
+\textbf{Capacity of Cut} $c(S, T)=\sum_{u \in S, v \in T, u \rightarrow v \in E(D)}c_{u \rightarrow v}$, only forward edges.
+
+\textbf{Flow Across Cut} The net flow across a cut is $\sum_{u \in S, v \in T, u \rightarrow v \in E(D)}f_{u \rightarrow v}$ $- \sum_{u \in S, v \in T, v \rightarrow u \in E(D)}f_{v \rightarrow u}$; the net flow going from nodes in $S$ to nodes in $T$. The net flow across any cut is equal to the global flow. For every flow and cut, $|f| \leq c(S, T)$.
+
+\textbf{Min-Cut} Cut minimising $c(S, T)$. By $|f| \leq c(S, T)$, $\max_f|f| \leq \min_{(S,T)}c(S, T)$.
+
+\textbf{Min-Cut LP} Introduce real $z_v$ for each vertex. Then minimise $\sum c_{u \rightarrow v}(z_v-z_u)$, subject to $z_s \leq 0, z_t \geq 1, z_v-z_u \geq 0$. $z_v$ is the "side" of the cut containing $v$, with vertices with smaller $z_v$ lying on the $s$-side.
+
+\textbf{Max-Flow Min-Cut Theorem} The Max-Flow and Min-Cut LPs form a Primal-Dual Pair. $\max_f|f|=\min_{(S, T)}c(S, T)$.
+
+\textbf{Integral Flow Theorem} If all capacities are integers, there exists a max-flow such that all edge flows are also integers.
+
+\textbf{Totally Unimodular Matrix} Every square submatrix has determinant in $\{0,-1,1\}$. They imply integrality of LP vertices when the RHS is integral.
+
+\textbf{Integer Vertices} If $A$ is TU and $b$ is an integer vector, the polyhedron $P=\{x \in \mathbb{R}^n:Ax\leq b\}$ has only integer vertices. Then every bounded LP of the form $\max\{c^Tx:Ax \leq b\}$ has an optimal solution at an integral vertex.
+
+\textbf{Incidence Matrix} The $|V|\times |E|$ matrix where an entry $A_{v, e}$ is $1$ if $v$ is an endpoint of $e$. Each column has exactly two $1$s.
+
+\textbf{Bipartite Incidence Matrices} Every bipartite graph has a TU incidence matrix.
+
+\textbf{Signed Incidence Matrix} For directed graph, from has $-1$, to has $1$. It is TU for every directed graph.
+
+\textbf{Appending Preserves TU} If $A$ is TU, the block matrix $(A, I, -I)^T$ is also TU.
+
+\textbf{Max-Flow LP in Matrix Form} Let $A$ be the signed incidence matrix of the flow network. Let $A_0$ be $A$ with the rows for $s$ and $t$ removed. Flow conservation is $A_0x=0$ and capacity constraints are $0 \leq x \leq c$. The objective is to maximise $\max\{w^Tx:A_0x=0, 0 \leq x \leq c\}$ where $w^Tx$ measures the flow value. If $c$ is integral, then the RHS vector is integral, giving the integral flow theorem.
+
+\textbf{Packing Problem} Given ground set $E$ and family $\mathcal{F}$ of feasible subsets of $E$, find a maximum collection of pairwise disjoint members of $\mathcal{F}$.
+
+\textbf{Covering Problem} Find a minimum set of elements of $E$ that intersects every member of $\mathcal{F}$.
+
+\textbf{Approximating Packing-Covering}
+\begin{itemize}
+    \item Relax integrality by allowing fractional solutions.
+    \item Use LP strong duality.
+    \item The gap between the integer optimum and LP optimum is the integrality gap.
+    \item The gap vanishes when the constraint matrix is TU and all capacities are integers.
+\end{itemize}
+
+\textbf{b-Fold Packing} Relaxed packing problem where we allow each element of $E$ to belong to at most $b$ chosen members of $\mathcal{F}$.
+
+\textbf{Max-Flow Min-Cut Tool}
+\begin{itemize}
+    \item Model the packing problem as a max-flow problem.
+    \item Model the covering problem as a min-cut problem.
+    \item Max-Flow Min-Cut gives equality of optima.
+    \item Integral Flow Theorem (from TU) ensures an integer optimal flow exits.
+\end{itemize}
+
+\textbf{Reduction to Network Flow}
+\begin{itemize}
+    \item Model combinatorial problem as a flow network.
+    \item Identify max flow with one combinatorial quantity.
+    \item Identify min cut with the dual quantity.
+    \item Apply Max-Flow Min-Cut (and integrality when needed).
+\end{itemize}
+
+\textbf{Menger's (Directed, Edge-Disjoint)}
+\begin{itemize}
+    \item Consider a flow network where every edge has capacity 1.
+    \item By Integral Flow Theorem, the max flow is an integer that can be decomposed into unit flows along edge-disjoint $x$-$y$ paths.
+    \item A min-cut then has capacity equal to the number of edges that must be removed to disconnect the graph.
+    \item Then by duality we have this equal to the maximum number of edge-disjoint paths.
+\end{itemize}
+
+\textbf{Menger's (Directed, Vertex-Disjoint)}
+\begin{itemize}
+    \item Split vertices into $v^-, v^+$. Then $v^-\rightarrow v^+$ has capacity 1, while $u^+ \rightarrow v^-, v^+\rightarrow w^-$ has capacity $\infty$.
+    \item A min-cut corresponds to a vertex separator, so we also get this to be equal to the number of vertex-disjoint paths.
+\end{itemize}
+
+\textbf{Menger's (Undirected)} Replace each undirected edge with two directed edges, then apply the directed version.
+
+\textbf{Kőnig's Theorem}
+\begin{itemize}
+    \item Construct the flow network where the source is connected to $A$ and the sink to $B$ with capacity 1. Then have edges from $A$ to $B$ with capacity $\infty$.
+    \item Max-Flow $=\nu(G)$: An integral flow sends 0 or 1 on each source or sink edge. The edges across the middle carrying flow 1 form a matching. Any matching gives a feasible integral flow.
+    \item Min-Cut $=\tau(G)$: A finite cut cannot use any $\infty$-edge. So the cut edges are a subset of the source or sink edges. This cuts all $s$-$t$ paths iff $A' \cup B'$ is a vertex cover. The capacity is $|A'|+|B'|$.
+    \item Max-Flow Min-Cut gives equality.
+\end{itemize}
+
+\subsection{Hypergraphs}
+
+\textbf{Hypergraph} Consists of vertex set and edge set where each edge is a subset of the vertex set. An ordinary graph has edge size 2.
+
+\textbf{Uniform Hypergraph} A hypergraph is $k$-uniform if every edge has $k$ vertices.
+
+\textbf{Complete k-uniform Hypergraph} $K_n^{(k)}$, with vertex set $[n]$, edge set $E={[n] \choose k}$.
+
+\textbf{Hypergraph Matching} Collection of pairwise disjoint edges. It is perfect if every vertex belongs to exactly one edge in the matching. For a $k$-uniform hypergraph, a perfect matching has exactly $n/k$ edges and exists only if $k |n$.
+
+\textbf{Baranyai's Theorem} If $k | n$, then the complete $k$-uniform hypergraph $K_n^{(k)}$ can be decomposed into perfect matchings.
+
+\textbf{Stronger Claim} For any $1 \leq l \leq n$, there exists a collection $\mathcal{A}_1, ..., A_m$ of $m$-partitions of $[l]$ ($m$ disjoint subsets) such that each subset of $[l]$ appears exactly ${n - l \choose k - |S|}$ times across all partitions.
+
+\subsection{Flow Numbers}
+
+\textbf{Nowhere-Zero $k$-Flows} Map $f:E(G) \rightarrow \{1,2,...,k-1\}$ satisfying flow conservation. The graph must be bridgeless.
+
+\textbf{Flow Number} $\varphi(G)$, smallest $k$ for which a nowhere-zero $k$-flow exists.
+
+\textbf{2-Flow} $G$ has a 2-flow iff every vertex has an even degree.
+
+\textbf{3-Flow} $G$ has a 3-flow iff it is bipartite.
+
+\textbf{Complete Graph} For all even $n>4$, $\varphi(K_n)=3$.
+
+\textbf{4-Flow} Every 4-edge-connected graph has a 4-flow.
+
+\textbf{Theorem (Seymour's)} Every bridgeless graph has a 6-flow. $\varphi(G)$ is finite iff $G$ is bridgeless.
+
+\textbf{Tutte's Conjectures}
+\begin{itemize}
+    \item 5-Flow: Every bridgeless multigraph has a 5-flow.
+    \item 4-Flow: Every bridgeless multigraph with no Petersen-graph minor has a 4-flow.
+    \item 3-Flow: Every multigraph with no cut of size 1 or 3 has a 3-flow.
+\end{itemize}
+
+\textbf{Flows over Abelian Groups} A nowhere-zero $M$-flow is a map $f:E(G) \rightarrow M \backslash\{0\}$ satisfying flow conservation. An example is $M=\mathbb{Z}_k=\mathbb{Z}/ k \mathbb{Z}$ (modulo $k$).
+
+\textbf{Theorem (Tutte)} Nowhere-zero $k$-flow exists iff nowhere zero $\mathbb{Z}_k$-flow exists.
+
+\section{Colouring}
+
+\textbf{Proper Colouring} A proper $k$-colouring is a map $c:V(G) \rightarrow \{1,...,k\}$ such that $c(u) \neq c(v), uv \in E(G)$. $\chi(G)$ is the smallest $k$ for which a proper $k$-clouring exists. $k$-colourable means $\chi(G) \leq k$.
+
+\textbf{Theorem (Lovász)} $\chi(KG(n, k))=n-2k+2$.
+
+\textbf{Bounds} $\chi(G) \geq \omega(G), \chi(G) \geq |V(G)|/\alpha(G)$. $\chi(G) \leq \frac{1}{2}+\sqrt{2m+\frac{1}{4}}, \chi(G) \leq \Delta(G)+1$.
+
+\textbf{Critcality} $G$ is $k$-critical if $\chi(G)=k$ but removing any edge or vertex decreases $\chi$. Odd cycles are $3$-critical. If $H$ is $k$-critical, $\delta(H) \geq k-1$. $\chi(G) \leq 1 + \max_{H \subseteq G}\delta(G)$.
+
+\textbf{Theorem (Brooks)} Let $G$ be a connected graph which is not complete or an odd cycle. Then $\chi(G) \leq \Delta(G)$.
+
+\textbf{Hajós Construction for $k$-constructible graphs}
+\begin{itemize}
+    \item $K_k$ is $k$-constructible.
+    \item If $x, y$ are non-adjacent, then $(G+xy)/xy$ is $k$-constructible.
+    \item If $V(G_1) \cap V(G_2)=\{x\}, xy_i\in E(G_i)$, then $(G_1 \cup G_2)-xy_1-xy_2+y_1y_2$ is $k$-constructible.
+    \item $\chi \geq k$ iff $G$ contains a $k$-constructible subgraph.
+    \item Every $k$-critical graph is $k$-constructible.
+\end{itemize}
+
+\textbf{Edge Colouring} Map $c:E(G) \rightarrow S, c(e) \neq c(f)$ if they share a vertex. $\chi'(G)$ is the smallest $k$ with proper $k$-edge colouring. $\chi'(G)=\chi(L(G))$, $\chi'(G) \geq \Delta(G)$.
+
+\textbf{König's Theorem} Every bipartite graph satisfies $\chi'(G) = \Delta(G)$.
+
+\textbf{Vizing's Theorem} Every graph satisfies $\Delta(G) \leq \chi'(G) \leq \Delta(G)+1$ (class 1 or class 2). For any loopless multigraph, $\Delta(G) \leq \chi'(G) \leq \Delta(G) + \mu(G)$, $\mu(G)$ is the maximum edge multiplicity.
+
+\textbf{Shannon's Theorem} Every multigraph satisfies $\chi'(G) \leq \lfloor \frac{3}{2}\Delta(G) \rfloor$.
+
+\textbf{Perfect Graph} $\chi(H) = \omega(H)$ for every induced subgraph.
+
+\textbf{Weak Perfect Graph Theorem} $G$ is perfect iff $\overline{G}$ is perfect. If $G'$ is obtained by expanding a vertex, it is also perfect.
+
+\textbf{Strong Perfect Graph Theorem} An odd hole is an induced cycle $C_{2k+1}, k \geq 2$. An odd antihole is the complement of an odd hole. Odd holes satisfy $\chi(C_{2k+1})=3>2=\omega(C_{2k+1})$. A graph is perfect iff it contains no odd hole and no odd antihole as an induced subgraph.
+
+\section{Planarity}
+
+\textbf{Planar Graph} Can be drawn such that edges are curves intersecting only at their endpoints. $K_5, K_{3,3}$ are none planar.
+
+\textbf{Plane Graph} Planar embedding of a planar graph. Plane consists of connected regions called faces, the unbounded region is the outer face while the others are inner faces.
+
+\textbf{Euler's Formula} For a connected plane graph with $n$ vertices, $m$ edges, and $\ell$ faces, $n-m+\ell=2$. Every planar graph with $n \geq 3$ vertices has at most $3n-6$ edges.
+
+\textbf{Euler Characteristic} Any graph $G$ cellularly embedded on surface $\Sigma$ satisfies $n-m+\ell=\chi(\Sigma)$ which is the Euler characteristic. Every face is homeomorphic to an open disk. Every closed orientable surface is obtained by attaching handles to a sphere. The number of handles is the genus $g$. $\chi(\Sigma_g)=2-2g$. Non-orientable surfaces have genus defined via $\chi=2-g'$ using non-orientable genus $g'$.
+
+\textbf{Toroidal} Graph can be embedded on the torus ($g=1$) without crossing. $n-m+\ell=0$.
+
+\textbf{Higher Surfaces} $m \leq 3n-6+6g$.
+
+\textbf{Heawood Bound} For $g \geq 1$, $\chi(G) \leq H(g) := \lfloor \frac{7+\sqrt{1+48g}}{2} \rfloor$. This bound is tight.
+
+\textbf{Fáry's Theorem} Every planar graph has a straight-line drawing without crossings. Harborth's conjecture extends this to lines of integral lengths.
+
+\textbf{Crossing Number} $cr(G)$ is the minimum number of edges crossings over all drawings of $G$ in the plane.
+
+\textbf{Zarankiewicz's Conjecture} $cr(K_{m,n})=\lfloor \frac{m}{2}\rfloor \lfloor \frac{m-1}{2}\rfloor \lfloor \frac{n}{2}\rfloor \lfloor\frac{n-1}{2}\rfloor$. The upper bound can be constructed. The upper bound for complete graphs is $cr(K_n) \leq \frac{1}{4} \lfloor \frac{n}{2} \rfloor \lfloor \frac{n-1}{2} \rfloor \lfloor \frac{n-2}{2} \rfloor \lfloor \frac{n-3}{2} \rfloor$.
+
+\textbf{Crossing Number Inequality} $cr(G) \geq m-3n+6$. If $m \geq 4n, cr(G) \geq \frac{m^3}{64n^2}$.
+
+\textbf{Szemerédi-Trotter Theorem} Given $n$ points and $m$ lines in $\mathbb{R}^2$, the number of point-line incidences is at most $I=O(n^{2/3}m^{2/3}+n+m)$.
+
+\textbf{Subdivision} A graph obtained by replacing each edge by a path of length $\geq 1$ where these paths are internally vertex-disjoint.
+
+\textbf{Topological Minor} $G \supseteq TH$ if $G$ contains a subgraph isomorphic to a subdivision of $H$. The original vertices of $H$ are branch vertices.
+
+\textbf{Kuratowski's Theorem} $G$ is planar iff it contains no subdivision of $K_5$ or $K_{3,3}$.
+
+\textbf{Minor} $G \supseteq MH$ if $H$ can be obtained from $G$ by a sequence of deleting edges or vertices, or contracting edges. Every topological minor of $G$ is also a minor of $G$. If $H$ has max degree at most 3, $G \supseteq MH$ implies $G \supseteq TH$.
+
+\textbf{Equivalence Lemma} $G$ contains $K_5$ or $K_{3,3}$ as a minor iff it contains them as a topological minor.
+
+\textbf{Wagner's Theorem} Kuratowski's but with minor instead of subdivision. They are equivalent by the equivalence lemma.
+
+\textbf{Hanani-Tutte Theorem} Two edges are independent if they share no endpoint. $G$ is planar iff it has a drawing in which every pair of independent edges crosses an even number of times.
+
+\subsection{Colouring Planar Graphs}
+
+\textbf{Four Colour Theorem} Every planar graph satisfies $\chi(G) \leq 4$.
+
+\textbf{Six Colour Theorem} Every planar graph satisfies $\chi(G) \leq 6$.
+
+\textbf{Five Colour Theorem (Heawood)} Every planar graph satisfies $\chi(G) \leq 5$.
+
+\textbf{Kempe Chain} For colours $i, j$, the Kempe $(i,j)$-chain from a vertex $u$ is the connected component of $u$ in the subgraph induced by all vertices with either of those colours. If $u,w$ lie in different components, we can swap colours in $u$'s component without affecting $w$.
+
+\textbf{Theorem (Grötzsch)} Every triangle-free planar graph is 3-colourable.
+
+\textbf{Geometric Dual Graph} Given a plane graph $G$, the geometric dual $G^*$ is constructed using the following: Place a vertex of $G^*$ in each face of $G$. For each edge of $G$, draw a dual edge crossing it to connect the corresponding dual vertices. $G^*$ is also planar, but might be a multigraph. $(G^*)^*\cong G$. The platonic solids swap $|V|,|F|$ for their duals.
+
+\textbf{Abelian Flow} An $A$-flow is a function $f:E(G) \rightarrow A$ satisfying Kirchoff's law at every vertex; $\sum_{in} f(e)=\sum_{out} f(e)$. Focus on $A=\mathbb{Z}_k, \mathbb{Z}$.
+
+\textbf{Flows and Colourings} Orient $G$ and colour the faces with values in $\mathbb{Z}_k$. For each edge, take the difference of face colours. A nowhere-zero $\mathbb{Z}_k$ flow on $G$ determines a proper colouring of $G^*$.
+
+\textbf{Planar Duality} $G^*$ has a proper $\mathbb{Z}_k$-colouring $\Leftrightarrow$ $G$ has a nowhere-zero $\mathbb{Z}_k$-flow. To upgrade to integer flows, use Tutte's.
+
+\section{Polynomials}
+
+\textbf{Chromatic Polynomial} $P(G,k)$ is the number of proper $k$-colourings of $G$. For $n$ vertices and $m$ edges, let $P(G,k)=\sum_{i=0}^n a_i k^i$. Then
+\begin{itemize}
+    \item $\deg P(G,k)=n$
+    \item $a_n=1, a_{n-1}=-m$
+    \item $a_0=P(G,0)=0$
+    \item The coefficients are all nonzero and alternate in sign.
+\end{itemize}
+
+\textbf{Deletion-Contraction} $P(G,k)=P(G-uv,k)-P(G/uv, k)$. Either the 2 endpoints have the same colour or they do not. $P(C_n, k)=(k-1)^n+(-1)^n(k-1)$.
+
+\textbf{Read's Conjecture} The absolute values $|a_n|,...,|a_1|$ are unimodal.
+
+\textbf{Huh's Theorem} The sequence $|a_i|$ is log-concave, $a_i^2 \geq a_{i-1}a_{i+1}$, and is unimodal.
+
+\textbf{Chromatic Roots} For an $n$ vertex graph, $P(G,k)$ has no real root greater than $n-1$, no negative real roots, and no roots in $(0,1)$.
+
+\textbf{Theorem (Jackson)} No chromatic polynomial has a real root in the interval $(1, \frac{32}{27}]$.
+
+\textbf{Theorem (Thomassen)} The real chromatic roots of all graphs are dense in $[\frac{32}{27}, \infty)$. So the bound is sharp.
+
+\textbf{Theorem (Sokal)} The complex chromatic roots of all graphs are dense in $\mathbb{C}$.
+
+\textbf{Acyclic Orientations} Choice of direction of each edge such that no directed cycle is created.
+
+\textbf{Theorem (Stanley)} $a(G)=(-1)^nP(G, -1)$.
+
+\textbf{Flow Polynomial} $F(G,k)$ counts the number of nowhere-zero $\mathbb{Z}_k$ flows on $G$.
+
+\textbf{Proposition} If $A, A'$ are finite with same cardinality, then $G$ has the same number of nowhere-zero flows.
+
+\textbf{Deletion-Contraction for Flows} Choose an edge which is neither a bridge nor a loop, then $F(G,k)=F(G/e, k)-F(G-e,k)$. For a loop, $F(G,k)=(k-1)F(G-e,k)$. For a bridge, $F(G,k)=0$.
+
+\textbf{Planar Duality} $F(G,k)=\frac{1}{k}P(G^*, k)$. The factor accounts for the free choice of colour on one face.
+
+\textbf{Tutte Polynomial} $T_G(x, y)=\sum_{A \subseteq E} (x-1)^{r(E)-r(A)}(y-1)^{|A|-r(A)}$ where $r(A)=|V|-c(A)$ is the rank of $A$, $c(A)$ is the number of connected components in the spanning subgraph $(V,A)$. The first exponent is corank, how many more components $A$ has than $G$. The second exponent is nullity, the dimension fo the cycle space of $(V,A)$, the number of independent cycles. $T_G$ is a generating function over all subgraphs.
+
+\textbf{Deletion-Contraction for Tutte Polynomial} If $e$ is ordinary, $T_G=T_{G-e}+T_{G/e}$. If $e$ is a bridge, $T_G=x \cdot T_{G/e}$. If $e$ is a loop, $T_G=y \cdot T_{G-e}$.
+
+\textbf{Specialisation} For $n=|V|, m=|E|, c=c(G)$, $P(G,k)=(-1)^{n-c}k^c T_G(1-k, 0), F(G,k)=(-1)^{m-n+c}T_G(0, 1-k)$.
+
+\textbf{Evaluations of $T_G(x, y)$} 
+\begin{itemize}
+    \item $T_G(1,1)$: Spanning trees.
+    \item $T_G(2,1)$: Spanning forests.
+    \item $T_G(1,2)$: Connected spanning subgraphs.
+    \item $T_G(2,0)$: Acyclic orientations.
+    \item $T_G(2,2)$: Edge subsets.
+\end{itemize}
+
+\section{Notation}
+\begin{itemize}
+    \item \textbf{$\delta(G)$}: Minimum Degree
+    \item \textbf{$\Delta(G)$}: Maximum Degree
+    \item \textbf{$\nu(G)$}: Matching number / Maximum matching size
+    \item \textbf{$\tau(G)$}: Vertex cover number / Minimum vertex cover
+    \item \textbf{$\omega(G)$}: Clique number / Maximum clique size
+    \item \textbf{$\alpha(G)$}: Independence number / Maximum independent set size
+    \item \textbf{$o(H)$}: Number of odd components
+    \item \textbf{$\kappa(G)$}: Vertex connectivity / Minimum size of vertex cut
+    \item \textbf{$\kappa'(G)$}: Edge connectivity / Minimum size of edge cut
+    \item \textbf{$\varphi(G)$}: Flow number / Smallest $k$ with nowhere-zero $k$ flow
+    \item \textbf{$\chi(G)$}: Chromatic number / Smallest $k$ with $k$-colouring.
+    \item \textbf{$\chi'(G)$}: Chromatic index / Smallest $k$ with $k$-edge-colouring.
+    \item \textbf{$cr(G)$}: Crossing number / Minimum number of edge crossings.
+    \item \textbf{$P(G, k)$}: Chromatic Polynomial / Proper $k$-colourings of $G$.
+    \item \textbf{$a(G)$}: Acyclic orientations of $G$.
+    \item \textbf{$F(G, k)$}: Flow Polynomial / Nowhere-zero $\mathbb{Z}_k$ flows of $G$.
+\end{itemize}
+
+\textbf{Petersen Graph} $\nu(P)=5, \tau(P)=6, \alpha(P)=4, KG(5, 2), \kappa(P) = 3, \kappa'(P)=3,\chi(P)=3, \chi'(P)=4, cr(P)=2, \varphi(P)=5$.
+
+\section{Tutorial Stuff}
+
+\textbf{T1Q2} If $G$ is regular, then so is $L(G)$. $G$ is connected iff $L(G)$ is connected.
+
+\textbf{T1Q3} Girth is the length of the shortest cycle in the graph. A $k$-regular graph with girth 5 has at least $k^2+1$ vertices.
+
+\textbf{T2Q1} $\alpha(G) \geq \frac{|V(G)|}{\Delta(G)+1}$, $\tau(G) \leq |V(G)|\frac{\Delta(G)}{\Delta(G)+1}$.
+
+\textbf{T3Q2} Every $3$-regular graph with no cut edge has a perfect matching.
+
+\textbf{T4Q1} For $k \geq 2$, a connected $k$-regular bipartite graph is 2-connected.
+
+\textbf{T4Q2} If a graph is 3-regular, then $\kappa(G)=\kappa'(G)$.
+
+\textbf{T4Q4} $G$ is 2-connected iff for any $x,y,z$, there is a path from $x$ to $y$ containing $z$.
+
+\textbf{T5Q1} The signed incidence matrix for a directed graph is TU.
+
+\textbf{T6Q1} For two graphs sharing a vertex set, $\chi(G_1 \cup G_2) \leq \chi(G_1) \cdot \chi(G_2)$.
+
+\textbf{T6Q2} The tensor product has vertex set $V(G) \times V(H)$ where $(g_1,h_1), (g_2,h_2)$ are adjacent iff $g_1 \sim g_2, h_1 \sim h_2$. $\chi(G \times H) \leq \min\{\chi(G), \chi(H)\}$. Equality holds for $\chi(G)=\chi(H)=3$.
+
+\textbf{T7Q2} $2\sqrt{n} \leq \chi(G) + \chi(\overline{G})\leq n+1, n \leq \chi(G) \cdot \chi(\overline{G}) \leq (n+1)^2/4$.
+
+\textbf{T7Q3 Art Gallery Theorem} For a polygon of $n$ walls, at most $\lfloor \frac{n}{3} \rfloor$ guards are needed.
+
+\textbf{T8Q1} There exists $k$-regular planar graphs only for $k \leq 5$.
+
+\textbf{T8Q2} There exists a 8 vertex graph where $G, \overline{G}$ are planar. There does not exist 11 vertex graph such that $G, \overline{G}$ are planar.
+
+\textbf{T9Q1} Every graph admits an embedding in $\mathbb{R}^3$ in which each edge is drawn as a straight line segment.
+
+\textbf{T9Q2} Every planar graph is a union of three forests.
+
+\textbf{T9Q3} Every minor of a planar graph is planar.
+
+\textbf{T9Q5} If $G$ is 2 or 3-connected, then $G^*$ also is. This does not hold for 4-connectedness.
+
+\end{multicols*}
+
+\end{document}
